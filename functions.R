@@ -2,7 +2,7 @@ if(!exists("pkgs")){pkgs <- c("glmnet", "mgm", "qgraph", "grpregOverlap", "syste
 if(!"none" %in% pkgs){invisible(suppressMessages(lapply(pkgs, require, character.only = TRUE)))}
 if(exists("clear")){if(clear == TRUE){rm(list = ls()); clear <- TRUE}} else {rm(pkgs)}
 if(".modnets" %in% search()){detach(".modnets")}
-#setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
+setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
 files <- paste0('~/C: Desktop/COMPS/METHODS/CODE/modnets/', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')
 invisible(sapply(files, source)); rm(files)
 if(!'methods' %in% sessionInfo()$basePkgs){invisible(suppressMessages(require(methods)))}
@@ -34,8 +34,9 @@ setup <- function(data, type, y = NULL, lags = NULL, scale = TRUE, allNum = FALS
 settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
   whatData <- c("sur1", "sur2", "sur3", "mvar", "mgm", "gauss1", "gauss2", 
                 "autism", "large", "symptom", "short", "resting", "big5", 
-                "m3", "m5", "mod", "PTSD", "fried", "wichers", "new", "dep1", 
-                "dep2", "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini")
+                "esm", "esm1", "esm2", "esm3", "m3", "m5", "mod", "PTSD", 
+                "fried", "wichers", "new", "dep1", "dep2", "bfi1", 
+                "bfi2", "bfi3", "obama", "bfiDat", "constantini")
   if(d){return(data.frame(sort(whatData)))}
   if(!is.null(dat)){
     dat <- match.arg(dat, c(whatData, "caseDrop"))
@@ -246,6 +247,18 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
       type <- rep("g", 9)
       level <- rep(1, 9)
     }
+    if(grepl('esm', dat)){
+      data <- readRDS('data/ESMdata.RDS')
+      timevars <- c(attr(data, 'timevars'), 'period')
+      if(dat == 'esm1'){
+        data <- data[, c(attr(data, 'useVars'), timevars)]
+      } else if(dat %in% c('esm2', 'esm3')){
+        data <- data[, c(attr(data, 'modVars'), timevars)]
+        if(dat == 'esm3'){data <- data[, setdiff(colnames(data), setdiff(timevars, 'period'))]}
+      }
+      assign('data', data, envir = .GlobalEnv)
+      return(message('data in .GlobalEnv'))
+    }
     if(dat == "new"){
       data <- readRDS("data/newData.RDS")
       type <- data$call$type
@@ -327,6 +340,15 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        getLL = TRUE, saveMods = TRUE, binarize = FALSE, 
                        fitCoefs = FALSE, ...){
   t1 <- Sys.time() # START
+  if(any(is.na(data))){
+    ww <- which(apply(data, 1, function(z) any(is.na(z))))
+    if(is.null(lags) | identical(lags, 0)){
+      data <- data[-ww, ]
+      warning(paste0(length(ww), ' cases deleted due to missingness'))
+    } else {
+      stop(paste0(length(ww), ' rows contain missing values'))
+    }
+  }
   args <- tryCatch({list(...)}, error = function(e){list()})
   if(identical(type, 'varSelect')){
     vargs <- list(data = data, m = moderators, lags = lags, exogenous = exogenous,
