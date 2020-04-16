@@ -1,0 +1,72 @@
+\subsection{Time-varying models}
+Researchers who work in this domain are well aware of the need to have more dynamic models that don't assume all effects to be stationary. This is the same motivation behind the idea of incorporating moderator variables in the psychological network approach. The directions that have been pursued thus far, however, have focused on models with time-varying coefficients; these models can be effective even when standard time series assumptions (e.g., stationarity) are violated. The two current approaches that are being discussed are (a) Kernel-based smoothing methods, and (b) generalized additive modeling (GAM). Actually, even more specifically, the goal here is to show what we \textit{miss} by not testing for moderators. Then, maybe the trajectory is that I show that time-varying models miss out on moderators as well.
+
+In standard VAR models, we assume that observations at each time point $t$ are generated from the same distribution parameterized by $\theta$. In time-varying models, this assumption is relaxed such that the parameters $\theta^t$ can be different for each time point $t \in \mathcal{T}_n = \{\frac{1}{n}, \frac{2}{n}, \dots, 1\}$, where $n$ is the number of time points in the series. Since a model cannot be estimated from a single time point, we have to make assumptions about how the parameters of the true model vary over time. Such assumptions are referred to as \textit{local stationarity}, and are dealt with differently by each of the two dominant methods. 
+
+\subsubsection{Kernel-smoothing approach}
+The first method assumes that the model $\theta^t$ is a smooth function of time. Here, observations close in time are combined during estimation, because we know their generating models are similar. This method involves fitting local models $\hat{\theta}^{t^e}$ across the series, where high weight is only given to data points close to the given estimation point $t^e$. The weight function is usually non-negative and symmetric over $t^e$ \cite{zhou2010time}. The time-varying model is then defined as the set of all local estimates $\theta^{t^e} = \{\theta^{e_1}, \theta^{e_2}, \dots, \theta^{|\mathcal{E}|} \}$ at estimation points $\mathcal{E} = \{t_{1}^e, t_{2}^e, \dots, t^{|\mathcal{E}|} \}$, where the entries in $\mathcal{E}$ are equally spaced across the time series and the number of estimation points $|\mathcal{E}|$ is chosen based on how fine-grained one would like to describe $\theta^t$ as a function of $t$. 
+
+Thus, we estimate the full model $\theta^{t^e}$ at time point $t^e$ by minimizing a weighted version of the loss function in Equation \ref{loss}:
+\begin{equation}
+    \hat{\theta}^{t^e} = \argmin_{\theta} \lb \frac{1}{\sum_{t=1}^n w_{t}^{t^e}} \sum_{t=1}^n w_{t}^{t^e} \mathcal{L}(\theta, X^t) + \lambda_n \norm{\theta}_1 \rb, 
+\end{equation}
+where $w_{t}^{t^e}$ is a function of $t$ defined by a kernel centered over $t^e$. Specifically, the weight function $w_{t}^{t^e}$ is defined as a Gaussian kernel, normalized such that the largest weight is equal to one \cite{zhou2010time}.
+\begin{equation}
+    w_{t}^{t^e} = \frac{Z_t}{\max_{(t \in \mathcal{T}_n)} \{ \cup_t Z_t \}}, \quad \text{where} \quad Z_t = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp{\bigg\{ - \frac{(t - t^e)^2}{2 \sigma^2} \bigg\}}.
+\end{equation}
+This scaling has the property that the sum of all weights $n_{\sigma, t^e} = \sum_{t=1}^n w_{t}^{t^e}$ (i.e., area under the curve) used at a given estimation point $t^e$ indicates the amount of data used for estimation at $t^e$ relative to the full time series.
+
+The two decisions that must be made with these models are: (a) defining the number of estimation points $|\mathcal{E}|$, and (b) selecting the bandwidth $\sigma$ of the kernel function $w_{t}^{t^e}$. Choosing a small bandwidth will mean that only a few nearby observations will influence the parameters estimated at $t^e$, while larger values of $\sigma$ will distribute weights more evenly across the time series. This produces a bias-variance trade-off in estimation: small values of $\sigma$ will mean that parameter-variation can be detected at small time scales, but that the estimates will be unstable due to the small amount of data being used. Larger values of $\sigma$, however, will create more stable estimates, but will miss out on more of the true parameter variation. Increasing $\sigma$ to a large enough value will cause the weights to converge on a uniform distribution and produce the same estimates as the stationary model. 
+
+\cite{haslbeck2015mgm} state that the ideal bandwidth $\sigma^*$ results in the estimated parameter vector $\hat{\theta}^{t}$ which minimizes the distance to the true time-varying model $\hat{\theta}^{t*}$ as a function of $\sigma$. They estimate the ideal bandwidth $\sigma^*$ using a time-stratified cross-validation scheme, where one searches a specified $\sigma$-sequence and selects the $\sigma$ which minimizes the mean (across folds and variables) out-of-sample prediction error. Overall, the kernel-based method is referred to as \textit{penalized kernel-smoothing regression} \cite{haslbeck2017estimate}.
+
+\subsubsection{Piecewise approach}
+In this approach, we assume that there exists a partition $\mathcal{B}$ of $\mathcal{T}_n$ in which time points are consecutive and in each of the subsets $B \in \mathcal{B}$ the model is stationary; that is, $\forall i,j \in B: \theta^i = \theta^j$. Statistically, this approach is based on regression splines using the GAM framework \cite{haslbeck2017estimate,bringmann2017changing}. The most basic form of GAMs is as follows:
+\begin{equation}
+    g(\text{E}(Y)) = \beta_0 + f_1(x_1) + f_2(x_2) + \cdots + f_m(x_m) \quad \text{or} \quad y_i = \beta_0 + \sum_{j=1}^p f_j(x_{ij}) + \epsilon_i
+\end{equation}
+The general idea of smoothing splines is that we want to find some function $g$ that minimizes
+\begin{equation} \label{smooth}
+    \hat{g}_{\lambda} = \argmin \lb \sum_{i=1}^n (y_i - g(x_i))^2 + \lambda \int g''(t)^2 dt \rb
+\end{equation}
+The second derivative of a function can be thought of as a measure of its \textit{roughness}: it is large in absolute value if $g(t)$ is very wiggly near $t$, and close to zero otherwise. Thus, $\lambda \int g''(t)^2 dt$ encourages $g$ to be smooth, where larger values of $\lambda$ will produce a smoother function $g$. Here, $\lambda$ controls the bias-variance trade-off of the smoothing spline. 
+
+The resultant function $g(x)$ that minimizes Equation \ref{smooth} is a piecewise cubic polynomial with knots at every unique value of $x_1, \dots, x_n$, and continuous first and second derivatives at each knot, while remaining linear in the region outside of the extreme knots. I.e., the function $g(x)$ is a natural cubic spline with knots at $x_1,\dots,x_n$; or, a \textit{shrunken} version of the natural cubic spline defined with a basis function approach, where the tuning parameter $\lambda$ controls the level of shrinkage.
+
+While $g(x)$ has a knot at each unique value of $x_i$, the tuning parameter $\lambda$ controls the roughness of the smoothing spline, and thus the \textit{effective degrees of freedom}. As $\lambda$ increases from $0$ to $\infty$, the effective degrees of freedom $df_{\lambda}$ decrease from $n$ to 2. A smoothing spline has $n$ degrees of freedom, but these are heavily constrained or shrunk down. Thus, $df_{\lambda}$ is a measure of the flexibility of the smoothing spline---higher values indicate a more flexible spline (lower bias but higher variance). Here is how we define the effective degrees of freedom:
+\begin{equation}
+    \matr{\hat{g}}_{\lambda} = \matr{S}_{\lambda} \matr{y}
+\end{equation}
+where $\matr{\hat{g}}_{\lambda}$ is an $n$-vector containing the fitted values of the smoothing spline at points $x_1,\dots,x_n$, and is equal to a $n \times n$ matrix $\matr{S}_{\lambda}$ times the response vector $\matr{y}$. The effective degrees of freedom is then
+\begin{equation}
+    df_{\lambda} = \sum_{i=1}^n \{ \matr{S}_{\lambda} \}_{ii}
+\end{equation}
+which is the sum of the diagonal elements in $\matr{S}_{\lambda}$. To find $\lambda$, we can use LOOCV:
+\begin{equation}
+    \text{RSS}_{cv}(\lambda) = \sum_{i=1}^n (y_i - \hat{g}_{\lambda}^{(-i)} (x_i))^2 = \sum_{i=1}^n \left[ \frac{y_i - \hat{g}_{\lambda} (x_i)}{1 - \{\matr{S}_{\lambda}\}_{ii}} \right]^2
+\end{equation}
+where $\hat{g}_{\lambda}^{(-i)}(x_i)$ is the fitted value for the smoothing spline evaluated at $x_i$, where the fit uses all of the observations except $(x_i, y_i)$. In contrast, $\hat{g}_{\lambda}(x_i)$ is the smoothing spline function fit to all of the observations and evaluated at $x_i$. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Coping with Non-Stationarity}
+The most basic form of the Gaussian discrete time AR model of lag order 1 is: $y_t = \beta_0 + \beta_1 y_{t-1} + \epsilon_t$. The autoregressive coefficient $\beta_1$ represents the degree and direction of the relation between a measurement at a previous time point $(t-1)$ and current time point $(t)$ of a single variable $y$ and can be estimated by OLS. The innovations $(\epsilon_t)$ are assumed to be normally distributed with a mean of 0 and variance $\sigma_{\epsilon}^2$ \cite{hamilton1994time}. It's worth noting that the dynamic error term $\epsilon_t$ is different than measurement error---measurement error tends to only affect scores on a single occasion, while dynamic error tends to affect subsequent occasions as well due to the underlying temporal dependency of the process \cite{schuurman2015incorporating}. In cases discussed here, focus is restricted to processes without measurement error.
+
+The autoregressive coefficient $\beta_1$ can also be interpreted as the extent to which a current observation is predictable by the preceding observation \cite{hamaker2009idiographic}. A positive value indicates that high values of a variable at one time point are likely to be followed by high values in the next time period. A negative value would indicate the opposite, which typically results in a jigsaw pattern. The intercept $\beta_0$ is the expected score when the observation at the previous occasion was zero (i.e., $y_{t-1} = 0$). When the measurement device used does not contain zero as a possible value, the intercept is typically not interesting \cite{bringmann2017changing}.
+
+An important assumption of AR(1) models is stationarity, for which there is a distinction between \textit{strictly stationary} and \textit{covariance-stationary} (also known as weakly or second-order stationary) processes. If a process is strictly stationary, the distribution of $y_t$ and all joint distributions of $y$ random variables are the same at all time points, and are thus time-invariant. Covariance-stationarity, however, only implies that the first two moments of the distribution---the mean and variance, and thus the parameters $\beta_0$ and $\beta_1$---have to be time-invariant. However, given that we are studying normally distributed processes here, covariance-stationarity implies strict stationarity since a normal distribution is completely defined by its first two moments \cite[36]{chatfield2003time}. Lastly, stationarity requires that the autoregressive coefficient must lie between $(-1, 1)$. Here, the mean $\mu$ and variance $\sigma^2$ of the process can be expressed as:
+\begin{equation}
+    \mu = \frac{\beta_0}{1 - \beta_1}, \quad \text{and} \quad \sigma^2 = \frac{\sigma_{\epsilon}^2}{1 - \beta_1^2} 
+\end{equation}
+
+When there is a trend in a time series (i.e., changing mean over time), we can perform a linear detrending of the data \cite{hamaker2009idiographic}. However, this may lead to the removal of important information from the data \cite{molenaar1992dynamic}. An alternative would be to model the trend with, for example, linear growth curve modeling \cite{tschacher2009panel}. But, both modeling the trend and detrending require specifying the functional form of the trend, which can be difficult, particularly when parametric forms are not available \cite{tan2012time,adolph2008shape,faraway2006glms}. A trend may also be caused by a unit root process, such as a random walk. In this case, the process has to be differenced in order to become stationary \cite{hamilton1994time}. The GAM approach to time-varying models has the advantage of detecting trends in a data-driven way, not requiring pre-specifications to account for a trend in the data. The Dickey Fuller test can be used to test for a unit root in a time series [CITE], and the KPSS test can test for a linear trend [CITE], but there are no specific tests for non-stationarity due to changing autoregression or a non-linear trend in the mean. 
+
+The defining feature of a time-varying model is that the coefficients of the model are allowed to vary over time, following an unspecified function of time \cite{dahlhaus1997fitting,giraitis2014inference}. To this end, we specify:
+\begin{equation}
+    y_t = \beta_{0,t} + \beta_{1,t} y_{t-1} + \epsilon_t
+\end{equation}
+where the intercept $\beta_{0,t}$ and autoregressive $\beta_{1,t}$ coefficients are now functions that can change over time. The innovations still form a white noise process so that the values of $\epsilon_t$ are i.i.d., implying that their variance is constant over time. An important assumption is that although the functional form of $\beta_{0,t}$ and $\beta_{1,t}$ can be any function, change in the parameter values is restricted to be gradual, without any sudden transitions. 
+
+Moreover, although the overall process being modeled may be non-stationary, the time-varying model implies that it is at least \textit{locally stationary}, meaning that $\forall t, \beta_{1,t} \in (-1, 1)$. Assuming the change is assumed to be gradual and the process is locally stationary, the model implied mean is \cite{giraitis2014inference}:
+\begin{equation}
+    \mu_t \approx \frac{\beta_{0,t}}{1 - \beta_{1,t}}, \quad \text{and} \quad \sigma_t^2 \approx \frac{\sigma_{\epsilon}^2}{1 - \beta_{1,t}^2}
+\end{equation}

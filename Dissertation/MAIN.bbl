@@ -1,0 +1,469 @@
+\begin{thebibliography}{}
+
+\bibitem[Abegaz \& Wit, 2013]{abegaz2013sparse}
+Abegaz, F. \& Wit, E. (2013).
+\newblock Sparse time series chain graphical models for reconstructing genetic
+  networks.
+\newblock {\em Biostatistics}, 14, 586--599.
+
+\bibitem[Barab{\'a}si et~al., 2016]{barabasi2016network}
+Barab{\'a}si, A.-L. et~al. (2016).
+\newblock {\em Network science}.
+\newblock Cambridge University Press.
+
+\bibitem[Barber et~al., 2015]{barber2015high}
+Barber, R.~F., Drton, M., et~al. (2015).
+\newblock High-dimensional ising model selection with bayesian information
+  criteria.
+\newblock {\em Electronic Journal of Statistics}, 9, 567--607.
+
+\bibitem[Baron \& Kenny, 1986]{baron1986moderator}
+Baron, R.~M. \& Kenny, D.~A. (1986).
+\newblock The moderator--mediator variable distinction in social psychological
+  research: Conceptual, strategic, and statistical considerations.
+\newblock {\em Journal of Personality and Social Psychology}, 51, 1173--1182.
+
+\bibitem[Berry et~al., 2016]{berry2016bias}
+Berry, W.~D., DeMeritt, J.~H., \& Esarey, J. (2016).
+\newblock Bias and overconfidence in parametric models of interactive
+  processes.
+\newblock {\em American Journal of Political Science}, 60, 521--539.
+
+\bibitem[Bien et~al., 2013]{bien2013lasso}
+Bien, J., Taylor, J., \& Tibshirani, R. (2013).
+\newblock A lasso for hierarchical interactions.
+\newblock {\em The Annals of Statistics}, 41, 1111--1141.
+
+\bibitem[Bollen \& Curran, 2006]{bollen2006lgcms}
+Bollen, K.~A. \& Curran, P.~J. (2006).
+\newblock {\em Latent growth curve models: A structural equation approach}.
+\newblock Hoboken, NJ: Wiley.
+
+\bibitem[Borgatti et~al., 2009]{borgatti2009network}
+Borgatti, S.~P., Mehra, A., Brass, D.~J., \& Labianca, G. (2009).
+\newblock Network analysis in the social sciences.
+\newblock {\em Science}, 323, 892--895.
+
+\bibitem[Boschloo et~al., 2016]{boschloo2016network}
+Boschloo, L., Schoevers, R.~A., van Borkulo, C.~D., Borsboom, D., \&
+  Oldehinkel, A.~J. (2016).
+\newblock The network structure of psychopathology in a community sample of
+  preadolescents.
+\newblock {\em Journal of Abnormal Psychology}, 125, 599.
+
+\bibitem[Brambor et~al., 2006]{brambor2006understanding}
+Brambor, T., Clark, W.~R., \& Golder, M. (2006).
+\newblock Understanding interaction models: Improving empirical analyses.
+\newblock {\em Political Analysis}, 14, 63--82.
+
+\bibitem[Braumoeller, 2004]{braumoeller2004hypothesis}
+Braumoeller, B.~F. (2004).
+\newblock Hypothesis testing and multiplicative interaction terms.
+\newblock {\em International Organization}, 58, 807--820.
+
+\bibitem[Bringmann et~al., 2017]{bringmann2017changing}
+Bringmann, L.~F., Hamaker, E.~L., Vigo, D.~E., Aubert, A., Borsboom, D., \&
+  Tuerlinckx, F. (2017).
+\newblock Changing dynamics: Time-varying autoregressive models using
+  generalized additive modeling.
+\newblock {\em Psychological Methods}, 22, 409--425.
+
+\bibitem[Bringmann et~al., 2016]{bringmann2016assessing}
+Bringmann, L.~F., Pe, M.~L., Vissers, N., Ceulemans, E., Borsboom, D.,
+  Vanpaemel, W., Tuerlinckx, F., \& Kuppens, P. (2016).
+\newblock Assessing temporal emotion dynamics using networks.
+\newblock {\em Assessment}, 23, 425--435.
+
+\bibitem[Bringmann et~al., 2013]{bringmann2013network}
+Bringmann, L.~F., Vissers, N., Wichers, M., Geschwind, N., Kuppens, P.,
+  Peeters, F., Borsboom, D., \& Tuerlinckx, F. (2013).
+\newblock A network approach to psychopathology: new insights into clinical
+  longitudinal data.
+\newblock {\em PLOS ONE}, 8, e60188.
+
+\bibitem[Chen et~al., 2014]{chen2014selection}
+Chen, S., Witten, D.~M., \& Shojaie, A. (2014).
+\newblock Selection and estimation for mixed graphical models.
+\newblock {\em Biometrika}, 102, 47--64.
+
+\bibitem[Costantini et~al., 2019]{costantini2019stability}
+Costantini, G., Richetin, J., Preti, E., Casini, E., Epskamp, S., \& Perugini,
+  M. (2019).
+\newblock Stability and variability of personality networks. a tutorial on
+  recent developments in network psychometrics.
+\newblock {\em Personality and Individual Differences}, 136, 68--78.
+
+\bibitem[Cramer et~al., 2016]{cramer2016major}
+Cramer, A. O.~J., van Borkulo, C.~D., Giltay, E.~J., van~der Maas, H. L.~J.,
+  Kendler, K.~S., Scheffer, M., \& Borsboom, D. (2016).
+\newblock Major depression as a complex dynamic system.
+\newblock {\em PLOS ONE}, 11, e0167490.
+
+\bibitem[Cramer et~al., 2010]{cramer2010comorbidity}
+Cramer, A. O.~J., Waldorp, L.~J., van~der Maas, H. L.~J., \& Borsboom, D.
+  (2010).
+\newblock Comorbidity: A network perspective.
+\newblock {\em Behavioral and Brain Sciences}, 33, 137--150.
+
+\bibitem[Curfman, 1993]{curfman1993exercise}
+Curfman, G.~D. (1993).
+\newblock Is exercise beneficial--or hazardous--to your heart?
+\newblock {\em New England Journal of Medicine}, 329, 1730--1731.
+
+\bibitem[Curran \& Bauer, 2011]{curran2011disaggregation}
+Curran, P.~J. \& Bauer, D.~J. (2011).
+\newblock The disaggregation of within-person and between-person effects in
+  longitudinal models of change.
+\newblock {\em Annual Review of Psychology}, 62, 583--619.
+
+\bibitem[De~Deyne \& Storms, 2008]{de2008word}
+De~Deyne, S. \& Storms, G. (2008).
+\newblock Word associations: Network and semantic properties.
+\newblock {\em Behavior Research Methods}, 40, 213--231.
+
+\bibitem[Dermody et~al., 2017]{dermody2017modeling}
+Dermody, S.~S., Thomas, K.~M., Hopwood, C.~J., Durbin, C.~E., \& Wright, A.
+  G.~C. (2017).
+\newblock Modeling the complexity of dynamic, momentary interpersonal behavior:
+  Applying the time-varying effect model to test predictions from interpersonal
+  theory.
+\newblock {\em Journal of Research in Personality}, 68, 54--62.
+
+\bibitem[Epskamp et~al., 2018a]{epskamp2018estimating}
+Epskamp, S., Borsboom, D., \& Fried, E.~I. (2018a).
+\newblock Estimating psychological networks and their accuracy: A tutorial
+  paper.
+\newblock {\em Behavior Research Methods}, 50, 195--212.
+
+\bibitem[Epskamp \& Fried, 2018]{epskamp2018tutorial}
+Epskamp, S. \& Fried, E.~I. (2018).
+\newblock A tutorial on regularized partial correlation networks.
+\newblock {\em Psychological Methods}, 23, 617--634.
+
+\bibitem[Epskamp et~al., 2017]{epskamp2017generalized}
+Epskamp, S., Rhemtulla, M., \& Borsboom, D. (2017).
+\newblock Generalized network psychometrics: Combining network and latent
+  variable models.
+\newblock {\em Psychometrika}, 82, 904--927.
+
+\bibitem[Epskamp et~al., 2018b]{epskamp2018personalized}
+Epskamp, S., van Borkulo, C.~D., van~der Veen, D.~C., Servaas, M.~N., Isvoranu,
+  A.-M., Riese, H., \& Cramer, A. O.~J. (2018b).
+\newblock Personalized network modeling in psychopathology: The importance of
+  contemporaneous and temporal connections.
+\newblock {\em Clinical Psychological Science}, 6, 416--427.
+
+\bibitem[Epskamp et~al., 2018c]{epskamp2018gaussian}
+Epskamp, S., Waldorp, L.~J., M{\~o}ttus, R., \& Borsboom, D. (2018c).
+\newblock The gaussian graphical model in cross-sectional and time-series data.
+\newblock {\em Multivariate Behavioral Research}, 53, 453--480.
+
+\bibitem[Forbush et~al., 2016]{forbush2016ed}
+Forbush, K., Siew, C. S.~Q., \& Vitevitch, M. (2016).
+\newblock Application of network analysis to identify interactive systems of
+  eating disorder psychopathology.
+\newblock {\em Psychological Medicine}, 46, 2667--2677.
+
+\bibitem[Foygel \& Drton, 2010]{foygel2010extended}
+Foygel, R. \& Drton, M. (2010).
+\newblock Extended bayesian information criteria for gaussian graphical models.
+\newblock In {\em Advances in neural information processing systems}, volume~23
+   (pp.\ 604--612).
+
+\bibitem[Fried \& Cramer, 2017]{fried2017moving}
+Fried, E.~I. \& Cramer, A. O.~J. (2017).
+\newblock Moving forward: Challenges and directions for psychopathological
+  network theory and methodology.
+\newblock {\em Perspectives on Psychological Science}, 12, 999--1020.
+
+\bibitem[Fried et~al., 2017]{fried2017mental}
+Fried, E.~I., van Borkulo, C.~D., Cramer, A. O.~J., Boschloo, L., Schoevers,
+  R.~A., \& Borsboom, D. (2017).
+\newblock Mental disorders as networks of problems: A review of recent
+  insights.
+\newblock {\em Social Psychiatry and Psychiatric Epidemiology}, 52, 1--10.
+
+\bibitem[Friedrich, 1982]{friedrich1982defense}
+Friedrich, R.~J. (1982).
+\newblock In defense of multiplicative terms in multiple regression equations.
+\newblock {\em American Journal of Political Science}, (pp.\ 797--833).
+
+\bibitem[Galaskiewicz \& Wasserman, 1993]{galaskiewicz1993social}
+Galaskiewicz, J. \& Wasserman, S. (1993).
+\newblock Social network analysis: Concepts, methodology, and directions for
+  the 1990s.
+\newblock {\em Sociological Methods \& Research}, 22, 3--22.
+
+\bibitem[Gelman \& Su, 2018]{arm}
+Gelman, A. \& Su, Y.-S. (2018).
+\newblock {\em arm: Data analysis using regression and multilevel/hierarchical
+  models}.
+\newblock R package version 1.10-1.
+
+\bibitem[Hainmueller et~al., 2019]{hainmueller2019much}
+Hainmueller, J., Mummolo, J., \& Xu, Y. (2019).
+\newblock How much should we trust estimates from multiplicative interaction
+  models? simple tools to improve empirical practice.
+\newblock {\em Political Analysis}, 27, 163--192.
+
+\bibitem[Hall \& Sammons, 2013]{hall2013mediation}
+Hall, J. \& Sammons, P. (2013).
+\newblock Mediation, moderation \& interaction.
+\newblock In T. Teo (Ed.), {\em Handbook of quantitative methods for
+  educational research}  (pp.\ 267--286). Rotterdam: Sense Publishers.
+
+\bibitem[Hamaker et~al., 2018]{hamaker2018frontiers}
+Hamaker, E.~L., Asparouhov, T., Brose, A., Schmiedek, F., \& Muth{\'e}n, B.
+  (2018).
+\newblock At the frontiers of modeling intensive longitudinal data: Dynamic
+  structural equation models for the affective measurements from the cogito
+  study.
+\newblock {\em Multivariate Behavioral Research}, 53, 820--841.
+
+\bibitem[Hamaker \& Grasman, 2015]{hamaker2015center}
+Hamaker, E.~L. \& Grasman, R.~P. (2015).
+\newblock To center or not to center? investigating inertia with a multilevel
+  autoregressive model.
+\newblock {\em Frontiers in Psychology}, 5, 1492.
+
+\bibitem[Haslbeck et~al., 2018]{haslbeck2018moderated}
+Haslbeck, J. M.~B., Borsboom, D., \& Waldorp, L.~J. (2018).
+\newblock {\em Moderated network models}.
+\newblock Retrieved from https://arxiv.org/abs/1807.02877.
+
+\bibitem[Haslbeck \& Fried, 2017]{haslbeck2017predictable}
+Haslbeck, J. M.~B. \& Fried, E.~I. (2017).
+\newblock How predictable are symptoms in psychopathological networks? a
+  reanalysis of 18 published datasets.
+\newblock {\em Psychological Medicine}, 47, 2767--2776.
+
+\bibitem[Haslbeck \& Waldorp, 2015]{haslbeck2015mgm}
+Haslbeck, J. M.~B. \& Waldorp, L.~J. (2015).
+\newblock {\em mgm: Structure estimation for time-varying mixed graphical
+  models in high-dimensional data}.
+\newblock Retrieved from https://arxiv.org/abs/1510.06871v6.
+
+\bibitem[Hills et~al., 2010]{hills2010associative}
+Hills, T.~T., Maouene, J., Riordan, B., \& Smith, L.~B. (2010).
+\newblock The associative structure of language: Contextual diversity in early
+  word learning.
+\newblock {\em Journal of Memory and Language}, 63, 259--273.
+
+\bibitem[Hinshaw, 2002]{hinshaw2002intervention}
+Hinshaw, S.~P. (2002).
+\newblock Intervention research, theoretical mechanisms, and causal processes
+  related to externalizing behavior patterns.
+\newblock {\em Development and Psychopathology}, 14, 789--818.
+
+\bibitem[Kindermann \& Snell, 1980]{kindermann1980relation}
+Kindermann, R.~P. \& Snell, J.~L. (1980).
+\newblock On the relation between markov random fields and social networks.
+\newblock {\em Journal of Mathematical Sociology}, 7, 1--13.
+
+\bibitem[Kreft et~al., 1995]{kreft1995effect}
+Kreft, I. G.~G., de~Leeuw, J., \& Aiken, L.~S. (1995).
+\newblock The effect of different forms of centering in hierarchical linear
+  models.
+\newblock {\em Multivariate Behavioral Research}, 30, 1--21.
+
+\bibitem[Lance, 1988]{lance1988residual}
+Lance, C.~E. (1988).
+\newblock Residual centering, exploratory and confirmatory moderator analysis,
+  and decomposition of effects in path models containing interactions.
+\newblock {\em Applied Psychological Measurement}, 12, 163--175.
+
+\bibitem[Lauritzen, 1996]{lauritzen1996graphical}
+Lauritzen, S.~L. (1996).
+\newblock {\em Graphical models}, volume~17.
+\newblock Oxford: Clarendon Press.
+
+\bibitem[Lim \& Hastie, 2015]{lim2015learning}
+Lim, M. \& Hastie, T. (2015).
+\newblock Learning interactions via hierarchical group-lasso regularization.
+\newblock {\em Journal of Computational and Graphical Statistics}, 24,
+  627--654.
+
+\bibitem[Little et~al., 2006]{little2006merits}
+Little, T.~D., Bovaird, J.~A., \& Widaman, K.~F. (2006).
+\newblock On the merits of orthogonalizing powered and product terms:
+  Implications for modeling interactions among latent variables.
+\newblock {\em Structural Equation Modeling}, 13, 497--519.
+
+\bibitem[Marsman et~al., 2018]{marsman2018introduction}
+Marsman, M., Borsboom, D., Kruis, J., Epskamp, S., van Bork, R., Waldorp,
+  L.~J., Maas, H. L. J. v.~d., \& Maris, G. (2018).
+\newblock An introduction to network psychometrics: Relating ising network
+  models to item response theory models.
+\newblock {\em Multivariate Behavioral Research}, 53, 15--35.
+
+\bibitem[McNally et~al., 2015]{mcnally2015mental}
+McNally, R.~J., Robinaugh, D.~J., Wu, G.~W., Wang, L., Deserno, M.~K., \&
+  Borsboom, D. (2015).
+\newblock Mental disorders as causal systems: A network approach to
+  posttraumatic stress disorder.
+\newblock {\em Clinical Psychological Science}, 3, 836--849.
+
+\bibitem[Meinshausen \& B{\"u}hlmann, 2006]{meinshausen2006high}
+Meinshausen, N. \& B{\"u}hlmann, P. (2006).
+\newblock High-dimensional graphs and variable selection with the lasso.
+\newblock {\em The Annals of Statistics}, 34, 1436--1462.
+
+\bibitem[Mittleman et~al., 1993]{mittleman1993triggering}
+Mittleman, M.~A., Maclure, M., Tofler, G.~H., Sherwood, J.~B., Goldberg, R.~J.,
+  \& Muller, J.~E. (1993).
+\newblock Triggering of acute myocardial infarction by heavy physical
+  exertion--protection against triggering by regular exertion.
+\newblock {\em New England Journal of Medicine}, 329, 1677--1683.
+
+\bibitem[Molenaar \& Campbell, 2009]{molenaar2009new}
+Molenaar, P. C.~M. \& Campbell, C.~G. (2009).
+\newblock The new person-specific paradigm in psychology.
+\newblock {\em Current Directions in Psychological Science}, 18, 112--117.
+
+\bibitem[Petersen, 1983]{petersen1983ergodicity}
+Petersen, K. (1983).
+\newblock {\em Ergodicity theory}.
+\newblock New York: Cambridge University Press, 5 edition.
+
+\bibitem[Read et~al., 2010]{read2010neural}
+Read, S.~J., Monroe, B.~M., Brownstein, A.~L., Yang, Y., Chopra, G., \& Miller,
+  L.~C. (2010).
+\newblock A neural network model of the structure and dynamics of human
+  personality.
+\newblock {\em Psychological Review}, 117, 61--92.
+
+\bibitem[Revelle, 2018]{psych}
+Revelle, W. (2018).
+\newblock {\em psych: Procedures for Psychological, Psychometric, and
+  Personality Research}.
+\newblock Northwestern University, Evanston, Illinois.
+\newblock R package version 1.8.12.
+
+\bibitem[Rothman et~al., 2010]{rothman2010sparse}
+Rothman, A.~J., Levina, E., \& Zhu, J. (2010).
+\newblock Sparse multivariate regression with covariance estimation.
+\newblock {\em Journal of Computational and Graphical Statistics}, 19,
+  947--962.
+
+\bibitem[Rovine \& Walls, 2006]{rovine2006multilevel}
+Rovine, M.~J. \& Walls, T.~A. (2006).
+\newblock Multilevel autoregressive modeling of interindividual differences in
+  the stability of a process.
+\newblock In T.~A. Walls \& J.~L. Schafer (Eds.), {\em Models for intensive
+  longitudinal data}  (pp.\ 124--147). New York, NY: Oxford University Press.
+
+\bibitem[Ryan et~al., 2019]{ryan2019dags}
+Ryan, O., Bringmann, L., \& Schuurman, N.~K. (2019).
+\newblock {\em The challenge of generating causal hypotheses using network
+  models}.
+\newblock Retrieved from https://psyarxiv.com/ryg69/.
+
+\bibitem[Sadler et~al., 2009]{sadler2009we}
+Sadler, P., Ethier, N., Gunn, G.~R., Duong, D., \& Woody, E. (2009).
+\newblock Are we on the same wavelength? interpersonal complementarity as
+  shared cyclical patterns during interactions.
+\newblock {\em Journal of Personality and Social Psychology}, 97, 1005--1020.
+
+\bibitem[Saunders, 1955]{saunders1955moderator}
+Saunders, D.~R. (1955).
+\newblock The "moderator variable" as a useful tool in prediction.
+\newblock In {\em Proceedings of the 1954 Invitational Conference on Testing
+  Problems}  (pp.\ 54--58).  Princeton, NJ: Educational Testing Service.
+
+\bibitem[Shiyko et~al., 2012]{shiyko2012using}
+Shiyko, M.~P., Lanza, S.~T., Tan, X., Li, R., \& Shiffman, S. (2012).
+\newblock Using the time-varying effect model (tvem) to examine dynamic
+  associations between negative affect and self confidence on smoking urges:
+  Differences between successful quitters and relapsers.
+\newblock {\em Prevention Science}, 13, 288--299.
+
+\bibitem[Siew et~al., 2019]{siew2019using}
+Siew, C. S.~Q., McCartney, M.~J., \& Vitevitch, M.~S. (2019).
+\newblock Using network science to understand statistics anxiety among college
+  students.
+\newblock {\em Scholarship of Teaching and Learning in Psychology}.
+
+\bibitem[Tan et~al., 2012]{tan2012time}
+Tan, X., Shiyko, M.~P., Li, R., Li, Y., \& Dierker, L. (2012).
+\newblock A time-varying effect model for intensive longitudinal data.
+\newblock {\em Psychological Methods}, 17, 61--77.
+
+\bibitem[Tibshirani, 1996]{tibshirani1996regression}
+Tibshirani, R. (1996).
+\newblock Regression selection and shrinkage via the lasso.
+\newblock {\em Journal of the Royal Statistical Society Series B}, 58,
+  267--288.
+
+\bibitem[van Borkulo et~al., 2014]{van2014new}
+van Borkulo, C.~D., Borsboom, D., Epskamp, S., Blanken, T.~F., Boschloo, L.,
+  Schoevers, R.~A., \& Waldorp, L.~J. (2014).
+\newblock A new method for constructing networks from binary data.
+\newblock {\em Scientific Reports}, 4, 5918.
+
+\bibitem[van Borkulo et~al., 2015]{van2015association}
+van Borkulo, C.~D., Boschloo, L., Borsboom, D., Penninx, B.~W., Waldorp, L.~J.,
+  \& Schoevers, R.~A. (2015).
+\newblock Association of symptom network structure with the course of
+  depression.
+\newblock {\em JAMA Psychiatry}, 72, 1219--1226.
+
+\bibitem[Vitevitch \& Luce, 2016]{vitevitch2016phonological}
+Vitevitch, M.~S. \& Luce, P.~A. (2016).
+\newblock Phonological neighborhood effects in spoken word perception and
+  production.
+\newblock {\em Annual Review of Linguistics}, 2, 75--94.
+
+\bibitem[West, 1996]{west1996introduction}
+West, D.~B. (1996).
+\newblock {\em Introduction to graph theory}.
+\newblock Upper Saddle River, NJ: Prentice Hall, 2 edition.
+
+\bibitem[Wild et~al., 2010]{wild2010graphical}
+Wild, B., Eichler, M., Friederich, H.-C., Hartmann, M., Zipfel, S., \& Herzog,
+  W. (2010).
+\newblock A graphical vector autoregressive modelling approach to the analysis
+  of electronic diary data.
+\newblock {\em BMC Medical Research Methodology}, 10, 28.
+
+\bibitem[Williams et~al., 2019]{williams2019nonregularized}
+Williams, D.~R., Rhemtulla, M., Wysocki, A.~C., \& Rast, P. (2019).
+\newblock On nonregularized estimation of psychological networks.
+\newblock {\em Multivariate Behavioral Research}, (pp.\ 1--23).
+
+\bibitem[Wright et~al., 2014]{wright2014treating}
+Wright, A. G.~C., Hallquist, M.~N., Swartz, H.~A., Frank, E., \& Cyranowski,
+  J.~M. (2014).
+\newblock Treating co-occurring depression and anxiety: Modeling the dynamics
+  of psychopathology and psychotherapy using the time-varying effect model.
+\newblock {\em Journal of Consulting and Clinical Psychology}, 82, 839--853.
+
+\bibitem[Wright et~al., 2015]{wright2015daily}
+Wright, A. G.~C., Hopwood, C.~J., \& Simms, L.~J. (2015).
+\newblock Daily interpersonal and affective dynamics in personality disorder.
+\newblock {\em Journal of Personality Disorders}, 29, 503--525.
+
+\bibitem[Wright et~al., 2013]{wright2013parallel}
+Wright, A. G.~C., Pincus, A.~L., \& Lenzenweger, M.~F. (2013).
+\newblock A parallel process growth model of avoidant personality disorder
+  symptoms and personality traits.
+\newblock {\em Personality Disorders: Theory, Research, and Treatment}, 4,
+  230--238.
+
+\bibitem[Wright~Jr, 1976]{wright1976linear}
+Wright~Jr, G.~C. (1976).
+\newblock Linear models for evaluating conditional relationships.
+\newblock {\em American Journal of Political Science}, (pp.\ 349--373).
+
+\bibitem[Yang et~al., 2014]{yang2014mixed}
+Yang, E., Baker, Y., Ravikumar, P., Allen, G., \& Liu, Z. (2014).
+\newblock Mixed graphical models via exponential families.
+\newblock In {\em Proceedings of the 17th International Conference on
+  Artificial Intelligence and Statistics}  (pp.\ 1042--1050).
+
+\bibitem[Yang, 2005]{yang2005can}
+Yang, Y. (2005).
+\newblock Can the strengths of aic and bic be shared? a conflict between model
+  identification and regression estimation.
+\newblock {\em Biometrika}, 92, 937--950.
+
+\end{thebibliography}

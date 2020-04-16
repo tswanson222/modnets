@@ -1,0 +1,14 @@
+%%% Look in COMPS --> Slides --> BeamerEx
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[>=stealth]
+        \node[ov] (x1) {$X_1$};
+        \node[ov] (x2) at (3,0) {$X_2$};
+        \node[ov] (m1) at (1.5,3) {$M_1$};
+        %\path[->] (x1) edge node {} (x2);
+        \draw[->] (x1) -- node[midway] (int) {} (x2);
+        \draw[->] (m1) -- (int.center);
+    \end{tikzpicture}
+    \caption{A basic conceptual diagram for understanding moderation.}
+    \label{fig:modfig}
+\end{figure}

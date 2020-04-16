@@ -1,0 +1,14 @@
+100 MNMs
+
+1. Empty graph with p = 12 nodes, randomly add 6 edges
+2. Of the edges: 2 unmoderated pairwise, 2 fully moderated pairwise, 2 partially moderated pairwise
+3. Resample the graph until each node has at most 2 edges.
+4. Add additional variable--moderator
+5. Final graph has 13 
+
+Repeat this 100 times to create data generating models
+
+Next, check sensitivity, specificity, and precision after estimating models for each graph at different sample sizes
+1. The basic model will be dealers choice
+2. NCT -- edges selected based on significant group difference of a pairwise interaction
+3. FGL -- edges are selected if the group difference is non-zero.

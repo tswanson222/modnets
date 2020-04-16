@@ -1,0 +1,77 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Psychological Networks}{2}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}Interpreting Network Models}{4}{subsection.1.1.1}
+\contentsline {subsubsection}{\numberline {1.1.1.1}Conditional associations}{4}{subsubsection.1.1.1.1}
+\contentsline {subsubsection}{\numberline {1.1.1.2}Types of networks}{5}{subsubsection.1.1.1.2}
+\contentsline {subsection}{\numberline {1.1.2}Extending Network Models}{6}{subsection.1.1.2}
+\contentsline {section}{\numberline {1.2}Basics of Moderation}{7}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}Interpreting Multiplicative Terms}{8}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}Conditional Marginal Effects}{9}{subsection.1.2.2}
+\contentsline {subsection}{\numberline {1.2.3}Visualizing Moderation Effects}{11}{subsection.1.2.3}
+\contentsline {subsubsection}{\numberline {1.2.3.1}(Conditional) marginal effects plot}{11}{subsubsection.1.2.3.1}
+\contentsline {subsubsection}{\numberline {1.2.3.2}Discussion}{13}{subsubsection.1.2.3.2}
+\contentsline {subsection}{\numberline {1.2.4}Summary}{13}{subsection.1.2.4}
+\contentsline {chapter}{\numberline {2}Moderated Network Models}{15}{chapter.2}
+\contentsline {section}{\numberline {2.1}Estimation}{16}{section.2.1}
+\contentsline {section}{\numberline {2.2}Analyzing Moderated Networks}{19}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Visualization}{19}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Visualizing the exogenous moderator}{21}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Conditional networks}{21}{subsection.2.2.3}
+\contentsline {subsection}{\numberline {2.2.4}Interpreting results}{25}{subsection.2.2.4}
+\contentsline {subsection}{\numberline {2.2.5}Summary}{27}{subsection.2.2.5}
+\contentsline {section}{\numberline {2.3}Model Comparison}{27}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Nodewise Fit Measures}{28}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.2}Global Fit Measures}{30}{subsection.2.3.2}
+\contentsline {section}{\numberline {2.4}General Discussion}{31}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Extending Pairwise Networks with Temporal Data}{31}{subsection.2.4.1}
+\contentsline {chapter}{\numberline {3}Network Stability and Model Selection}{32}{chapter.3}
+\contentsline {section}{\numberline {3.1}Model Selection}{33}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Thresholding}{33}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Model Search}{34}{subsection.3.1.2}
+\contentsline {subsection}{\numberline {3.1.3}Regularization}{34}{subsection.3.1.3}
+\contentsline {subsection}{\numberline {3.1.4}The Problem with Moderated Networks}{35}{subsection.3.1.4}
+\contentsline {subsection}{\numberline {3.1.5}Summary}{35}{subsection.3.1.5}
+\contentsline {section}{\numberline {3.2}Variable Selection with the Hierarchical LASSO}{36}{section.3.2}
+\contentsline {section}{\numberline {3.3}Variable Selection with the LASSO}{38}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Disadvantages of the LASSO}{39}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Variable Selection and Interaction Terms}{40}{subsection.3.3.2}
+\contentsline {section}{\numberline {3.4}Stability Selection}{41}{section.3.4}
+\contentsline {chapter}{\numberline {4}Moderators in Temporal Networks}{43}{chapter.4}
+\contentsline {section}{\numberline {4.1}Time Series Models of Psychological Processes}{43}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Stationarity Assumptions}{43}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Estimating Temporal and Contemporaneous Networks}{44}{subsection.4.1.2}
+\contentsline {subsubsection}{\numberline {4.1.2.1}Graphical VAR}{44}{subsubsection.4.1.2.1}
+\contentsline {subsection}{\numberline {4.1.3}Seemingly Unrelated Regression (SUR)}{46}{subsection.4.1.3}
+\contentsline {subsubsection}{\numberline {4.1.3.1}Coping with correlated errors}{46}{subsubsection.4.1.3.1}
+\contentsline {subsubsection}{\numberline {4.1.3.2}Two-stage graphical SUR}{46}{subsubsection.4.1.3.2}
+\contentsline {section}{\numberline {4.2}Experience Sampling Methodology}{47}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Time-Varying Effect Models}{48}{subsection.4.2.1}
+\contentsline {section}{\numberline {4.3}Multivariate Time Series Models}{48}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Autoregressive Models}{48}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Vector Autoregressive Model}{49}{subsection.4.3.2}
+\contentsline {subsection}{\numberline {4.3.3}Graphical VAR}{49}{subsection.4.3.3}
+\contentsline {subsection}{\numberline {4.3.4}Seemingly Unrelated Regressions}{49}{subsection.4.3.4}
+\contentsline {subsection}{\numberline {4.3.5}Two-Stage Graphical SUR}{49}{subsection.4.3.5}
+\contentsline {section}{\numberline {4.4}Mixed Moderated Vector Autoregression}{50}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Maximum Likelihood Approaches}{51}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Partial Contemporaneous and Directed Correlations}{53}{subsection.4.4.2}
+\contentsline {chapter}{\numberline {5}Multilevel Moderated Networks}{54}{chapter.5}
+\contentsline {section}{\numberline {5.1}Within-Person Processes}{54}{section.5.1}
+\contentsline {subsection}{\numberline {5.1.1}Multilevel Models}{55}{subsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.1.1}Sources of variability in two-level models}{56}{subsubsection.5.1.1.1}
+\contentsline {subsection}{\numberline {5.1.2}Person-Mean Centering}{58}{subsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.2.1}Other types of centering}{59}{subsubsection.5.1.2.1}
+\contentsline {subsubsection}{\numberline {5.1.2.2}Level 1 interaction}{60}{subsubsection.5.1.2.2}
+\contentsline {subsection}{\numberline {5.1.3}Multilevel Vector Autoregression}{60}{subsection.5.1.3}
+\contentsline {subsubsection}{\numberline {5.1.3.1}Making the model compatible with software}{61}{subsubsection.5.1.3.1}
+\contentsline {subsubsection}{\numberline {5.1.3.2}Simple example of random effects}{61}{subsubsection.5.1.3.2}
+\contentsline {subsection}{\numberline {5.1.4}Multilevel Graphical VAR}{61}{subsection.5.1.4}
+\contentsline {subsubsection}{\numberline {5.1.4.1}Pooled and individual LASSO estimation}{63}{subsubsection.5.1.4.1}
+\contentsline {subsubsection}{\numberline {5.1.4.2}Two-step frequentist multilevel model}{63}{subsubsection.5.1.4.2}
+\contentsline {subsubsection}{\numberline {5.1.4.3}N = 1 Graphical VAR}{65}{subsubsection.5.1.4.3}
+\contentsline {section}{\numberline {5.2}Two-Step Multilevel VAR}{66}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}Step 1: Temporal and Between-Subjects Networks}{68}{subsection.5.2.1}
+\contentsline {subsection}{\numberline {5.2.2}Step 2: Contemporaneous Networks}{69}{subsection.5.2.2}
+\contentsline {chapter}{\numberline {6}Conclusion}{70}{chapter.6}
+\contentsline {chapter}{\numberline {A}Appendix Filler}{80}{appendix.A}

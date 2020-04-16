@@ -1,0 +1,59 @@
+%%%%%%%%%% INTRODUCTION
+\parencite[cf.][]{borgatti2009network,barabasi2016network}. For instance, network models---i.e., \textit{probabilistic graphical models} \cite{lauritzen1996graphical}---have been used by psychologists in studying such diverse phenomena as the dynamics of psychopathology \parencite[e.g.,][]{cramer2010comorbidity,epskamp2018personalized}, personality development across the lifespan \parencite[e.g.,][]{read2010neural,costantini2019stability}, the associative structure of words in memory \parencite[e.g.,][]{hills2010associative,de2008word}, the role of probabilistic phonotactics in spoken word recognition \parencite[e.g.,][]{vitevitch2016phonological}, and connections between social networks and personal well-being \parencite[e.g.,][]{kindermann1980relation,galaskiewicz1993social}.
+
+
+%%%%%%%%%% NETWORKS
+\textit{latent variable modeling}, where the objective is to connect a set of observations with some unobserved latent construct(s) using methods such as confirmatory factor analysis and structural equation modeling \parencites(e.g.,)(){little2006merits}
+
+This leads to questions about the best way to construct such models, especially with regards to defining the nature of the edges---i.e., associations between variables. Any type of statistical association can be used, including marginal associations \parencites(such as zero-order correlations; 
+e.g.,)(){forbush2016ed,siew2019using}, 
+
+Importantly, inferences about causality are not possible for these types of models \parencites(see)(){ryan2019dags}, although researchers often use them for exploratory purposes and as hypothesis-generating tools.
+
+Although in some circumstances it may be a reasonable assumption that the relationships between variables are restricted to pairwise associations, researchers have explicitly called for the need to test alternative models in past work \parencites(e.g.,)(){fried2017moving}.
+
+
+%%%%%%%%%% MODERATION
+This is the meaning of a `main effect' in a regression model that includes an interaction: the `main effect' or `simple slope' of a predictor that is part of an interaction is \textit{not} the `average effect' of that variable across values of the moderator, as it may sometimes be perceived \parencites(cf.)(){friedrich1982defense}, but is rather the effect of that variable only when the moderator is equal to 0. 
+
+\subsection{Interpreting Multiplicative Terms}
+The first reported use of the term "moderation" was by \textcite{saunders1955moderator}, 
+
+
+%%%%%%%%%% MODNETS
+An undirected network consisting of all binary variables is commonly referred to as an \textit{Ising Model}, and has been studied at great length in previous work \parencites(see)(){lauritzen1996graphical,van2014new,marsman2018introduction}. Moreover, Mixed Graphical Models---where outcome variables may be associated with different univariate distributions---have also received treatment within the literature \parencites(e.g.,)(){yang2014mixed,chen2014selection}. Importantly, all of these models can be formulated as MNMs using the same basic approach, although the results will be subject to different interpretations and are not necessarily associated with a normalizable joint distribution \parencites(cf.)(){yang2014mixed, haslbeck2018moderated}.
+
+this is a common approach taken in the psychological network literature, even when interactions are not included and exact partial correlations could otherwise be computed \parencites(e.g.,)(){haslbeck2015mgm,epskamp2018gaussian}. 
+
+
+%%%%%%%%%% COMPARISON
+This approach was first used by \textcite{haslbeck2017predictable}, but has been expanded in the \code{modnets} package to allow for model comparison.
+
+
+%%%%%%%%%% GENERAL DISCUSSION
+One recent approach spearheaded by \textcite{epskamp2017generalized} has been to integrate network models with latent variable models in an effort to create `hybrid networks' for studying psychological phenomena.
+
+
+%%%%%%%%%% ESTIMATION
+\subsection{Estimating Cross-Sectional GGMs}
+In standard approaches, either direct estimation of the inverse covariance matrix needed is used in creating a GGM, or nodewise regression with post-fitting aggregation of coefficients to create edges. In either approach the LASSO is applied, just in a different way. First, there is the \textit{graphical LASSO (glasso)} which is an algorithm used for applying LASSO regularization when estimating a sparse covariance matrix. The `glasso' is the only algorithm, to my knowledge, that applies regularization directly to the elements of an inverse covariance matrix during their estimation
+\begin{equation}
+    \hat{\matr{\Theta}} = \argmin_{\matr{\Theta}} \Big\{ \tr(\hat{\matr{\Sigma}} \matr{\Theta}) - \log |\matr{\Theta}| + \lambda_n \sum_{i \neq j} \norm{\matr{\Theta}_{ij}}_1 \Big\}.
+\end{equation}
+Afterwards, the elements of $\hat{\matr{\Theta}}$ are thresholded such that if any parameters are estimated to be smaller than some lower bound $\tau_n$, they will be fixed to zero. The exact calculation for $\tau_n$ varies across applications$,^1$ but it is widely agreed that doing this step is essential for controlling the false positive rate and reducing the number of spurious edges \cite{loh2013structure,meinshausen2006high,friedman2008sparse}. 
+
+The distribution of $X$ factorizes according to $\G$ if it can be represented as a product of clique functions \parencites(e.g.,)(){loh2013structure}
+\begin{equation} \label{cliqueProd}
+    P(X) \propto \prod_{C \in \mathcal{C}} \psi_C (X_C)
+\end{equation}
+
+%%%%%%%%%% TIME-VARYING
+But, both modeling the trend and detrending require specifying the functional form of the trend, which can be difficult, particularly when parametric forms are not available \parencite[e.g.,][]{tan2012time,adolph2008shape,faraway2006glms}. A trend may also be caused by a unit root process, such as a random walk.
+
+This method involves fitting local models $\hat{\theta}^{t^e}$ across the series, where high weight is only given to data points close to the given estimation point $t^e$. The weight function is usually non-negative and symmetric over $t^e$ \parencite[e.g.,][]{zhou2010time}. 
+
+
+%%%%%%%%%% APPENDIX
+These methods are implemented in the \code{glmnet} package within \code{R} \parencites(cf.)(){friedman2010bregularization}, wherein generalized linear models are estimated with $\ell_1$, $\ell_2$, and the elastic net using cyclical coordinate descent, computed along a regularization path. 
+
+When it comes to effect sizes, though, \textcite{cohen1988power} agrees that standardized guidelines are not really the way to go. See p.25, and the wikipedia entry for effect size.
