@@ -34,9 +34,9 @@ setup <- function(data, type, y = NULL, lags = NULL, scale = TRUE, allNum = FALS
 settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
   whatData <- c("sur1", "sur2", "sur3", "mvar", "mgm", "gauss1", "gauss2", 
                 "autism", "large", "symptom", "short", "resting", "big5", 
-                "esm", "esm1", "esm2", "esm3", "esm4", "m3", "m5", "mod", 
-                "PTSD", "fried", "wichers", "new", "dep1", "dep2", "bfi1", 
-                "bfi2", "bfi3", "obama", "bfiDat", "constantini")
+                "esm", "esm1", "esm2", "esm3", "esm4", "esm5", "m3", "m5", 
+                "mod", "PTSD", "fried", "wichers", "new", "dep1", "dep2", 
+                "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini")
   if(d){return(data.frame(sort(whatData)))}
   if(!is.null(dat)){
     dat <- match.arg(dat, c(whatData, "caseDrop"))
@@ -256,6 +256,8 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
         data <- data[, c(attr(data, 'modVars'), timevars)]
         if(dat == 'esm3'){data <- data[, setdiff(colnames(data), setdiff(timevars, 'period'))]}
         if(dat == 'esm4'){data <- data[, setdiff(colnames(data), timevars)]}
+      } else if(dat == 'esm5'){
+        data <- data[, c(attr(data, 'modVars'), 'concentrat', setdiff(timevars, 'period'))]
       }
       assign('data', data, envir = .GlobalEnv)
       return(message('data in .GlobalEnv'))
@@ -511,6 +513,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       if(!is.null(beepno) & !is.null(dayno)){
         consec <- mgm:::beepday2consec(beepvar = beepno, dayvar = dayno)
         consec <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+        output$call$consec <- which(consec)
       } else {
         consec <- NULL
       }
@@ -1693,6 +1696,28 @@ detrender <- function(data, timevar = NULL, vars = NULL,
   return(data_detrend)
 }
 
+##### getConsec
+getConsec <- function(data, beepno = NULL, dayno = NULL, makeAtt = TRUE){
+  stopifnot(!is.null(beepno) & !is.null(dayno))
+  beepday <- list(beepno, dayno)
+  stopifnot(sum(sapply(c(1, nrow(data)), function(i){
+    all(sapply(beepday, length) == i)})) == 1)
+  if(all(sapply(beepday, length) == 1)){
+    if(is.character(beepno)){beepno <- which(colnames(data) == beepno)}
+    if(is.character(dayno)){dayno <- which(colnames(data) == dayno)}
+    data0 <- data[, -c(beepno, dayno)]
+    beepday <- as.list(data[, c(beepno, dayno)])
+    data <- data0
+  }
+  consec <- mgm:::beepday2consec(beepvar = beepday[[1]], dayvar = beepday[[2]])
+  out <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+  if(makeAtt){
+    attr(data, 'samp_ind') <- which(out)
+    out <- data
+  }
+  return(out)
+}
+
 ##### lagMat: create lagged matrices for fitting SUR models
 lagMat <- function(data, type = "g", m = NULL, covariates = NULL, center = TRUE,
                    scale = FALSE, exogenous = TRUE, lags = 1, 
@@ -1783,7 +1808,7 @@ lagMat <- function(data, type = "g", m = NULL, covariates = NULL, center = TRUE,
     stop("Can't have binary outcomes for lagged models")
   }
   if(!is.null(consec)){
-    stopifnot(length(consec) == nrow(out$Y))
+    if(exists('samp_ind', inherits = FALSE)){consec <- consec[samp_ind]}
     out$Y <- out$Y[consec, ]
     out$X <- out$X[consec, ]
   }
