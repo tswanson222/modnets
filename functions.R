@@ -34,8 +34,8 @@ setup <- function(data, type, y = NULL, lags = NULL, scale = TRUE, allNum = FALS
 settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
   whatData <- c("sur1", "sur2", "sur3", "mvar", "mgm", "gauss1", "gauss2", 
                 "autism", "large", "symptom", "short", "resting", "big5", 
-                "esm", "esm1", "esm2", "esm3", "m3", "m5", "mod", "PTSD", 
-                "fried", "wichers", "new", "dep1", "dep2", "bfi1", 
+                "esm", "esm1", "esm2", "esm3", "esm4", "m3", "m5", "mod", 
+                "PTSD", "fried", "wichers", "new", "dep1", "dep2", "bfi1", 
                 "bfi2", "bfi3", "obama", "bfiDat", "constantini")
   if(d){return(data.frame(sort(whatData)))}
   if(!is.null(dat)){
@@ -252,9 +252,10 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
       timevars <- c(attr(data, 'timevars'), 'period')
       if(dat == 'esm1'){
         data <- data[, c(attr(data, 'useVars'), timevars)]
-      } else if(dat %in% c('esm2', 'esm3')){
+      } else if(dat %in% c('esm2', 'esm3', 'esm4')){
         data <- data[, c(attr(data, 'modVars'), timevars)]
         if(dat == 'esm3'){data <- data[, setdiff(colnames(data), setdiff(timevars, 'period'))]}
+        if(dat == 'esm4'){data <- data[, setdiff(colnames(data), timevars)]}
       }
       assign('data', data, envir = .GlobalEnv)
       return(message('data in .GlobalEnv'))
@@ -338,7 +339,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        verbose = FALSE, exogenous = TRUE, binary = NULL, mval = NULL,
                        residMat = "sigma", medges = 1, pcor = FALSE, maxiter = 100,
                        getLL = TRUE, saveMods = TRUE, binarize = FALSE, 
-                       fitCoefs = FALSE, ...){
+                       fitCoefs = FALSE, detrend = FALSE, ...){
   t1 <- Sys.time() # START
   if(any(is.na(data))){
     ww <- which(apply(data, 1, function(z) any(is.na(z))))
@@ -469,6 +470,23 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       return(output)
     } else {
       ### TEMPORAL
+      if(!identical(detrend, FALSE)){
+        if(is(detrend, 'list')){
+          stopifnot(length(detrend) %in% 1:2)
+          if(is.null(names(detrend))){
+            if(length(detrend) == 1){
+              detrend <- detrend[[1]]
+            } else {
+              names(detrend)[order(sapply(detrend, length))] <- c('timevar', 'vars')
+            }
+          }
+        }
+        timevar <- switch(2 - isTRUE(detrend), NULL, ifelse(
+          is(detrend, 'list'), detrend$timevar, ifelse(
+            is(detrend, 'numeric'), colnames(data)[detrend], detrend)))
+        dvars <- switch(2 - is(detrend, 'list'), detrend$vars, NULL)
+        data <- detrender(data = data, timevar = timevar, vars = dvars, verbose = verbose)
+      }
       output$call$rule <- NULL
       if(threshold != FALSE){output$call$pcor <- ifelse(is.logical(pcor), "none", pcor)}
       if(class(type) == "list"){
@@ -1626,6 +1644,28 @@ SURnet <- function(fit, dat, s = "sigma", m = NULL, threshold = FALSE,
 
 ### ======================================================================== ###
 ### ======================================================================== ###
+##### detrender: detrend variables based on linear model
+detrender <- function(data, timevar = NULL, vars = NULL, 
+                      rmTimevar = TRUE, verbose = TRUE){
+  if(!is(data, 'data.frame')){data <- data.frame(data)}
+  data_detrend <- data
+  if(is.null(timevar)){
+    timevar <- 'time'
+    data_detrend$time <- 1:nrow(data_detrend)
+  }
+  if(is.null(vars)){vars <- setdiff(colnames(data_detrend), timevar)}
+  for(i in seq_along(vars)){
+    ff <- as.formula(paste0(vars[[i]], ' ~ ', timevar))
+    fit <- lm(ff, data = data_detrend)
+    if(anova(fit)$P[1] < .05){
+      if(verbose){message(paste0('Detrending variable ', i))}
+      data_detrend[[vars[i]]][!is.na(data_detrend[[vars[i]]])] <- residuals(fit)
+    }
+  }
+  if(rmTimevar){data_detrend <- data_detrend[, setdiff(colnames(data_detrend), timevar)]}
+  return(data_detrend)
+}
+
 ##### lagMat: create lagged matrices for fitting SUR models
 lagMat <- function(data, type = "g", m = NULL, covariates = NULL, center = TRUE,
                    scale = FALSE, exogenous = TRUE, lags = 1, checkType = FALSE){
