@@ -338,8 +338,8 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        alpha = 1, saveData = TRUE, center = TRUE, covariates = NULL, 
                        verbose = FALSE, exogenous = TRUE, binary = NULL, mval = NULL,
                        residMat = "sigma", medges = 1, pcor = FALSE, maxiter = 100,
-                       getLL = TRUE, saveMods = TRUE, binarize = FALSE, 
-                       fitCoefs = FALSE, detrend = FALSE, ...){
+                       getLL = TRUE, saveMods = TRUE, binarize = FALSE, fitCoefs = FALSE, 
+                       detrend = FALSE, beepno = NULL, dayno = NULL, ...){
   t1 <- Sys.time() # START
   if(any(is.na(data))){
     ww <- which(apply(data, 1, function(z) any(is.na(z))))
@@ -379,8 +379,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
     if(length(covariates) >= ncol(data) - 1){stop("Must have at least 2 outcome variables")}
   }
   if(is.null(lambda) & ncol(data) >= nrow(data)){lambda <- "EBIC"}
-  ### SETUP
-  if(is.null(lambda)){
+  if(is.null(lambda)){ ### SETUP
     if(grepl("min", which.lam)){which.lam <- "min"} else {which.lam <- "1se"}
     output <- list()
     output$call <- list(type = type, moderators = moderators, mval = mval, lags = lags,
@@ -406,6 +405,8 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       }
       output$call$type <- type
     }
+  }
+  if(is.null(lambda)){
     ### CROSS-SECTIONAL
     if(is.null(lags)){
       output$call["lags"] <- NULL
@@ -469,7 +470,24 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       if(verbose){print(Sys.time() - t1)}
       return(output)
     } else {
-      ### TEMPORAL
+      ### TEMPORAL -- added detrend and beepno and dayno; they do not all work together yet
+      if(!is.null(beepno) & !is.null(dayno)){
+        beepday <- list(beepno, dayno)
+        stopifnot(sum(sapply(c(1, nrow(data)), function(z) all(sapply(beepday, length) == z))) == 1)
+        if(all(sapply(beepday, length) == 1)){
+          if(is.character(beepno)){beepno <- which(colnames(data) == beepno)}
+          if(is.character(dayno)){dayno <- which(colnames(data) == dayno)}
+          data0 <- data[, -c(beepno, dayno)]
+          beepno <- data[, beepno]
+          dayno <- data[, dayno]
+          data <- data0
+          if(exists("samp_ind", inherits = FALSE)){
+            attr(data, "samp_ind") <- samp_ind
+          }
+        }
+      } else if(!is.null(beepno) & is.null(dayno) | !is.null(dayno) & is.null(beepno)){
+        stop('Must specify both beepno AND dayno, or neither')
+      }
       if(!identical(detrend, FALSE)){
         if(is(detrend, 'list')){
           stopifnot(length(detrend) %in% 1:2)
@@ -486,6 +504,15 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
             is(detrend, 'numeric'), colnames(data)[detrend], detrend)))
         dvars <- switch(2 - is(detrend, 'list'), detrend$vars, NULL)
         data <- detrender(data = data, timevar = timevar, vars = dvars, verbose = verbose)
+        if(exists("samp_ind", inherits = FALSE)){
+          attr(data, "samp_ind") <- samp_ind
+        }
+      }
+      if(!is.null(beepno) & !is.null(dayno)){
+        consec <- mgm:::beepday2consec(beepvar = beepno, dayvar = dayno)
+        consec <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+      } else {
+        consec <- NULL
       }
       output$call$rule <- NULL
       if(threshold != FALSE){output$call$pcor <- ifelse(is.logical(pcor), "none", pcor)}
@@ -521,9 +548,9 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       }
       fit <- SURfit(data = data, varMods = type, m = moderators, mod = which.lam, 
                     center = center, scale = scale, exogenous = exogenous, 
-                    covs = covariates, sur = std, maxiter = maxiter)
+                    covs = covariates, sur = std, maxiter = maxiter, consec = consec)
       dat <- lagMat(data = data, type = type, m = moderators, covariates = covariates, 
-                    center = center, scale = scale, exogenous = exogenous)
+                    center = center, scale = scale, exogenous = exogenous, consec = consec)
       net <- SURnet(fit = fit, dat = dat, s = residMat, m = moderators, pcor = pcor,
                     threshold = threshold, mval = mval, medges = medges)
       if(!is.null(covariates)){
@@ -1203,12 +1230,12 @@ SURsampler <- function(B = NULL, S, n, seed = NULL, beta, beta2 = NULL,
 ##### SURfit: fit SUR model with or without constraints
 SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL, 
                    type = "g", center = TRUE, scale = FALSE, exogenous = TRUE, 
-                   covs = NULL, sur = TRUE, ...){
+                   covs = NULL, sur = TRUE, consec = NULL, ...){
   if(!is(varMods, 'list')){type <- varMods; varMods <- NULL}
   eqs <- surEqs(data = data, varMods = varMods, mod = match.arg(mod, c("min", "1se")), 
                 m = m, exogenous = exogenous, covs = covs)
   dat <- lagMat(data = data, type = type, m = m, covariates = covs, center = center, 
-                scale = scale, exogenous = exogenous)
+                scale = scale, exogenous = exogenous, consec = consec)
   fit <- systemfit::systemfit(formula = eqs, method = ifelse(sur, "SUR", "OLS"), 
                               data = cbind.data.frame(dat$Y, dat$X), 
                               maxiter = maxiter, ...) # FULLFIX
@@ -1668,7 +1695,8 @@ detrender <- function(data, timevar = NULL, vars = NULL,
 
 ##### lagMat: create lagged matrices for fitting SUR models
 lagMat <- function(data, type = "g", m = NULL, covariates = NULL, center = TRUE,
-                   scale = FALSE, exogenous = TRUE, lags = 1, checkType = FALSE){
+                   scale = FALSE, exogenous = TRUE, lags = 1, 
+                   consec = NULL, checkType = FALSE){
   if(lags != 1){stop("Only lag = 1 currently supported")}
   if("samp_ind" %in% names(attributes(data))){samp_ind <- attr(data, "samp_ind")}
   data <- data.frame(data)
@@ -1753,6 +1781,11 @@ lagMat <- function(data, type = "g", m = NULL, covariates = NULL, center = TRUE,
   out <- list(Y = Y, X = X) #, full = full) # FULLFIX
   if("binomial" %in% type[match(colnames(out$Y), names(type))] & checkType){
     stop("Can't have binary outcomes for lagged models")
+  }
+  if(!is.null(consec)){
+    stopifnot(length(consec) == nrow(out$Y))
+    out$Y <- out$Y[consec, ]
+    out$X <- out$X[consec, ]
   }
   return(out)
 }
