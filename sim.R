@@ -109,6 +109,69 @@ SimNets <- function(N, nsims = 10, ntime = 50, p = 3, m = "random", FUN = "mlGVA
   return(output)
 }
 
+##### TEMPORARY 
+threeFits <- function(dat, m, scale = TRUE, saveMods = FALSE, ...){
+  args <- tryCatch({list(...)}, error = function(e){list()})
+  args[c('scale', 'saveMods', 'lags')] <- list(scale, saveMods, 1)
+  args <- args[intersect(names(args), formalArgs('fitNetwork'))]
+  out <- setNames(lapply(1:3, function(z){
+    X <- switch(z, dat[, -m], dat, dat)
+    M <- switch(z, NULL, NULL, m)
+    covars <- switch(z, NULL, m, NULL)
+    args0 <- replace(args, c('data', 'moderators', 'covariates'), list(data = X, moderators = M, covariates = covars))
+    do.call(fitNetwork, args0)
+  }), paste0('fit', 1:3))
+  return(out)
+}
+getVars <- function(dat, m, inds = c('CV', 'AIC', 'BIC', 'EBIC'), 
+                    vars = NULL, fit = TRUE, ex = NULL, scale = TRUE,
+                    saveMods = FALSE, nCores = 1, ...){
+  args <- tryCatch({list(...)}, error = function(e){list()})
+  input <- list(dat, m, 1, scale, saveMods)
+  newvars <- FALSE
+  if(is.null(vars)){
+    args1 <- args[intersect(names(args), formalArgs('varSelect'))]
+    args1[c('data', 'm', 'lags', 'scale')] <- input[1:4]
+    if(nCores > 1){
+      pbapply::pboptions(type = 'timer', char = '-')
+      vars <- pbapply::pblapply(setdiff(inds, ex), function(z){
+        args0 <- replace(args1, 'criterion', list(criterion = z))
+        do.call(varSelect, args0)
+      }, cl = nCores)
+    } else {
+      vars <- lapply(setdiff(inds, ex), function(z){
+        args0 <- replace(args1, 'criterion', list(criterion = z))
+        do.call(varSelect, args0)
+      })
+    }
+    newvars <- TRUE
+  }
+  if(fit & !is.null(vars)){
+    args2 <- args[intersect(names(args), formalArgs('fitNetwork'))]
+    args2[c('data', 'moderators', 'lags', 'scale', 'saveMods')] <- input
+    pbapply::pboptions(type = 'timer', char = '-')
+    fits <- pbapply::pblapply(vars, function(z){
+      args0 <- replace(args2, 'type', list(type = z))
+      do.call(fitNetwork, args0)
+    }, cl = nCores)
+  }
+  out <- list()
+  if(newvars){out$vars <- vars}
+  if(fit){out$fits <- fits}
+  return(out)
+}
+intSelect <- function(x1, x2 = NULL, len = FALSE){
+  if(!is.null(x2)){
+    n <- 8 - length(x2$fits)
+    x1 <- append(x1, setNames(x2$fits, paste0('fit', n:7)))
+    if(!len){return(x1)}
+  }
+  k <- lapply(lapply(x1, selected), '[[', 'ints')
+  k <- lapply(lapply(k, unlist), function(z) setdiff(z, ''))
+  k
+}
+
+
 ##### simNet: simulate network structures and data
 simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL, 
                    sparsity = .5, intercepts = NULL, nIter = 250, msym = FALSE, 

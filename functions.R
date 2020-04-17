@@ -3,7 +3,7 @@ if(!"none" %in% pkgs){invisible(suppressMessages(lapply(pkgs, require, character
 if(exists("clear")){if(clear == TRUE){rm(list = ls()); clear <- TRUE}} else {rm(pkgs)}
 if(".modnets" %in% search()){detach(".modnets")}
 setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
-files <- paste0('~/C: Desktop/COMPS/METHODS/CODE/modnets/', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')
+files <- paste0('./', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')
 invisible(sapply(files, source)); rm(files)
 if(!'methods' %in% sessionInfo()$basePkgs){invisible(suppressMessages(require(methods)))}
 options(stringsAsFactors = FALSE)
@@ -1684,6 +1684,7 @@ detrender <- function(data, timevar = NULL, vars = NULL,
     data_detrend$time <- 1:nrow(data_detrend)
   }
   if(is.null(vars)){vars <- setdiff(colnames(data_detrend), timevar)}
+  vars <- setdiff(vars, timevar)
   for(i in seq_along(vars)){
     ff <- as.formula(paste0(vars[[i]], ' ~ ', timevar))
     fit <- lm(ff, data = data_detrend)

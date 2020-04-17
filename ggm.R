@@ -905,7 +905,8 @@ posteriorProbs <- function(bics, plot = FALSE, mods = NULL){
 bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, rule = 'OR',
                     ci = .95, caseMin = .05, caseMax = .75, caseN = 10, threshold = FALSE,
                     fits = NULL, type = 'g', saveMods = TRUE, verbose = TRUE, fitCoefs = FALSE, 
-                    size = NULL, nCores = 1, cluster = 'mclapply', directedDiag = FALSE, ...){
+                    size = NULL, nCores = 1, cluster = 'mclapply', block = FALSE, maxiter = 10,
+                    directedDiag = FALSE, ...){
   if(identical(m, 0)){m <- NULL}
   args <- tryCatch({list(...)}, error = function(e){list()})
   call <- as.list(match.call())
@@ -935,32 +936,57 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
     }
   }
   ci <- (1 - ci)/2
-  n <- n0 <- nrow(data)
   lags <- switch(2 - !is.null(lags), ifelse(all(lags != 0), 1, 0), 0)
+  consec <- switch(2 - (lags & 'samp_ind' %in% names(attributes(data))), attr(data, 'samp_ind'), NULL)
+  n <- n0 <- ifelse(is.null(consec), nrow(data), length(consec))
   if(is.null(fits)){
+    sampInd <- function(size = NULL, n, lags = NULL, consec = NULL, 
+                        caseDrop = FALSE, block = FALSE, ind_args = NULL){
+      if(!is.null(ind_args)){
+        call <- as.list(match.call())[-1]
+        call <- call[setdiff(names(call), 'ind_args')]
+        if('size' %in% names(call)){call$size <- size}
+        if(length(call) > 0){ind_args <- replace(ind_args, names(call), call)}
+        out <- do.call(sampInd, ind_args)
+        return(out)
+      }
+      if(!caseDrop){
+        n0 <- n
+        n <- ifelse(is.null(size), n, size)
+        possible <- switch(2 - is.null(consec), seq_len(n0 - lags), consec)
+        out <- sample(possible, n, replace = TRUE)
+      } else {
+        possible <- switch(2 - is.null(consec), seq_len(n - lags), consec)
+        if(lags & block){
+          start <- sample(seq_len(n - size), 1)
+          section <- start:(start + size - 1)
+          out <- possible[section]
+        } else {
+          out <- sample(possible, size, replace = FALSE)
+        }
+      }
+      return(out)
+    }
+    indArgs <- list(size = size, n = n, lags = lags, consec = consec, caseDrop = caseDrop, block = block)
     if(!caseDrop){
-      n <- ifelse(is.null(size), n, size)
-      inds <- data.frame(replicate(nboots, sample(1:(n0 - lags), n, replace = TRUE)))
+      inds <- replicate(nboots, list(sampInd(ind_args = indArgs)))
     } else {
       mm <- as.numeric(!is.null(m))
       p <- ncol(data) - mm
-      if(lags){
-        mm <- as.numeric(isTRUE(!is.null(m)))
-        p <- ncol(data) - mm
-        fixMax <- round((1 - caseMax) * n) < ((p + 1) * (mm + 2))
-        if(fixMax){
-          caseMax <- 1 - (((p + 1) * (mm + 2))/n)
-          message(paste0('caseMax too large; setting to max value: ', round(caseMax, 2)))
-        }
+      fixMax <- ifelse(lags, round((1 - caseMax) * n) < ((p + 1) * (mm + 2)), 
+                       round((1 - caseMax) * n) < sampleSize(p = p, m = mm, print = FALSE))
+      if(fixMax){
+        caseMax <- 1 - ifelse(lags, ((p + 1) * (mm + 2)), sampleSize(p = p, m = mm, print = FALSE))/n
+        message(paste0('caseMax too large -- setting to max value: ', round(caseMax, 2)))
       }
       subCases <- round((1 - seq(caseMin, caseMax, length = caseN)) * n)
       subNs <- sample(subCases, nboots, replace = TRUE)
-      inds <- lapply(subNs, function(z) sort(sample(seq_len(n - lags), z)))
+      inds <- lapply(subNs, sampInd, ind_args = indArgs)
     }
     if(verbose & identical(nCores, 1)){pb <- txtProgressBar(min = 0, max = nboots + 1, style = 3)}
     args0 <- list(data = data, moderators = m, type = type, lags = lags, rule = rule, 
-                  threshold = sampThresh, verbose = FALSE, 
-                  saveMods = FALSE, fitCoefs = fitCoefs)
+                  threshold = sampThresh, verbose = FALSE, saveMods = FALSE, 
+                  fitCoefs = fitCoefs, maxiter = maxiter)
     args <- args[setdiff(names(args), names(args0))]
     args0 <- append(args0, args[intersect(names(args), formalArgs(fitNetwork))])
     fit0 <- do.call(fitNetwork, args0)
@@ -976,7 +1002,7 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
         if(cluster == 'SOCK'){
           obj1 <- switch(2 - !as.logical(lags), c('nodewise', 'modNet', 'modLL'), 
                          c('lagMat', 'SURfit', 'SURnet', 'SURll', 'surEqs', 'getCoefs', 'systemfit'))
-          obj1 <- c(obj1, 'lags', 'inds', 'data', 'args0', 'm', 'caseDrop')
+          obj1 <- c(obj1, 'lags', 'inds', 'data', 'args0', 'm', 'caseDrop', 'indArgs', 'sampInd', 'maxiter')
           parallel::clusterExport(cl, c('fitNetwork', 'Matrix', 'net', 'netInts', obj1), envir = environment())
         }
       } else {
@@ -984,46 +1010,96 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
       }
       if(verbose){
         pbapply::pboptions(type = 'timer', char = '-')
-        fits <- suppressWarnings(structure(pbapply::pblapply(seq_len(nboots), function(z){
+        fits <- suppressWarnings(pbapply::pblapply(seq_len(nboots), function(z){
           newargs <- args0
-          newargs$data <- switch(lags + 1, data[inds[[z]], ], structure(data, samp_ind = inds[[z]]))
-          fit <- tryCatch({do.call(fitNetwork, newargs)}, error = function(e){
-            stop(paste0("Sampling error", ifelse(caseDrop, ": Try reducing 'caseMax'", "")))})
+          inds0 <- inds[[z]]
+          fit <- tt <- 0
+          while(identical(fit, 0)){
+            newargs$data <- switch(lags + 1, data[inds0, ], structure(data, samp_ind = inds0))
+            fit <- tryCatch({do.call(fitNetwork, newargs)}, error = function(e){0})
+            if(identical(fit, 0)){
+              tt <- tt + 1
+              if(tt == maxiter){break}
+              inds0 <- sampInd(size = length(inds0), ind_args = indArgs)
+            } else {
+              attr(fit, 'inds') <- inds0
+            }
+          }
+          if(identical(fit, 0)){fit <- structure(list(), class = 'try-error')}
           return(fit)
-        }, cl = cl), class = c('list', 'bootFits'), inds = inds, lags = lags, m = m))
+        }, cl = cl))
       } else if(tolower(cluster) == 'mclapply'){
-        fits <- suppressWarnings(structure(parallel::mclapply(seq_len(nboots), function(z){
-          args0$data <- switch(lags + 1, data[inds[[z]], ], structure(data, samp_ind = inds[[z]]))
-          fit <- tryCatch({do.call(fitNetwork, args0)}, error = function(e){
-            stop(paste0("Sampling error", ifelse(caseDrop, ": Try reducing 'caseMax'", "")))})
+        fits <- suppressWarnings(parallel::mclapply(seq_len(nboots), function(z){
+          newargs <- args0
+          inds0 <- inds[[z]]
+          fit <- tt <- 0
+          while(identical(fit, 0)){
+            newargs$data <- switch(lags + 1, data[inds0, ], structure(data, samp_ind = inds0))
+            fit <- tryCatch({do.call(fitNetwork, newargs)}, error = function(e){0})
+            if(identical(fit, 0)){
+              tt <- tt + 1
+              if(tt == maxiter){break}
+              inds0 <- sampInd(size = length(inds0), ind_args = indArgs)
+            } else {
+              attr(fit, 'inds') <- inds0
+            }
+          }
+          if(identical(fit, 0)){fit <- structure(list(), class = 'try-error')}
           return(fit)
-        }, mc.cores = nCores), class = c('list', 'bootFits'), inds = inds, lags = lags, m = m))
+        }, mc.cores = nCores))
       } else {
-        fits <- suppressWarnings(structure(parallel::parLapply(cl, seq_len(nboots), function(z){
-          args0$data <- switch(lags + 1, data[inds[[z]], ], structure(data, samp_ind = inds[[z]]))
-          fit <- tryCatch({do.call(fitNetwork, args0)}, error = function(e){
-            stop(paste0("Sampling error", ifelse(caseDrop, ": Try reducing 'caseMax'", "")))})
+        fits <- suppressWarnings(parallel::parLapply(cl, seq_len(nboots), function(z){
+          newargs <- args0
+          inds0 <- inds[[z]]
+          fit <- tt <- 0
+          while(identical(fit, 0)){
+            newargs$data <- switch(lags + 1, data[inds0, ], structure(data, samp_ind = inds0))
+            fit <- tryCatch({do.call(fitNetwork, newargs)}, error = function(e){0})
+            if(identical(fit, 0)){
+              tt <- tt + 1
+              if(tt == maxiter){break}
+              inds0 <- sampInd(size = length(inds0), ind_args = indArgs)
+            } else {
+              attr(fit, 'inds') <- inds0
+            }
+          }
+          if(identical(fit, 0)){fit <- structure(list(), class = 'try-error')}
           return(fit)
-        }), class = c('list', 'bootFits'), inds = inds, lags = lags, m = m))
+        }))
       }
       if(tolower(cluster) != 'mclapply'){parallel::stopCluster(cl)}
       rm(cl)
     } else {
-      fits <- structure(lapply(seq_len(nboots), function(z){
-        args0$data <- switch(lags + 1, data[inds[[z]], ], structure(data, samp_ind = inds[[z]]))
-        fit <- tryCatch({do.call(fitNetwork, args0)}, error = function(e){
-          stop(paste0("Sampling error", ifelse(caseDrop, ": Try reducing 'caseMax'", "")))})
+      fits <- suppressWarnings(lapply(seq_len(nboots), function(z){
+        newargs <- args0
+        inds0 <- inds[[z]]
+        fit <- tt <- 0
+        while(identical(fit, 0)){
+          newargs$data <- switch(lags + 1, data[inds0, ], structure(data, samp_ind = inds0))
+          fit <- tryCatch({do.call(fitNetwork, newargs)}, error = function(e){0})
+          if(identical(fit, 0)){
+            tt <- tt + 1
+            if(tt == maxiter){break}
+            inds0 <- sampInd(size = length(inds0), ind_args = indArgs)
+          } else {
+            attr(fit, 'inds') <- inds0
+          }
+        }
+        if(identical(fit, 0)){fit <- structure(list(), class = 'try-error')}
         if(verbose){setTxtProgressBar(pb, z + 1)}
         return(fit)
-      }), class = c('list', 'bootFits'), inds = inds, lags = lags, m = m)
+      }))
     }
     if(any(sapply(fits, class) == 'try-error')){
       err <- which(sapply(fits, class) == 'try-error')
       inds <- inds[-err]
       nboots <- nboots - length(err)
-      fits <- structure(fits[-err], class = c('list', 'bootFits'), inds = inds, lags = lags, m = m)
-      if(verbose){message(paste0(length(err), ' iterations failed'))}
+      fits <- fits[-err]
+      if(caseDrop){subNs <- subNs[-err]}
+      if(verbose){message(paste0('\n', length(err), ' iterations failed'))}
     }
+    inds <- lapply(fits, attr, 'inds')
+    fits <- structure(fits, class = c('list', 'bootFits'), inds = inds, lags = lags, m = m)
     net2 <- net3 <- FALSE
   } else {
     if(is(fits, 'bootNet')){
