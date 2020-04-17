@@ -170,7 +170,23 @@ intSelect <- function(x1, x2 = NULL, len = FALSE){
   k <- lapply(lapply(k, unlist), function(z) setdiff(z, ''))
   k
 }
-
+csgather <- function(x){
+  y <- lapply(lapply(x, cscoef, first = TRUE, verbose = FALSE), function(z) data.frame(t(z)))
+  y1 <- setNames(do.call(rbind.data.frame, lapply(y, '[[', 1)), c('edge', 'strength', 'EI'))
+  y2 <- setNames(do.call(rbind.data.frame, lapply(y, '[[', 2)), c('edge', 'strength', 'EI'))
+  y1$M <- factor(rep(c(.1, .2, .3), each = 100), levels = c(.1, .2, .3))
+  y2$M <- factor(rep(c(.1, .2, .3), each = 100), levels = c(.1, .2, .3))
+  rownames(y1) <- 1:nrow(y1)
+  rownames(y2) <- 1:nrow(y2)
+  if(any(is.na(y1))){y1[is.na(y1)] <- 0}
+  if(any(is.na(y2))){y2[is.na(y2)] <- 0}
+  tt <- c('Pairwise', 'Interactions')
+  measures <- c('Edge', 'Strength', 'ExpectedInfluence')
+  out <- cbind.data.frame(rbind(y1, y2), type = factor(rep(tt, sapply(list(y1, y2), nrow)), levels = tt))
+  out2 <- cbind.data.frame(measure = factor(rep(measures, each = nrow(out)), levels = measures), value = c(out$edge, out$strength, out$EI))
+  out2 <- cbind.data.frame(out2, type = rep(out$type, 3), M = rep(out$M, 3))
+  return(out2)
+}
 
 ##### simNet: simulate network structures and data
 simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL, 
