@@ -170,12 +170,19 @@ intSelect <- function(x1, x2 = NULL, len = FALSE){
   k <- lapply(lapply(k, unlist), function(z) setdiff(z, ''))
   k
 }
-csgather <- function(x){
-  y <- lapply(lapply(x, cscoef, first = TRUE, verbose = FALSE), function(z) data.frame(t(z)))
+csgather <- function(x, first = TRUE){
+  y <- lapply(lapply(x, cscoef, first = first, verbose = FALSE), function(z) data.frame(t(z)))
   y1 <- setNames(do.call(rbind.data.frame, lapply(y, '[[', 1)), c('edge', 'strength', 'EI'))
   y2 <- setNames(do.call(rbind.data.frame, lapply(y, '[[', 2)), c('edge', 'strength', 'EI'))
-  y1$M <- factor(rep(c(.1, .2, .3), each = 100), levels = c(.1, .2, .3))
-  y2$M <- factor(rep(c(.1, .2, .3), each = 100), levels = c(.1, .2, .3))
+  nn <- do.call(rbind, strsplit(names(x), '_'))
+  nk <- length(unique(nn[, 3]))
+  if(nk == 3){
+    y1$M <- factor(rep(c(.1, .2, .3), each = 100), levels = c(.1, .2, .3))
+    y2$M <- factor(rep(c(.1, .2, .3), each = 100), levels = c(.1, .2, .3))
+  } else if(nk == 4){
+    y1$M <- factor(rep(c(.1, .2, .3, .5), each = 100), levels = c(.1, .2, .3, .5))
+    y2$M <- factor(rep(c(.1, .2, .3, .5), each = 100), levels = c(.1, .2, .3, .5))
+  }
   rownames(y1) <- 1:nrow(y1)
   rownames(y2) <- 1:nrow(y2)
   if(any(is.na(y1))){y1[is.na(y1)] <- 0}
