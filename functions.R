@@ -343,6 +343,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        getLL = TRUE, saveMods = TRUE, binarize = FALSE, fitCoefs = FALSE, 
                        detrend = FALSE, beepno = NULL, dayno = NULL, ...){
   t1 <- Sys.time() # START
+  if(!identical(detrend, FALSE) | (!is.null(beepno) & !is.null(dayno))){lags <- 1}
   if(any(is.na(data))){
     ww <- which(apply(data, 1, function(z) any(is.na(z))))
     if(is.null(lags) | identical(lags, 0)){

@@ -184,7 +184,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
                    fixedArgs = NULL, betweenArgs = NULL, bm = FALSE, ...){
   t1 <- Sys.time()
   mnames <- mi <- m
-  args0 <- list(...)
+  args0 <- tryCatch({list(...)}, error = function(e){list()})
   if(!bm){
     bm <- list(moderators = NULL)
     betweenArgs <- switch(
