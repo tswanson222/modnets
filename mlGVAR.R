@@ -181,10 +181,20 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
                    exogenous = TRUE, center = TRUE, scale = TRUE, fixedType = 'g', 
                    betweenType = 'g', centerWithin = TRUE, scaleWithin = FALSE,
                    rule = 'OR', threshold = 'none', verbose = TRUE, pcor = FALSE, 
-                   fixedArgs = NULL, betweenArgs = NULL, bm = FALSE, ...){
+                   fixedArgs = NULL, betweenArgs = NULL, bm = FALSE, beepno = NULL,
+                   dayno = NULL, deleteMissing = TRUE, ...){
   t1 <- Sys.time()
   mnames <- mi <- m
   args0 <- tryCatch({list(...)}, error = function(e){list()})
+  if(any(is.na(data))){
+    if(deleteMissing){
+      ww <- which(apply(data, 1, function(z) any(is.na(z))))
+      data <- na.omit(data)
+      warning(paste0(length(ww), ' rows deleted due to missingness'))
+    } else {
+      stop(paste0(length(ww), ' rows contain missing values'))
+    }
+  }
   if(!bm){
     bm <- list(moderators = NULL)
     betweenArgs <- switch(
@@ -212,12 +222,32 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
     }
   }
   data <- data.frame(data[, -which(colnames(data) == idvar)], ID = data[, idvar])
+  if(!is.null(beepno) | !is.null(dayno)){
+    stopifnot(!is.null(beepno) & !is.null(dayno))
+    stopifnot(length(beepno) == 1 & length(dayno) == 1)
+    if(is.numeric(dayno)){dayno <- colnames(data)[dayno]}
+    if(is.numeric(beepno)){beepno <- colnames(data)[beepno]}
+    data0 <- data
+    data <- data[, setdiff(colnames(data), c(beepno, dayno))]
+  }
   vars <- setdiff(colnames(data), 'ID')
   dat <- setupVAR(data = data, idvar = 'ID', method = 'all', center = center,
                   scale = scale, vars = vars, centerWithin = centerWithin,
                   scaleWithin = scaleWithin)
   fixedDat <- dat[, vars]
   samp_ind <- as.numeric(cumsum(table(dat[, 'ID'])))
+  if(!is.null(beepno) & !is.null(dayno)){
+    dat <- cbind.data.frame(dat, data0[, c(beepno, dayno)])
+    dat0 <- split(dat, dat$ID)
+    consec <- vector('list', length(dat0))
+    for(i in seq_along(dat0)){
+      consec[[i]] <- which(!getConsec(data = dat0[[i]], beepno = beepno, dayno = dayno, makeAtt = FALSE))
+      if(i > 1){
+        consec[[i]] <- consec[[i]] + sum(sapply(1:(i - 1), function(z) nrow(dat0[[z]])))
+      }
+    }
+    samp_ind <- union(unlist(consec), samp_ind)
+  }
   attr(fixedDat, 'samp_ind') <- (1:nrow(dat))[-samp_ind]
   if(!is.null(m)){
     m <- which(vars %in% mnames)
@@ -264,6 +294,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
     if(selectFUN == 'varSelect' | isTRUE(fixedType)){
       args1.2 <- append(replace(args1, c('type', 'verbose'), list(
         type = 'g', verbose = FALSE)), args0)
+      if(!isTRUE(fixedType)){args1.2$type <- fixedType}
       names(args1.2)[names(args1.2) == 'm'] <- 'moderators'
       args1.2 <- args1.2[intersect(fitNetArgs, names(args1.2))]
       fixedNets <- tryCatch({do.call(fitNetwork, replace(args1.2, 'saveMods', FALSE))}, error = function(e){
@@ -337,6 +368,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
     if(selectFUN == 'varSelect' | isTRUE(betweenType)){
       args2.2 <- append(replace(args2, c('type', 'verbose'), list(
         type = 'g', verbose = FALSE)), args0)
+      if(!isTRUE(betweenType)){args2.2$type <- betweenType}
       names(args2.2)[names(args2.2) == 'm'] <- 'moderators'
       args2.2 <- args2.2[intersect(fitNetArgs, names(args2.2))]
       betNet <- tryCatch({do.call(fitNetwork, replace(args2.2, 'saveMods', FALSE))}, error = function(e){
@@ -423,6 +455,8 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
   return(out)
 }
 
+# NOTE: beepno & dayno only work for mlGVAR, not lmerVAR. Also, does not
+# yet work with model selection procedures
 
 ### ======================================================================== ###
 ### ========================= Fit lmerVAR models =========================== ###

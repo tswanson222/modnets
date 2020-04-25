@@ -36,7 +36,7 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
                 "autism", "large", "symptom", "short", "resting", "big5", 
                 "esm", "esm1", "esm2", "esm3", "esm4", "esm5", "m3", "m5", 
                 "mod", "PTSD", "fried", "wichers", "new", "dep1", "dep2", 
-                "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini")
+                "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini", "covid")
   if(d){return(data.frame(sort(whatData)))}
   if(!is.null(dat)){
     dat <- match.arg(dat, c(whatData, "caseDrop"))
@@ -94,6 +94,11 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
       poop <- list(data = data, data0 = data0)
       list2env(poop, envir = .GlobalEnv)
       return(message("data and data0 in .GlobalEnv"))
+    }
+    if(dat == 'covid'){
+      data <- readRDS('data/covid.RDS')
+      assign('data', data, envir = .GlobalEnv)
+      return(message('data in .GlobalEnv'))
     }
     if(dat == "constantini"){
       data0 <- readRDS("data/data_all.RDS")
@@ -473,7 +478,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       if(verbose){print(Sys.time() - t1)}
       return(output)
     } else {
-      ### TEMPORAL -- added detrend and beepno and dayno; they do not all work together yet
+      ### TEMPORAL
       if(!is.null(beepno) & !is.null(dayno)){
         beepday <- list(beepno, dayno)
         stopifnot(sum(sapply(c(1, nrow(data)), function(z) all(sapply(beepday, length) == z))) == 1)
@@ -958,6 +963,25 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
   }
 }
 
+##### plotNet3: Designed for mlGVAR and lmerVAR output
+plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'between'),
+                     titles = TRUE, l = 3, label = NULL, xpos = 0, ypos = .5){
+  args0 <- list(...)
+  avlay(l = l)
+  args0$object <- object
+  stopifnot(length(nets) == 3)
+  mains <- c('Temporal network', 'Partial Contemporaneous Correlations', 'Between-subjects network')
+  invisible(lapply(1:3, function(i){
+    args <- replace(args0, 'which.net', list(which.net = nets[i]))
+    if(isTRUE(titles)){args$title <- mains[i]}
+    do.call(plotNet, args)
+  }))
+  if(!is.null(label)){
+    plot.new()
+    text(x = xpos, y = ypos, labels = label)
+  }
+}
+
 ##### predictNet: Calculate prediction error
 predictNet <- function(object, data = NULL, all = FALSE, scale = FALSE){
   if("SURnet" %in% c(names(object), names(attributes(object)))){
@@ -1133,14 +1157,23 @@ predictDelta <- function(mod1, mod0, scale = FALSE){
 }
 
 ##### avlay: wrapper for 'averageLayout'
-avlay <- function(..., net = 'temporal', collapse = FALSE, args = NULL){
-  x <- list(...)
-  stopifnot(length(x) > 0)
-  if(length(x) == 1){x <- x[[1]]} else if(collapse){x <- appd(x)}
-  args0 <- list(object = NA, which.net = net, plot = FALSE)
-  args <- append(args[setdiff(names(args), names(args0))], args0)
-  averageLayout(lapply(x, function(z) do.call(
-    plotNet, replace(args, 'object', list(object = z)))))
+avlay <- function(..., which.net = 'temporal', threshold = FALSE, 
+                  collapse = FALSE, net = NULL, l = NULL, args = NULL){
+  if(is.null(l)){
+    x <- list(...)
+    stopifnot(length(x) > 0)
+    if(length(x) == 1){x <- x[[1]]} else if(collapse){x <- appd(x)}
+    args0 <- list(object = NA, which.net = which.net, 
+                  threshold = threshold, plot = FALSE)
+    if(!is.null(net)){args0$which.net <- net}
+    args <- append(args[setdiff(names(args), names(args0))], args0)
+    averageLayout(lapply(x, function(z) do.call(
+      plotNet, replace(args, 'object', list(object = z)))))
+  } else if(identical(l, 1) | identical(l, 2) | identical(l, 3) | identical(l, 4)){
+      layout(switch(l, t(1:2), t(matrix(1:4, 2, 2)),
+                    matrix(c(1, 1, 2, 2, 4, 3, 3, 4), nrow = 2, ncol = 4, byrow = T),
+                    matrix(c(4, 1, 1, 4, 2, 2, 3, 3), nrow = 2, ncol = 4, byrow = T)))
+  }
 }
 
 
