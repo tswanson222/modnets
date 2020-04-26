@@ -465,8 +465,8 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
                     idvar = "ID", intvars = NULL, center = TRUE, scale = TRUE, 
                     centerWithin = TRUE, scaleWithin = FALSE, exogenous = TRUE,
-                    covariates = NULL, fix = NULL, warnings = FALSE, 
-                    verbose = TRUE){
+                    covariates = NULL, fix = NULL, warnings = FALSE, verbose = TRUE,
+                    beepno = NULL, dayno = NULL, deleteMissing = TRUE){
   t1 <- Sys.time()
   suppressMessages(invisible(c(require(lme4), require(lmerTest))))
   if(!warnings){oldw <- getOption("warn"); options(warn = -1)}
@@ -475,12 +475,41 @@ lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
   vars <- colnames(data)
   if(!idvar %in% vars){stop("Must supply 'idvar'")}
   if(!is.null(m)){mnames <- switch(2 - is.character(m), m, vars[m])}
+  if(any(is.na(data))){
+    if(deleteMissing){
+      ww <- which(apply(data, 1, function(z) any(is.na(z))))
+      data <- na.omit(data)
+      warning(paste0(length(ww), ' rows deleted due to missingness'))
+    } else {
+      stop(paste0(length(ww), ' rows contain missing values'))
+    }
+  }
   data <- data.frame(data[, -which(vars == idvar)], ID = data[, idvar])
-  vars <- setdiff(vars, idvar)
+  if(!is.null(beepno) | !is.null(dayno)){
+    stopifnot(!is.null(beepno) & !is.null(dayno))
+    stopifnot(length(beepno) == 1 & length(dayno) == 1)
+    if(is.numeric(dayno)){dayno <- colnames(data)[dayno]}
+    if(is.numeric(beepno)){beepno <- colnames(data)[beepno]}
+    data0 <- data
+    data <- data[, setdiff(colnames(data), c(beepno, dayno))]
+  }
+  vars <- setdiff(colnames(data), idvar)
   dat <- setupVAR(data = data, idvar = "ID", method = "all", center = center,
                   scale = scale, centerWithin = FALSE, scaleWithin = FALSE)
   dat0 <- dat[, vars]
   samp_ind <- as.numeric(cumsum(table(dat[, "ID"])))
+  if(!is.null(beepno) & !is.null(dayno)){
+    dat <- cbind.data.frame(dat, data0[, c(beepno, dayno)])
+    dat1 <- split(dat, dat$ID)
+    consec <- vector('list', length(dat1))
+    for(i in seq_along(dat1)){
+      consec[[i]] <- which(!getConsec(data = dat1[[i]], beepno = beepno, dayno = dayno, makeAtt = FALSE))
+      if(i > 1){
+        consec[[i]] <- consec[[i]] + sum(sapply(1:(i - 1), function(z) nrow(dat1[[z]])))
+      }
+    }
+    samp_ind <- union(unlist(consec), samp_ind)
+  }
   nid <- attr(dat0, "samp_ind") <- setdiff(1:nrow(dat), samp_ind)
   ids0 <- unique(dat[, "ID"])
   ids <- dat[nid, "ID"]
