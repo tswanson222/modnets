@@ -298,7 +298,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
       names(args1.2)[names(args1.2) == 'm'] <- 'moderators'
       args1.2 <- args1.2[intersect(fitNetArgs, names(args1.2))]
       fixedNets <- tryCatch({do.call(fitNetwork, replace(args1.2, 'saveMods', FALSE))}, error = function(e){
-        do.call(fitNetwork, replace(args1.2, c('type', 'saveMods'), c('g', FALSE)))})
+        do.call(fitNetwork, replace(args1.2, c('type', 'saveMods'), list(type = 'g', saveMods = FALSE)))})
     } else {
       if('fit0' %in% names(fixedType)){fixedType$fit0 <- NULL}
       if(is(fixedType, 'list')){attr(fixedType[[2]], 'threshold') <- fixedThresh}
@@ -372,7 +372,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
       names(args2.2)[names(args2.2) == 'm'] <- 'moderators'
       args2.2 <- args2.2[intersect(fitNetArgs, names(args2.2))]
       betNet <- tryCatch({do.call(fitNetwork, replace(args2.2, 'saveMods', FALSE))}, error = function(e){
-        do.call(fitNetwork, replace(args2.2, c('type', 'saveMods'), c('g', FALSE)))})
+        do.call(fitNetwork, replace(args2.2, c('type', 'saveMods'), list(type = 'g', saveMods = FALSE)))})
     } else {
       if('fit0' %in% names(betweenType)){betweenType$fit0 <- NULL}
       if(is(betweenType, 'list')){attr(betweenType[[2]], 'threshold') <- betThresh}

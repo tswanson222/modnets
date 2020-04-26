@@ -35,14 +35,17 @@ nodewise <- function(data, mods = NULL, varMods = NULL, lambda = "min", center =
       } else if(length(mods) == 1){
         varMods <- NULL
       } else {
-        varMods <- lapply(1:ncol(data), function(z){
+        varMods <- setNames(lapply(1:ncol(data), function(z){
           mains <- vs[-z]
           ints <- apply(combn(mains, 2), 2, paste0, collapse = ":")
           if(!z %in% mods){ints <- ints[apply(combn(mains, 2), 2, function(zz) any(vs[mods] %in% zz))]}
           return(list(mod0 = c(mains, ints)))
-        })
-        names(varMods) <- vs
-        exogenous <- FALSE
+        }), vs)
+        if(exogenous & length(mods) < (ncol(data) - 1)){
+          varMods <- varMods[vs[-mods]]
+        } else {
+          exogenous <- FALSE
+        }
         mods <- NULL
         lambda <- 1
       }
@@ -80,7 +83,9 @@ nodewise <- function(data, mods = NULL, varMods = NULL, lambda = "min", center =
     if(!is.null(covariates)){
       for(i in 1:length(vars)){eqs[[i]] <- paste0(eqs[[i]], " + ", paste(names(covariates), collapse = " + "))}
     }
-    return(lapply(eqs, as.formula))
+    #return(lapply(eqs, as.formula))
+    eqs <- setNames(lapply(eqs, as.formula), vars)
+    return(eqs)
   }
   if(!is.null(covariates)){
     if(class(covariates) %in% c("numeric", "integer")){
@@ -136,6 +141,7 @@ nodewise <- function(data, mods = NULL, varMods = NULL, lambda = "min", center =
     if(!is.null(covariates) & ifelse("covariates" %in% names(attributes(varMods)), FALSE, TRUE)){
       ints <- lapply(ints, paste0, " + ", paste(names(covariates), collapse = " + "))
     }
+    names(ints) <- names(varMods)
   } else {
     ints <- intMatrix(data, mods, covariates)
     if(!is.null(mods) & !exogenous){ints <- append(ints, list(as.formula(paste0(names(mods), " ~ .^2"))))}
@@ -204,10 +210,33 @@ nodewise <- function(data, mods = NULL, varMods = NULL, lambda = "min", center =
     }
     names(bcovs) <- cnames
   }
-  b <- ps <- matrix(NA, nrow = ncol(data), ncol = ncol(data))
-  for(i in 1:ncol(data)){
-    b[i, match(names(mm[[i]]), colnames(data))] <- mm[[i]]
-    ps[i, match(names(ps1[[i]]), colnames(data))] <- ps1[[i]]
+  #b <- ps <- matrix(NA, nrow = ncol(data), ncol = ncol(data))
+  #for(i in 1:ncol(data)){
+  #  b[i, match(names(mm[[i]]), colnames(data))] <- mm[[i]]
+  #  ps[i, match(names(ps1[[i]]), colnames(data))] <- ps1[[i]]
+  #  if(!is.null(mods)){
+  #    if(exogenous | (!exogenous & i < ncol(data))){
+  #      bx[i, match(names(m2[[i]]), mx)] <- m2[[i]]
+  #      psx[i, match(names(ps2[[i]]), mx)] <- ps2[[i]]
+  #    }
+  #  }
+  #}
+  #for(i in 1:length(ints)){
+  #  b[i, match(names(mm[[i]]), names(ints))] <- mm[[i]]
+  #  ps[i, match(names(ps1[[i]]), names(ints))] <- ps1[[i]]
+  #  if(!is.null(mods)){
+  #    if(exogenous | (!exogenous & i < ncol(data))){
+  #      bx[i, match(names(m2[[i]]), mx)] <- m2[[i]]
+  #      psx[i, match(names(ps2[[i]]), mx)] <- ps2[[i]]
+  #    }
+  #  }
+  #}
+  b <- ps <- matrix(NA, nrow = length(ints), ncol = length(ints))
+  for(i in 1:length(ints)){
+    mm0 <- mm[[i]][which(names(mm[[i]]) %in% names(ints))]
+    ps0 <- ps1[[i]][which(names(ps1[[i]]) %in% names(ints))]
+    b[i, match(names(mm0), names(ints))] <- mm0
+    ps[i, match(names(ps0), names(ints))] <- ps0
     if(!is.null(mods)){
       if(exogenous | (!exogenous & i < ncol(data))){
         bx[i, match(names(m2[[i]]), mx)] <- m2[[i]]
@@ -218,9 +247,10 @@ nodewise <- function(data, mods = NULL, varMods = NULL, lambda = "min", center =
   diag(b) <- diag(ps) <- 1
   if(any(is.na(b))){b[is.na(b)] <- 0}
   if(any(is.na(ps))){ps[is.na(ps)] <- 0}
-  out <- list(models = m, B = list(b = b, ps = ps))
+  out <- list(models = setNames(m, names(ints)), B = list(b = b, ps = ps))
   if(is.null(mods)){
     attributes(out$models)$noMods <- TRUE
+    if(length(ints) != ncol(data)){attr(out$models, 'exogenous') <- TRUE}
   } else {
     attributes(out$models)$exogenous <- exogenous
     if(nrow(bm) >= 1 & exogenous){out$Bm <- bm}
@@ -252,8 +282,9 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
     if(is.null(data)){
       if("noMods" %in% names(attributes(models)) & length(models) == ncol(mods0$dat)){
         data <- mods0$dat
-      } else if(attr(models, "exogenous") == TRUE){
-        data <- mods0$dat[, -ncol(mods0$dat)]
+      } else if(isTRUE(attr(models, "exogenous"))){
+        #data <- mods0$dat[, -ncol(mods0$dat)]
+        data <- mods0$dat[, names(models)]
       } else {
         data <- mods0$dat
       }
