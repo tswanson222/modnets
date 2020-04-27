@@ -38,6 +38,7 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
                 "mod", "PTSD", "fried", "wichers", "new", "dep1", "dep2", 
                 "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini", "covid")
   if(d){return(data.frame(sort(whatData)))}
+  setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
   if(!is.null(dat)){
     dat <- match.arg(dat, c(whatData, "caseDrop"))
     if("caseDrop" %in% c(dat, moderators)){

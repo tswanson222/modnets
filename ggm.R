@@ -1808,7 +1808,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
 }
 
 ##### cscoef: get correlation stability coefficients from caseDrop procedure
-cscoef <- function(obj, cor = .7, ci = .95, first = FALSE, verbose = TRUE){
+cscoef <- function(obj, cor = .7, ci = .95, first = TRUE, verbose = TRUE){
   stopifnot(isTRUE(attr(obj, 'caseDrop')))
   ci0 <- ci * 100
   ci <- paste0("q", c((1 - ci)/2, 1 - (1 - ci)/2) * 100)[1]
