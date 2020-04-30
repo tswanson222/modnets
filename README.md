@@ -5,12 +5,20 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 
 1. Cross-sectional moderated networks
 	* Involves nodewise estimation of a GGM with higher-order interactions
+	* Can accomodate any combination of continuous and binary variables.
+	* Nodewise regressions are fit using either OLS or logistic regression, depending on variable types.
 2. Idiographic (temporal) moderated networks
-	* Involves GLS estimation of a SUR time series model, as well as a concentration graph of the residuals.
+	* Involves generalized least squares (GLS) estimation of multivariate time series model, as well as the inverse-covariance structure of the residuals. 
+	* Currently only works for continuous variables, although exogenous moderators can be binary. 
+	* Default estimation is seemingly unrelated regressions (SUR) via `systemfit`, but OLS is also available (unconstrained SUR estimates are equivalent to OLS estimates).
 3. Multi-level moderated networks
 	* Uses one of two methods for estimation.
 	* One is a two-step multilevel model, where fixed/random effects are estimated separately from between-subject effects
 	* The other uses a formal multilevel moderated vector autoregressive model with `lmer`
+	* Only works for continous variables, although exogenous moderators can be binary.
+
+Penalized estimators for each of these models are also available, such as the LASSO, ridge regression, elastic net, the (overlapping) group LASSO, and the hierarchical LASSO. Hyperparameter selection will be performed automatically based on either the AIC, BIC, EBIC, or cross-validation depending upon user input.
+
 
 ## Downloading and using the package
 Currently, the way to use the R package is as follows:
@@ -29,8 +37,10 @@ The repository will be made accessible to download in R via `devtools` soon. Als
 * The primary functions used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
 
 ## Model selection
-* For model selection, you can use `varSelect` to employ either best-subset selection, the LASSO, ridge regression, or elastic net (all via `glmnet`), or the hierarchical LASSO (via `glinternet`). These methods support various information criteria as well as cross-validation for model selection, and are embedded within the `varSelect` function.
+* For model selection, you can use `varSelect` to employ either best-subset selection (via `leaps`), the LASSO, ridge regression, or elastic net (via `glmnet`), or the hierarchical LASSO (via `glinternet`). These methods support various information criteria as well as cross-validation for model selection, and are embedded within the `varSelect` function.
+* As a note, all of the model selection procedures in `varSelect` operate on a sequential, nodewise basis.
 * Additionally, you can use the `resample` function to use repeated subsampling or bootstrapping with the `varSelect` algorithm built in. 
+* This latter method will take into account the actual model-fit values (such as those obtained in the GLS-driven SUR for temporal networks)
 
 ## Stability \& power analyses
 * Currently, these methods are not supported in the multilevel setting.
