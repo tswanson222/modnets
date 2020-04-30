@@ -44,16 +44,33 @@ The repository will be made accessible to download in R via `devtools` soon.
 source('modnets/functions.R')
 # Package is now loaded! Make sure 'modnets' folder is in working directory.
 
-### SIMULATE MODERATED NETWORK DATA
-set.seed(1)
+### ================================================ ###
+### ======= SIMULATE MODERATED NETWORK DATA ======== ###
+### ================================================ ###
+# Can simulate data with no moderators, or with one exogenous moderator
+set.seed(123)
 x <- simNet(N = 100, p = 5, m = TRUE, sparsity = .5)
 
+str(x)
+### Contents:
+# x$data -------- 100x6 dataset, where 'M' is the moderator
+# x$b1 ---------- true regression coefficients, where columns --> rows
+# x$b2 ---------- true interaction coefficients, where (M * columns) --> rows
+# x$intercepts -- true intercepts; defaults to 0
+# x$m ----------- true mean of 'M'
+# x$m1 ---------- coefficents for main effects of M on outcomes; default to 0
+
 head(x$data)
-# A 100x6 dataset, where the variable 'M' is the moderator, and there are 5 outcomes.
-# The 'x' object also contains elements that describe the true model parameters
+print(x$b1)
+print(x$b2)
+print(x$intercepts)
+print(x$m)
+print(x$m1)
 
 
-### FITTING MODELS
+### ================================================ ###
+### =============== FITTING MODELS ================= ###
+### ================================================ ###
 # First, lets fit an unmoderated network, leaving out 'M' entirely
 fit0 <- fitNetwork(data = x$data[, -6]) 
 
@@ -66,6 +83,8 @@ fit2 <- fitNetwork(data = x$data, moderators = 6)
 # Create a list of models we want to compare
 fits <- list(fit0 = fit0, fit1 = fit1, fit2 = fit2)
 
+
+##### PLOTTING
 plot(fit0)
 plot(fit1)
 plot(fit2)
@@ -76,13 +95,14 @@ plot(fit1, threshold = TRUE)
 plot(fit2, threshold = .05)
 # Plot only significant edges of the network. threshold = TRUE defaults to threshold = .05
 
+
+##### MODEL COMPARISON
 modTable(fits = fits)
 # Performs likelihood ratio tests comparing the three models.
-# Right-most column displays how many times each model was selected out of all the comparisons
+
 
 modTable(fits = fits, nodes = TRUE)
 # This does the same thing as above but at the nodewise level
-
 ```
 
 More examples to be added soon.
