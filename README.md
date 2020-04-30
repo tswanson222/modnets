@@ -12,6 +12,30 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 	* One is a two-step multilevel model, where fixed/random effects are estimated separately from between-subject effects
 	* The other uses a formal multilevel moderated vector autoregressive model with `lmer`
 
+## Downloading and using the package
+Currently, the way to use the R package is as follows:
+
+1. Put `modnets` folder in the working directory.
+2. Run: `source('modnets/functions.R')`
+3. You now have access to all functions in the package!
+
 The repository will be made accessible to download in R via `devtools` soon.
+
+# Package Functions
+
+## Primary functions
+* The primary function used for the first two types of models is: `fitNetwork`. There are a variety of arguments and options that can be used for, e.g., penalized estimation, model specification, etc. 
+* The primary functions(s) used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
+
+## Model selection
+* For model selection, you can use `varSelect` to employ either best-subset selection, `glmnet`, or the hierarchical LASSO via `glinternet`. These methods supports various information criteria as well as cross-validation for model selection.
+* Additionally, you can use the `resample` function to use repeated subsampling or bootstrapping with the `varSelect` algorithm built in. 
+
+## Stability \& power analyses
+* Currently, these methods are not supported in the multilevel setting.
+* For bootstrapping/edge-weight accuracy analysis, you can use the `bootNet` function (the name will be changed, given the popularity of the `bootnet` function by Sacha Epskamp that my code is based on).
+* For case-dropping stability analysis, you can use `bootNet` while setting `caseDrop = TRUE`.
+* For power analysis, you can use: `mnetPowerSim` to simulate data based on expected network structure(s).
+
 
 Please contact trevorswanson222@gmail.com with any questions.
