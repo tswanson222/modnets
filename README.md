@@ -15,11 +15,12 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 ## Downloading and using the package
 Currently, the way to use the R package is as follows:
 
-1. Download the folder `modnets` and place it in your working directory
+1. Download the folder [modnets] and place it in your working directory
 2. Run: `source('modnets/functions.R')`
 3. You now have access to all functions in the package!
 
-The repository will be made accessible to download in R via `devtools` soon.
+The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the [data] folder and save it inside the [modnets] folder.
+
 
 # Package Functions
 
@@ -36,6 +37,7 @@ The repository will be made accessible to download in R via `devtools` soon.
 * For bootstrapping/edge-weight accuracy analysis, you can use the `bootNet` function (the name will be changed, given the popularity of the `bootnet` function by Sacha Epskamp that my code is based on).
 * For case-dropping stability analysis, you can use `bootNet` while setting `caseDrop = TRUE`.
 * For power analysis, you can use: `mnetPowerSim` to simulate data based on expected network structure(s).
+
 
 # Examples
 
@@ -80,26 +82,35 @@ fit1 <- fitNetwork(data = x$data, covariates = 6)
 # Now, lets fit the saturated model where 'M' moderates all edges in the network
 fit2 <- fitNetwork(data = x$data, moderators = 6) 
 
-# Create a list of models we want to compare
-fits <- list(fit0 = fit0, fit1 = fit1, fit2 = fit2)
 
-
-##### PLOTTING
+### ================= PLOTTING ===================== ###
 plot(fit0)
 plot(fit1)
 plot(fit2)
 # We can plot each of these models to see the resultant undirected network
 
-plot(fit0, threshold = TRUE)
-plot(fit1, threshold = TRUE)
+plot(fit0, threshold = .05)
+plot(fit1, threshold = .05)
 plot(fit2, threshold = .05)
-# Plot only significant edges of the network. threshold = TRUE defaults to threshold = .05
+# Plot only significant edges of the network.
+
+plot(fit0, threshold = TRUE, predict = TRUE)
+plot(fit1, threshold = TRUE, predict = TRUE)
+plot(fit2, threshold = TRUE, predict = TRUE)
+# Using 'threshold = TRUE' is the same as 'threshold = .05'
+# 'predict = TRUE' plots R2 values for each regression
+
+plot(fit2, mnet = TRUE)
+plot(fit2, threshold = TRUE, mnet = TRUE
+# 'mnet = TRUE' plots the exogenous moderator
 
 
-##### MODEL COMPARISON
+### ============== MODEL COMPARISON ================ ###
+# Create a list of models we want to compare
+fits <- list(fit0 = fit0, fit1 = fit1, fit2 = fit2)
+
 modTable(fits = fits)
-# Performs likelihood ratio tests comparing the three models.
-
+# Performs likelihood ratio tests comparing the three models
 
 modTable(fits = fits, nodes = TRUE)
 # This does the same thing as above but at the nodewise level
