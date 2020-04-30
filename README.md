@@ -48,7 +48,7 @@ source('modnets/functions.R')
 ### ======= SIMULATE MODERATED NETWORK DATA ======== ###
 ### ================================================ ###
 # Can simulate data with no moderators, or with one exogenous moderator
-set.seed(123)
+set.seed(666)
 x <- simNet(N = 100, p = 5, m = TRUE, sparsity = .5)
 
 str(x)
