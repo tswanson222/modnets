@@ -25,11 +25,11 @@ The repository will be made accessible to download in R via `devtools` soon. Als
 # Package Functions
 
 ## Primary functions
-* The primary function used for the first two types of models is: `fitNetwork`. There are a variety of arguments and options that can be used for, e.g., penalized estimation, model specification, etc. These options are all contained within the `varSelect` algorithm.
+* The primary function used for the first two types of models is: `fitNetwork`. There are a variety of arguments and options that can be used for, e.g., penalized estimation, model specification, etc.
 * The primary functions used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
 
 ## Model selection
-* For model selection, you can use `varSelect` to employ either best-subset selection, the LASSO, ridge regression, or elastic net via `glmnet`, or the hierarchical LASSO via `glinternet`. These methods supports various information criteria as well as cross-validation for model selection.
+* For model selection, you can use `varSelect` to employ either best-subset selection, the LASSO, ridge regression, or elastic net via `glmnet`, or the hierarchical LASSO via `glinternet`. These methods supports various information criteria as well as cross-validation for model selection, and are embedded in the `varSelect` function.
 * Additionally, you can use the `resample` function to use repeated subsampling or bootstrapping with the `varSelect` algorithm built in. 
 
 ## Stability \& power analyses
