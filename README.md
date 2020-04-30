@@ -37,5 +37,14 @@ The repository will be made accessible to download in R via `devtools` soon.
 * For case-dropping stability analysis, you can use `bootNet` while setting `caseDrop = TRUE`.
 * For power analysis, you can use: `mnetPowerSim` to simulate data based on expected network structure(s).
 
+# Examples
 
-Please contact trevorswanson222@gmail.com with any questions.
+## Cross-sectional moderated network
+```
+Does this even work the same way?
+
+```
+
+
+
+Please contact t092s958@ku.edu with any questions.
