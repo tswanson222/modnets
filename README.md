@@ -9,8 +9,8 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 	* Involves GLS estimation of a SUR time series model, as well as a concentration graph of the residuals.
 3. Multi-level moderated networks
 	* Uses one of two methods for estimation.
-	* First method is a two-step multilevel model, where fixed/random effects are estimated separately from between-subject effects
-	* Second method uses a formal multilevel moderated vector autoregressive model with `lmer`
+	* One is a two-step multilevel model, where fixed/random effects are estimated separately from between-subject effects
+	* The other uses a formal multilevel moderated vector autoregressive model with `lmer`
 
 The repository will be made accessible to download in R via `devtools` soon.
 
