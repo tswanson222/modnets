@@ -111,7 +111,7 @@ plot(fit2, threshold = TRUE, predict = TRUE)
 # 'predict = TRUE' plots R2 values for each regression
 
 plot(fit2, mnet = TRUE)
-plot(fit2, threshold = TRUE, mnet = TRUE
+plot(fit2, threshold = TRUE, mnet = TRUE)
 # 'mnet = TRUE' plots the exogenous moderator
 
 
