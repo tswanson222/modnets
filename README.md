@@ -1,5 +1,5 @@
 # modnets
-R package for moderated network models (under construction).
+R package for moderated network models (UNDER CONSTRUCTION).
 
 Designed to afford exploratory and confirmatory estimation of 3 types of moderated networks:
 
@@ -15,7 +15,7 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 ## Downloading and using the package
 Currently, the way to use the R package is as follows:
 
-1. Put `modnets` folder in the working directory.
+1. Download the folder `modnets` and place it in your working directory
 2. Run: `source('modnets/functions.R')`
 3. You now have access to all functions in the package!
 
@@ -24,11 +24,11 @@ The repository will be made accessible to download in R via `devtools` soon.
 # Package Functions
 
 ## Primary functions
-* The primary function used for the first two types of models is: `fitNetwork`. There are a variety of arguments and options that can be used for, e.g., penalized estimation, model specification, etc. 
-* The primary functions(s) used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
+* The primary function used for the first two types of models is: `fitNetwork`. There are a variety of arguments and options that can be used for, e.g., penalized estimation, model specification, etc. These options are all contained within the `varSelect` algorithm.
+* The primary functions used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
 
 ## Model selection
-* For model selection, you can use `varSelect` to employ either best-subset selection, `glmnet`, or the hierarchical LASSO via `glinternet`. These methods supports various information criteria as well as cross-validation for model selection.
+* For model selection, you can use `varSelect` to employ either best-subset selection, the LASSO, ridge regression, or elastic net via `glmnet`, or the hierarchical LASSO via `glinternet`. These methods supports various information criteria as well as cross-validation for model selection.
 * Additionally, you can use the `resample` function to use repeated subsampling or bootstrapping with the `varSelect` algorithm built in. 
 
 ## Stability \& power analyses
