@@ -44,16 +44,26 @@ The repository will be made accessible to download in R via `devtools` soon.
 source('modnets/functions.R')
 # Package is now loaded! Make sure 'modnets' folder is in working directory.
 
+### SIMULATE MODERATED NETWORK DATA
 set.seed(1)
-data <- simNet(N = 100, p = 5, m = TRUE, sparsity = .5)
+x <- simNet(N = 100, p = 5, m = TRUE, sparsity = .5)
 
-head(data$data)
+head(x$data)
 # A 100x6 dataset, where the variable 'M' is the moderator, and there are 5 outcomes.
-# The 'data' object also contains elements that describe the true model parameters
+# The 'x' object also contains elements that describe the true model parameters
 
-fit0 <- fitNetwork(data = data$data[, -6]) # First, lets fit an unmoderated network, leaving out 'M' entirely
-fit1 <- fitNetwork(data = data$data, covariates = 6) # Next, lets fit a model that only includes 'M' as a covariate
-fit2 <- fitNetwork(data = data$data, moderators = 6) # Now, lets fit the saturated model where 'M' moderates all edges in the network
+
+### FITTING MODELS
+# First, lets fit an unmoderated network, leaving out 'M' entirely
+fit0 <- fitNetwork(data = x$data[, -6]) 
+
+# Next, lets fit a model that only includes 'M' as a covariate
+fit1 <- fitNetwork(data = x$data, covariates = 6) 
+
+# Now, lets fit the saturated model where 'M' moderates all edges in the network
+fit2 <- fitNetwork(data = x$data, moderators = 6) 
+
+# Create a list of models we want to compare
 fits <- list(fit0 = fit0, fit1 = fit1, fit2 = fit2)
 
 plot(fit0)
@@ -67,7 +77,8 @@ plot(fit2, threshold = .05)
 # Plot only significant edges of the network. threshold = TRUE defaults to threshold = .05
 
 modTable(fits = fits)
-# Performs likelihood ratio tests comparing the three models. Right-most column displays how many times each variable was selected out of all the comparisons
+# Performs likelihood ratio tests comparing the three models.
+# Right-most column displays how many times each model was selected out of all the comparisons
 
 modTable(fits = fits, nodes = TRUE)
 # This does the same thing as above but at the nodewise level
