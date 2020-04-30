@@ -40,7 +40,7 @@ The repository will be made accessible to download in R via `devtools` soon.
 # Examples
 
 ## Cross-sectional moderated network
-```
+```r
 source('modnets/functions.R')
 # Package is now loaded! Make sure 'modnets' folder is in working directory.
 
