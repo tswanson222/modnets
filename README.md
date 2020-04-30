@@ -15,11 +15,11 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 ## Downloading and using the package
 Currently, the way to use the R package is as follows:
 
-1. Download the folder (modnets) and place it in your working directory
+1. Download the folder [modnets](modnets) and place it in your working directory
 2. Run: `source('modnets/functions.R')`
 3. You now have access to all functions in the package!
 
-The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the (data) folder and save it inside the [modnets] folder.
+The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the [data](data) folder and save it inside the [modnets](modnets) folder.
 
 
 # Package Functions
