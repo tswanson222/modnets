@@ -29,7 +29,7 @@ The repository will be made accessible to download in R via `devtools` soon. Als
 * The primary functions used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
 
 ## Model selection
-* For model selection, you can use `varSelect` to employ either best-subset selection, the LASSO, ridge regression, or elastic net via `glmnet`, or the hierarchical LASSO via `glinternet`. These methods supports various information criteria as well as cross-validation for model selection, and are embedded in the `varSelect` function.
+* For model selection, you can use `varSelect` to employ either best-subset selection, the LASSO, ridge regression, or elastic net (all via `glmnet`), or the hierarchical LASSO (via `glinternet`). These methods support various information criteria as well as cross-validation for model selection, and are embedded within the `varSelect` function.
 * Additionally, you can use the `resample` function to use repeated subsampling or bootstrapping with the `varSelect` algorithm built in. 
 
 ## Stability \& power analyses
