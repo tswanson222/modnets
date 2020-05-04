@@ -109,7 +109,9 @@ SimNets <- function(N, nsims = 10, ntime = 50, p = 3, m = "random", FUN = "mlGVA
   return(output)
 }
 
+
 ##### TEMPORARY 
+# esmStudy
 threeFits <- function(dat, m, scale = TRUE, saveMods = FALSE, ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
   args[c('scale', 'saveMods', 'lags')] <- list(scale, saveMods, 1)
@@ -170,6 +172,8 @@ intSelect <- function(x1, x2 = NULL, len = FALSE){
   k <- lapply(lapply(k, unlist), function(z) setdiff(z, ''))
   k
 }
+
+# study 1?
 csgather <- function(x, first = TRUE){
   y <- lapply(lapply(x, cscoef, first = first, verbose = FALSE), function(z) data.frame(t(z)))
   y1 <- setNames(do.call(rbind.data.frame, lapply(y, '[[', 1)), c('edge', 'strength', 'EI'))
@@ -194,6 +198,7 @@ csgather <- function(x, first = TRUE){
   out2 <- cbind.data.frame(out2, type = rep(out$type, 3), M = rep(out$M, 3))
   return(out2)
 }
+
 
 ##### simNet: simulate network structures and data
 simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL, 
