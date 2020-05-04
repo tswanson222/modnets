@@ -842,10 +842,11 @@ setupModnets <- function(folders = '.', rm = FALSE){
     if(isTRUE(rm)){system(paste0('rm -rf ', folders[j], '/modnets'))}
     system(paste0('mkdir ', folders[j], '/modnets'))
     for(k in seq_along(mods)){system(paste0("cp ", fold, mods[k], " ./", folders[j], "/modnets/"))}
+    path <- "setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')"
     f0 <- readLines(paste0(folders[j], "/modnets/functions.R"))
-    f1 <- which(f0 == "setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')")
     f2 <- which(f0 == "files <- paste0('./', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')")
-    f0[f1] <- paste0("#", f0[f1])
+    f1 <- which(f0 == path)
+    if(length(f1) != 0){f0[f1] <- paste0("#", f0[f1])}
     f0[f2] <- gsub("'./'", "'modnets/'", f0[f2])
     f0 <- paste0(paste0(f0, collapse = "\n"), "\n")
     cat(f0, file = paste0(folders[j], "/modnets/functions.R"))
