@@ -853,3 +853,16 @@ setupModnets <- function(folders = '.', rm = FALSE){
   }
 }
 
+allModnets <- function(file = NULL, path = 'default', modfolder = NULL){
+  stopifnot(!is.null(file))
+  if(is.null(modfolder)){modfolder <- '~/C: Desktop/COMPS/METHODS/CODE/modnets'}
+  if(identical(path, 'default')){path <- modfolder}
+  mods <- paste0(c("functions", "ggm", "centrality", "sim", "mlGVAR", 
+                   "simGVAR", "penalized", "power", "plots"), ".R")
+  if(any(grepl('/$', path))){path <- gsub('/$', '', path)}
+  if(any(grepl('/$', modfolder))){modfolder <- gsub('/$', '', modfolder)}
+  k <- lapply(mods, function(i) suppressWarnings(readLines(paste0(modfolder, '/', i))))
+  k <- paste0(lapply(k, paste0, collapse = '\n'), collapse = '\n\n')
+  cat(paste0(k, '\n'), file = paste0(path, '/', file))
+}
+

@@ -338,7 +338,8 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
       aic <- AIC(models[[z]])
       bic <- BIC(models[[z]])
     }
-    return(list(deviance = deviance, LL_model = LL_model, AIC = aic, BIC = bic, model = mods[[z]]))
+    pees <- as.matrix(summary(models[[z]])$coefficients[, 4], ncol = 1) ###
+    return(list(deviance = deviance, LL_model = LL_model, AIC = aic, BIC = bic, model = mods[[z]], pvals = pees)) ###
   })
   if(!"noMods" %in% names(attributes(models))){pcor <- FALSE}
   if("noMods" %in% names(attributes(models))){

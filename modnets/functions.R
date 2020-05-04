@@ -2007,7 +2007,7 @@ net <- function(fit, n = "beta", threshold = FALSE, rule = "OR",
 
 ##### netInts: get interactions from fit objects
 netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE, 
-                    rule = 'none', r = NULL, empty = TRUE){
+                    rule = 'none', r = NULL, empty = TRUE, mselect = NULL){
   rules <- c('none', 'or', 'and')
   eout <- function(fit, empty = TRUE){
     n <- tryCatch({ncol(net(fit))}, error = function(e){TRUE})
@@ -2050,8 +2050,12 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
   } else if(any(c('mlVARsim', 'simMLgvar') %in% atts)){
     stopifnot("mm" %in% names(fit))
     out <- fit$mm$mb2
+  } else if(!'interactions' %in% names(fit)){
+    out <- tryCatch({mmat(fit = fit, m = mselect)}, error = function(e){TRUE})
+    if(isTRUE(out)){return(eout(fit, empty))}
+    pvals <- out$pvals
+    out <- out$betas
   } else {
-    if(!'interactions' %in% names(fit)){return(eout(fit, empty))}
     out <- fit$interactions[[1]]
     if(isTRUE(attr(fit, "ggm"))){
       pvals <- out[[2]][[2]]
@@ -2074,6 +2078,49 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
   if(avg){out <- (t(out) + out)/2}
   if(!is.null(r)){out <- out[-r, -r]}
   if(is(out, 'list')){return(eout(fit, empty))}
+  return(out)
+}
+
+##### mmat: get interaction matrices when there are multiple exogenous moderators
+mmat <- function(fit, m = NULL){
+  if(isTRUE(attr(fit, 'ggm'))){
+    stopifnot(!is.null(fit$call$moderators))
+    allmods <- fit$call$moderators
+    p <- length(fit$mods)
+    vs <- names(fit$mods)
+    exind <- function(fit, mm, ex){
+      lapply(lapply(lapply(fit$mods, '[[', ifelse(ex == 'b', 'model', 'pvals')), 
+                    function(i) i[grep(mm, rownames(i)), ]), function(z){
+                      names(z) <- gsub(mm, '', names(z))
+                      if(any(!names(z) %in% vs)){z <- z[which(names(z) %in% vs)]}
+                      z
+                    })
+    }
+    if(is.null(m)){
+      m <- allmods[1]
+    } else if(!m %in% allmods){
+      if(any(grepl(m, allmods))){
+        m <- allmods[grep(m, allmods)[1]]
+      } else {
+        stop(paste0('No interactions with ', m))
+      }
+    }
+    mm <- paste0(c(paste0(':', m), paste0(m, ':')), collapse = '|')
+    betas <- exind(fit = fit, mm = mm, ex = 'b')
+    pvals <- exind(fit = fit, mm = mm, ex = 'p')
+    b1 <- p1 <- structure(matrix(0, p, p), dimnames = rep(list(vs), 2))
+    for(i in 1:p){
+      b1[i, match(names(betas[[i]]), vs)] <- betas[[i]]
+      p1[i, match(names(pvals[[i]]), vs)] <- pvals[[i]]
+    }
+    b1 <- t(b1)
+    p1 <- t(p1); diag(p1) <- 1
+    rownames(b1) <- rownames(p1) <- paste0(vs, ':', m)
+    out <- list(betas = b1, pvals = p1)
+    attr(out, 'moderator') <- m
+  } else {
+    stop('Not developed yet')
+  }
   return(out)
 }
 
