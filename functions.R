@@ -36,7 +36,8 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
                 "autism", "large", "symptom", "short", "resting", "big5", 
                 "esm", "esm1", "esm2", "esm3", "esm4", "esm5", "m3", "m5", 
                 "mod", "PTSD", "fried", "wichers", "new", "dep1", "dep2", 
-                "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini", "covid")
+                "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini",
+                "covid", "covid2", "esm6")
   if(d){return(data.frame(sort(whatData)))}
   setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
   if(!is.null(dat)){
@@ -96,8 +97,16 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
       list2env(poop, envir = .GlobalEnv)
       return(message("data and data0 in .GlobalEnv"))
     }
-    if(dat == 'covid'){
+    if(grepl('covid', dat)){
       data <- readRDS('data/covid.RDS')
+      if(dat == 'covid2'){
+        vs <- colnames(data)
+        k <- attr(data, 'k')
+        m <- vs[k][startsWith(vs[k], 'C')]
+        data <- data[, setdiff(colnames(data), setdiff(vs[k], m))]
+        attr(data, 'k') <- which(colnames(data) %in% m)
+        attr(data, 'args') <- list(m = attr(data, 'k'), beepno = 'beepvar', dayno = 'dayvar')
+      }
       assign('data', data, envir = .GlobalEnv)
       return(message('data in .GlobalEnv'))
     }
@@ -262,8 +271,10 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
         data <- data[, c(attr(data, 'modVars'), timevars)]
         if(dat == 'esm3'){data <- data[, setdiff(colnames(data), setdiff(timevars, 'period'))]}
         if(dat == 'esm4'){data <- data[, setdiff(colnames(data), timevars)]}
-      } else if(dat == 'esm5'){
-        data <- data[, c(attr(data, 'modVars'), 'concentrat', setdiff(timevars, 'period'))]
+      } else if(dat %in% c('esm5', 'esm6')){
+        k <- switch(2 - (dat == 'esm6'), c('concentrat', 'period'), 'concentrat')
+        data <- data[, c(attr(data, 'modVars'), k, setdiff(timevars, 'period'))]
+        if(dat == 'esm6'){data <- na.omit(data[, 1:18]); levels(data$period) <- 1:6}
       }
       assign('data', data, envir = .GlobalEnv)
       return(message('data in .GlobalEnv'))
@@ -349,6 +360,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        getLL = TRUE, saveMods = TRUE, binarize = FALSE, fitCoefs = FALSE, 
                        detrend = FALSE, beepno = NULL, dayno = NULL, ...){
   t1 <- Sys.time() # START
+  fullcall <- match.call()
   if(!identical(detrend, FALSE) | (!is.null(beepno) & !is.null(dayno))){lags <- 1}
   if(any(is.na(data))){
     ww <- which(apply(data, 1, function(z) any(is.na(z))))
@@ -450,6 +462,9 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       mods0 <- nodewise(data = data, mods = moderators, varMods = type, 
                         lambda = which.lam, center = center, scale = scale,
                         covariates = covariates, exogenous = exogenous)
+      if(any(sapply(mods0$models, function(z) length(coef(z))) >= nrow(data)) & verbose){
+        warning('Model is overspecified; not enough cases to estimate all parameters')
+      }
       out <- modNet(models = mods0, threshold = threshold, rule = rule, 
                     mval = mval, pcor = pcor, binarize = binarize)
       output <- append(output, out)
@@ -476,6 +491,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
         output$mods0$models <- NULL
         output$fitobj <- if(fitCoefs){getFitCIs(output)} else {NULL}
       }
+      attr(output, 'fullcall') <- fullcall
       if(verbose){print(Sys.time() - t1)}
       return(output)
     } else {
@@ -582,7 +598,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       if(fitCoefs | !saveMods){
         output$SURfit <- if(fitCoefs){getFitCIs(output)} else {NULL}
       }
-      #if(!saveMods){output$SURfit <- NULL}
+      attr(output, 'fullcall') <- fullcall
       if(verbose){print(Sys.time() - t1)}
       return(output)
     }
@@ -675,7 +691,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
                     scale = FALSE, lag = NULL, con = 'adjR2', cat = 'nCC', 
                     plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
-                    binarize = FALSE, mlty = TRUE, ...){
+                    binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   getEdgeColors <- function(adjMat){
     obj <- sign(as.vector(adjMat))
     colMat <- rep(NA, length(obj))
@@ -737,13 +753,39 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
     if(isTRUE(attr(object, "mlGVAR"))){
       object <- object[[switch(which.net, between = "betweenNet", "fixedNets")]]
     }
-    if("SURnet" %in% names(object)){object <- object$SURnet}
+    if("SURnet" %in% names(object)){
+      if(!is.null(mselect) & length(object$call$moderators) > 1 & isTRUE(object$call$exogenous)){
+        if(isTRUE(mselect)){mselect <- object$call$moderators[1]}
+        adjm <- netInts(fit = object, n = 'temporal', threshold = TRUE, 
+                        avg = FALSE, rule = 'none', empty = FALSE, 
+                        mselect = mselect)
+        object$SURnet$temporal$modEdges <- abs(sign(adjm)) + 1
+      }
+      object <- object$SURnet
+    }
     if(!"adjMat" %in% names(object)){
       object[c("adjMat", "edgeColors")] <- eval(parse(text = paste0("object$", switch(
         which.net, pdc = "temporal$PDC", which.net))))[c("adjMat", "edgeColors")]
       if(!startsWith(which.net, "c") & "modEdges" %in% names(object$temporal)){
         object$modEdges <- object$temporal$modEdges
       }
+    }
+  }
+  obmods <- object$call$moderators
+  exo <- ifelse('exogenous' %in% names(object$call), object$call$exogenous, TRUE)
+  if(isTRUE(attr(object, 'ggm')) & ifelse(
+    all(!sapply(list(obmods, mselect), is.null)), 
+    length(obmods) > 1 & exo, FALSE)){
+    if(isTRUE(mselect)){mselect <- obmods[1]}
+    adjm <- netInts(fit = object, n = 'between', threshold = TRUE, 
+                    avg = !nodewise, rule = rule, empty = FALSE, 
+                    mselect = mselect)
+    if(nodewise){
+      object$nodewise$modEdgesNW <- abs(sign(adjm)) + 1
+      diag(object$nodewise$modEdgesNW) <- 0
+    } else {
+      object$modEdges <- abs(sign(adjm)) + 1
+      diag(object$modEdges) <- 0
     }
   }
   if(threshold != FALSE){
@@ -981,6 +1023,19 @@ plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'betwe
     plot.new()
     text(x = xpos, y = ypos, labels = label)
   }
+}
+
+##### getEdgeColors
+getEdgeColors <- function(adjMat){
+  obj <- sign(as.vector(adjMat))
+  colMat <- rep(NA, length(obj))
+  if(any(obj == 1)){colMat[obj == 1] <- "darkgreen"}
+  if(any(obj == 0)){colMat[obj == 0] <- "darkgrey"}
+  if(any(obj == -1)){colMat[obj == -1] <- "red"}
+  colMat <- matrix(colMat, ncol = ncol(adjMat), nrow = nrow(adjMat))
+  if(all(adjMat %in% 0:1)){colMat[colMat != 'darkgrey'] <- 'darkgrey'}
+  dimnames(colMat) <- dimnames(adjMat)
+  colMat
 }
 
 ##### predictNet: Calculate prediction error
@@ -2061,13 +2116,27 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
       pvals <- out[[2]][[2]]
       out <- out[[2]][[1]]
     } else {
+      rule <- 'none'
       pvals <- fit$interactions$pvals
+      if(ncol(out) != nrow(out) & !is.null(mselect)){
+        if(isTRUE(mselect)){mselect <- fit$call$moderators[1]}
+        m1 <- paste0(':', mselect); m2 <- paste0(mselect, ':')
+        mm <- paste0(c(m1, m2), collapse = '|')
+        my <- paste0(gsub('[.]y$', '', rownames(out)), collapse = '|')
+        mb1 <- out[, grep(mm, colnames(out))]
+        mb1 <- mb1[, grep(my, colnames(mb1))]
+        mp1 <- pvals[, grep(mm, colnames(pvals))]
+        mp1 <- mp1[, grep(my, colnames(mp1))]
+        out <- mb1
+        pvals <- mp1
+      }
     }
   }
   if(threshold != FALSE & !"mlVARsim" %in% atts){
     rule <- match.arg(tolower(rule), rules)
+    if(isTRUE(attr(fit, 'ggm')) & rule == 'none'){rule <- 'or'}
     if(!is.numeric(threshold)){threshold <- .05}
-    if(rule == 'none'){
+    if(rule == 'none' | isTRUE(attr(fit, 'SURnet'))){
       out <- out * ifelse(pvals <= threshold, 1, 0)
     } else if(rule == 'or'){
       out <- out * ifelse(pvals <= threshold | t(pvals) <= threshold, 1, 0)
@@ -2087,35 +2156,49 @@ mmat <- function(fit, m = NULL){
     stopifnot(!is.null(fit$call$moderators))
     allmods <- fit$call$moderators
     p <- length(fit$mods)
-    vs <- names(fit$mods)
+    vs <- varnames <- names(fit$mods)
     exind <- function(fit, mm, ex){
-      lapply(lapply(lapply(fit$mods, '[[', ifelse(ex == 'b', 'model', 'pvals')), 
-                    function(i) i[grep(mm, rownames(i)), ]), function(z){
-                      names(z) <- gsub(mm, '', names(z))
-                      if(any(!names(z) %in% vs)){z <- z[which(names(z) %in% vs)]}
-                      z
-                    })
+      lapply(lapply(lapply(fit$mods, '[[', ifelse(ex == 'b', 'model', 'pvals')), function(i){
+        i[grep(mm, rownames(i)), ]
+      }), function(z){
+        orignames <- names(z)
+        names(z) <- gsub(mm, '', names(z))
+        if(any(!names(z) %in% vs)){
+          orignames <- orignames[which(names(z) %in% vs)]
+          z <- z[which(names(z) %in% vs)]
+        }
+        attr(z, 'orignames') <- orignames
+        return(z)
+      })
     }
     if(is.null(m)){
       m <- allmods[1]
-    } else if(!m %in% allmods){
-      if(any(grepl(m, allmods))){
-        m <- allmods[grep(m, allmods)[1]]
+    } else if(!tolower(m) %in% tolower(allmods)){
+      if(any(grepl(tolower(m), tolower(allmods)))){
+        m <- allmods[grep(tolower(m), tolower(allmods))[1]]
       } else {
         stop(paste0('No interactions with ', m))
       }
+    } else if(!m %in% allmods){
+      m <- allmods[which(tolower(allmods) == tolower(m))]
     }
-    mm <- paste0(c(paste0(':', m), paste0(m, ':')), collapse = '|')
+    m1 <- paste0(':', m); m2 <- paste0(m, ':')
+    mm <- paste0(c(m1, m2), collapse = '|')
     betas <- exind(fit = fit, mm = mm, ex = 'b')
     pvals <- exind(fit = fit, mm = mm, ex = 'p')
     b1 <- p1 <- structure(matrix(0, p, p), dimnames = rep(list(vs), 2))
     for(i in 1:p){
+      nvi <- attr(betas[[i]], 'orignames')
       b1[i, match(names(betas[[i]]), vs)] <- betas[[i]]
       p1[i, match(names(pvals[[i]]), vs)] <- pvals[[i]]
+      if(any(grepl(m2, nvi))){
+        varnames[which(paste0(m2, vs) %in% nvi)] <- paste0(m2, vs)[which(paste0(m2, vs) %in% nvi)]
+      }
     }
+    varnames[!grepl(m2, varnames)] <- paste0(varnames[!grepl(m2, varnames)], m1)
     b1 <- t(b1)
     p1 <- t(p1); diag(p1) <- 1
-    rownames(b1) <- rownames(p1) <- paste0(vs, ':', m)
+    rownames(b1) <- rownames(p1) <- varnames
     out <- list(betas = b1, pvals = p1)
     attr(out, 'moderator') <- m
   } else {
@@ -2552,7 +2635,8 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
 varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
                       lags = NULL, exogenous = TRUE, type = "g", center = TRUE,
                       scale = FALSE, gamma = .5, nfolds = 10, varSeed = NULL, 
-                      useSE = TRUE, nlam = NULL, covs = NULL, verbose = TRUE){
+                      useSE = TRUE, nlam = NULL, covs = NULL, verbose = TRUE, 
+                      beepno = NULL, dayno = NULL){
   dat <- data
   ALL <- FALSE
   dmnames <- NULL # VARSELECT START
@@ -2564,6 +2648,9 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
   if(is.null(lags)){
     if(length(m) >= ncol(dat) - 1){exogenous <- FALSE}
     if(!exogenous){ALL <- TRUE}
+  } else if(any(!sapply(c(beepno, dayno), is.null))){
+    stopifnot(!is.null(beepno) & !is.null(dayno))
+    dat <- getConsec(data = dat, beepno = beepno, dayno = dayno)
   }
   if(!is(dat, 'list')){
     dat <- structure(data.frame(dat), samp_ind = attr(data, "samp_ind"))
@@ -2802,6 +2889,19 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
     seeds <- seed
   }
   sampInd <- samps <- vars <- vars1 <- fits <- train <- test <- list()
+  if((exogenous | is.null(m)) & sampMethod != 'bootstrap'){
+    mno <- as.numeric(!is.null(m) & !identical(m, 0))
+    lno <- as.numeric(!is.null(lags) & !identical(lags, 0))
+    minsize <- sampleSize(p = ncol(data) - mno, m = mno,
+                          lags = lno, print = FALSE)
+    minn <- ifelse(split > .5, N - floor(N * split), floor(N * split))
+    if(minn < minsize & split != .5){
+      split <- .5
+      minn <- ifelse(split > .5, N - floor(N * split), floor(N * split))
+      if(minn > minsize){warning('Split size set to .5 to produce large enough subsamples')}
+    }
+    if(minn < minsize){stop('Sample-split size is smaller than required')}
+  }
   if(nCores > 1 | isTRUE(nCores)){
     if(isTRUE(nCores)){nCores <- parallel::detectCores()}
     if(grepl('Windows', sessionInfo()$running)){cluster <- 'SOCK'}

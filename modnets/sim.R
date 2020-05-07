@@ -111,13 +111,17 @@ SimNets <- function(N, nsims = 10, ntime = 50, p = 3, m = "random", FUN = "mlGVA
 
 
 ##### TEMPORARY 
-# esmStudy
+# -------------------- START
 threeFits <- function(dat, m, scale = TRUE, saveMods = FALSE, ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
   args[c('scale', 'saveMods', 'lags')] <- list(scale, saveMods, 1)
   args <- args[intersect(names(args), formalArgs('fitNetwork'))]
   out <- setNames(lapply(1:3, function(z){
     X <- switch(z, dat[, -m], dat, dat)
+    if(z == 1){
+      mostattributes(X) <- attributes(dat)
+      names(X) <- names(dat)[-m]
+    }
     M <- switch(z, NULL, NULL, m)
     covars <- switch(z, NULL, m, NULL)
     args0 <- replace(args, c('data', 'moderators', 'covariates'), list(data = X, moderators = M, covariates = covars))
@@ -127,9 +131,16 @@ threeFits <- function(dat, m, scale = TRUE, saveMods = FALSE, ...){
 }
 getVars <- function(dat, m, inds = c('CV', 'AIC', 'BIC', 'EBIC'), 
                     vars = NULL, fit = TRUE, ex = NULL, scale = TRUE,
-                    saveMods = FALSE, nCores = 1, ...){
+                    saveMods = FALSE, which.lam = 'min', nCores = 1, ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
-  input <- list(dat, m, 1, scale, saveMods)
+  beepday <- c('beepno', 'dayno')
+  if(any(beepday %in% names(args))){
+    stopifnot(all(beepday %in% names(args)))
+    dat <- getConsec(dat, args$beepno, args$dayno)
+    args <- args[setdiff(names(args), beepday)]
+  }
+  vs <- colnames(dat)
+  input <- list(dat, m, 1, scale, saveMods, which.lam[1])
   newvars <- FALSE
   if(is.null(vars)){
     args1 <- args[intersect(names(args), formalArgs('varSelect'))]
@@ -146,32 +157,77 @@ getVars <- function(dat, m, inds = c('CV', 'AIC', 'BIC', 'EBIC'),
         do.call(varSelect, args0)
       })
     }
+    names(vars) <- paste0('vars', setdiff(inds, ex))
     newvars <- TRUE
+  } else if(any(sapply(vs, function(i) any(grepl(i, names(vars)))))){
+    vars <- setNames(list(vars), paste0('vars', attr(vars, 'criterion')))
+  } else {
+    names(vars) <- paste0('vars', unname(sapply(vars, attr, 'criterion')))
   }
   if(fit & !is.null(vars)){
     args2 <- args[intersect(names(args), formalArgs('fitNetwork'))]
-    args2[c('data', 'moderators', 'lags', 'scale', 'saveMods')] <- input
+    args2[c('data', 'moderators', 'lags', 'scale', 'saveMods', 'which.lam')] <- input
     pbapply::pboptions(type = 'timer', char = '-')
-    fits <- pbapply::pblapply(vars, function(z){
+    fits <- setNames(pbapply::pblapply(vars, function(z){
       args0 <- replace(args2, 'type', list(type = z))
       do.call(fitNetwork, args0)
-    }, cl = nCores)
+    }, cl = nCores), gsub('^vars', 'fit', names(vars)))
+    cvv <- which(grepl('CV$', names(vars)))
+    if(length(cvv) > 0){
+      names(fits)[cvv] <- paste0(names(fits)[cvv], which.lam[1])
+      if(length(which.lam) > 1){
+        args2 <- replace(args2, c('type', 'which.lam'), list(
+          type = vars[[cvv]], which.lam = which.lam[2]))
+        fits <- append(fits, list(do.call(fitNetwork, args2)))
+        names(fits)[length(fits)] <- paste0('fitCV', which.lam[2])
+      }
+    }
   }
   out <- list()
   if(newvars){out$vars <- vars}
-  if(fit){out$fits <- fits}
+  if(fit){
+    if(!newvars & length(fits) == 1){
+      out$fits <- fits[[1]]
+    } else {
+      out$fits <- fits
+    }
+  }
+  #if(newvars){out$vars <- vars}
+  #if(fit){out$fits <- fits}
   return(out)
 }
-intSelect <- function(x1, x2 = NULL, len = FALSE){
-  if(!is.null(x2)){
-    n <- 8 - length(x2$fits)
-    x1 <- append(x1, setNames(x2$fits, paste0('fit', n:7)))
-    if(!len){return(x1)}
+#intSelect <- function(x1, x2 = NULL, len = FALSE){
+#  if(!is.null(x2)){
+#    n <- 8 - length(x2$fits)
+#    x1 <- append(x1, setNames(x2$fits, paste0('fit', n:7)))
+#    if(!len){return(x1)}
+#  }
+#  k <- lapply(lapply(x1, selected), '[[', 'ints')
+#  k <- lapply(lapply(k, unlist), function(z) setdiff(z, ''))
+#  k
+#}
+intSelect <- function(x, collapse = FALSE, threshold = FALSE, 
+                      len = FALSE, rmnull = TRUE){
+  m <- sapply(lapply(x, '[[', 'call'), '[[', 'moderators')
+  m0 <- which(sapply(m, is.null))
+  m <- setdiff(names(m), names(m0))
+  s <- lapply(lapply(x[m], selected, threshold = threshold), '[[', 'ints')
+  if(length(s) < length(x)){
+    x0 <- setdiff(names(x), names(s))
+    s <- append(setNames(rep(list(NULL), length(x0)), x0), s)
+    s <- s[order(gnum(names(s)))]
   }
-  k <- lapply(lapply(x1, selected), '[[', 'ints')
-  k <- lapply(lapply(k, unlist), function(z) setdiff(z, ''))
-  k
+  if(collapse){
+    s <- lapply(s, function(z){
+      z1 <- unname(unlist(z))
+      z1[z1 != '']
+    })
+  }
+  if(rmnull & any(sapply(s, is.null))){s <- s[-which(sapply(s, is.null))]}
+  if(len){s <- sapply(s, length)}
+  return(s)
 }
+# ---------------------- END
 
 # study 1?
 csgather <- function(x, first = TRUE){
