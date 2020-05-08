@@ -1951,6 +1951,7 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
                      xn = NULL, getCIs = FALSE, discrete = FALSE, 
                      ylab = NULL, main = NULL, midline = TRUE){
   require(ggplot2)
+  if(isTRUE(discrete)){compare <- 0:1}
   if("adjMat" %in% names(out)){out <- out$mods0}
   if(any(c("models", "SURnet") %in% names(out))){
     out <- condEffects(out, xn = xn, x = compare)}
@@ -2028,6 +2029,7 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
       pp <- pp + xlab(xlab) + ylab(ylab) + ggtitle(mainlab) + theme_bw()
     }
   } else {
+    if(isTRUE(discrete)){data$x <- factor(data$x, levels = 0:1)}
     pp <- ggplot(data = data, aes(x = x, y = y)) + 
       geom_point() + geom_errorbar(aes(ymin = lower, ymax = upper), width = .05)
     if(midline){pp <- pp + geom_hline(yintercept = mean(data$y), linetype = 3, alpha = .6, color = "red")}

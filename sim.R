@@ -208,6 +208,8 @@ getVars <- function(dat, m, inds = c('CV', 'AIC', 'BIC', 'EBIC'),
 #}
 intSelect <- function(x, collapse = FALSE, threshold = FALSE, 
                       len = FALSE, rmnull = TRUE){
+  single <- FALSE
+  if('call' %in% names(x)){x <- list(fit = x); single <- TRUE}
   m <- sapply(lapply(x, '[[', 'call'), '[[', 'moderators')
   m0 <- which(sapply(m, is.null))
   m <- setdiff(names(m), names(m0))
@@ -225,7 +227,28 @@ intSelect <- function(x, collapse = FALSE, threshold = FALSE,
   }
   if(rmnull & any(sapply(s, is.null))){s <- s[-which(sapply(s, is.null))]}
   if(len){s <- sapply(s, length)}
+  if(single){s <- s[[1]]}
   return(s)
+}
+
+fullTable <- function(outs, orderBy = 'LRT', decreasing = TRUE){
+  stopifnot(all(sapply(outs, function(z) 'fits' %in% names(z))))
+  fits <- lapply(outs, '[[', 'fits')
+  fits <- setNames(lapply(seq_along(fits), function(z){
+    names(fits[[z]]) <- paste0(names(fits[[z]]), '_', gnum(names(fits)[z]))
+    fits[[z]]
+  }), names(fits))
+  tt <- SURtable(appd(fits))[[2]]
+  tt <- cbind.data.frame(setNames(do.call(
+    rbind.data.frame, strsplit(rownames(tt), '_')
+  ), c('mod', 'samp')), tt)
+  tt <- tt[order(gnum(tt$mod)), ]
+  tt <- tt[order(tt$samp), ]
+  rownames(tt) <- 1:nrow(tt)
+  tt$mod <- factor(tt$mod)
+  tt$samp <- factor(tt$samp)
+  if(orderBy %in% colnames(tt)){tt <- tt[order(tt[[orderBy]], decreasing = decreasing), ]}
+  return(tt)
 }
 # ---------------------- END
 

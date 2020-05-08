@@ -3992,13 +3992,13 @@ plotStability <- function(obj, pp = 1, s = 3, thresh = .5, color = "black"){
 ### ======================================================================== ###
 ### ======================================================================== ###
 if(exists("clear")){
-  if(clear == TRUE){
+  if(isTRUE(clear)){
     message("Clearing .GlobalEnv")
     rm(clear)
     .modnets <- new.env()
     .modnets <- globalenv()
     suppressMessages(attach(.modnets))
-    rm(list=ls())
+    rm(list = setdiff(ls(), ifelse(exists('keep'), 'keep', '')))
   }
 }
 message("This is modnets 1.0.0")
