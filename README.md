@@ -25,10 +25,15 @@ Currently, the way to use the R package is as follows:
 
 1. Download the folder [modnets](modnets) and place it in your working directory
 2. In R, run: `source('modnets/functions.R')`
-   - Or, if you wish to avoid clutter, run: `clear <- TRUE; source('modnets/functions.R')`
 3. You now have access to all functions in the package!
 
 The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the [data](data) folder and save it inside the [modnets](modnets) folder.
+
+Because we are loading the package via the `source` command, by default all functions will be stored in the global environment. To reduce clutter and make for a cleaner setup, there are two "commands" that can be added. 
+
+* By setting `clear <- TRUE` in the global environment, the functions will be relegated into a new environment called `.modnets`. **Note, however, that this also clears the contents of your global environment.** 
+* To address potential issues from the above, you can create a list or vector called `keep` that names the objects you want to preserve. To preserve all of your global environment, simply set `keep <- ls()`
+* To put these commands together, simply run: `keep <- ls(); clear <- TRUE; source('modnets/functions.R')`
 
 
 # Package Functions

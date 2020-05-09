@@ -1,6 +1,7 @@
+.globals <- globalenv(); suppressMessages(attach(.globals))
 if(!exists("pkgs")){pkgs <- c("glmnet", "mgm", "qgraph", "grpregOverlap", "systemfit", "leaps", "hierNet", "glinternet")}
 if(!"none" %in% pkgs){invisible(suppressMessages(lapply(pkgs, require, character.only = TRUE)))}
-if(exists("clear")){if(clear == TRUE){rm(list = ls()); clear <- TRUE}} else {rm(pkgs)}
+if(exists("clear")){if(clear == TRUE){rm(list = setdiff(ls(), 'keep')); clear <- TRUE}} else {rm(pkgs)}
 if(".modnets" %in% search()){detach(".modnets")}
 #setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
 files <- paste0('modnets/', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')
@@ -4033,7 +4034,17 @@ if(exists("clear")){
     .modnets <- new.env()
     .modnets <- globalenv()
     suppressMessages(attach(.modnets))
-    rm(list = setdiff(ls(), ifelse(exists('keep'), 'keep', '')))
+    rm(list = setdiff(ls(), 'keep'))
+    if(exists('keep')){
+      if(is.character(keep)){
+        invisible(sapply(keep, function(z){
+          if(z %in% ls('.globals')){assign(z, eval(parse(text = z)), envir = .GlobalEnv)}
+        }))
+      }
+      rm(keep, envir = .GlobalEnv)
+      rm(keep, envir = .modnets, inherits = TRUE)
+    }
   }
 }
+detach(.globals)
 message("This is modnets 1.0.0")
