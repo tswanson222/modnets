@@ -1790,6 +1790,7 @@ detrender <- function(data, timevar = NULL, vars = NULL,
 ##### getConsec
 getConsec <- function(data, beepno = NULL, dayno = NULL, makeAtt = TRUE){
   stopifnot(!is.null(beepno) & !is.null(dayno))
+  stopifnot(is.data.frame(data))
   beepday <- list(beepno, dayno)
   stopifnot(sum(sapply(c(1, nrow(data)), function(i){
     all(sapply(beepday, length) == i)})) == 1)
@@ -2850,21 +2851,25 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
   # The 'split' argument, for sampMethod %in% c('split', 'stability') 
   # Is the proportion of the data to be included in the training set
   t1 <- Sys.time() # RESAMPLE START
-  if(!is.null(lags)){lags <- switch(2 - identical(as.numeric(lags), 0), NULL, 1)}
-  if(is.null(lags)){
-    if(!identical(block, FALSE)){message('Block bootstrap only available for time series data')}
-    block <- FALSE
-  } else if(any(!sapply(c(beepno, dayno), is.null))){
-    stopifnot(!is.null(beepno) & !is.null(dayno))
-    data <- getConsec(data = data, beepno = beepno, dayno = dayno)
+  if(is.null(lags) & !identical(block, FALSE)){
+    message('Assuming lags = 1 since block resampling was requested')
+    lags <- 1
+  }
+  if(!is.null(lags)){
+    lags <- switch(2 - identical(as.numeric(lags), 0), NULL, 1)
+    if(any(!sapply(c(beepno, dayno), is.null))){
+      stopifnot(!is.null(beepno) & !is.null(dayno))
+      data <- getConsec(data = data, beepno = beepno, dayno = dayno)
+    }
   }
   consec <- switch(2 - (!is.null(lags) & 'samp_ind' %in% names(attributes(data))), 
                    attr(data, 'samp_ind'), NULL)
+  N <- ifelse(is.null(consec), nrow(data) - ifelse(is.null(lags), 0, lags), length(consec))
+  data <- data.frame(data)
   if(!is.null(m)){if(all(m == 0)){m <- NULL}}
   method <- ifelse(!is.null(m), 'glinternet', ifelse(
     !method %in% c('glmnet', 'subset'), 'glmnet', method))
-  N <- ifelse(is.null(consec), nrow(data) - ifelse(is.null(lags), 0, lags), length(consec))
-  data <- data.frame(data)
+  if(isTRUE(block)){block <- floor(3.15 * N^(1/3))}
   criterion <- toupper(match.arg(tolower(criterion), c(
     "cv", "aic", "bic", "ebic", "cp", "rss", "adjr2", "rsq", "r2")))
   if(!criterion %in% c("AIC", "BIC", "EBIC", "CV")){method <- "subset"}
@@ -2905,7 +2910,6 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
     if(identical(block, FALSE)){
       sample(allinds, size, replace = (method == 'bootstrap'))
     } else if(method == 'bootstrap'){
-      if(isTRUE(block)){block <- floor(3.15 * N^(1/3))}
       stopifnot(block < N & block > 1)
       nblox <- 1
       while(N > block * nblox){nblox <- nblox + 1}
@@ -3413,8 +3417,8 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
   }
   sci <- sapply(adjCIs0, function(z) !all(z$select_ci == z$select))
   if(any(sci)){
-    message(paste0('CIs different than p-values for: ', paste(
-      names(sci)[sci], collapse = ', ')))
+    message(paste0('CIs different than p-values for:\n', paste(
+      names(sci)[sci], collapse = '\n')))
   }
   varMods0 <- lapply(varMods0, function(z) do.call(cbind.data.frame, z))
   boots <- lapply(1:niter, function(z){
