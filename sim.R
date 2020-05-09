@@ -1600,7 +1600,8 @@ getCommandArgs <- function(x = commandArgs(trailingOnly = TRUE)){
       assign(substr(a[1], 1, (nchar(a[1]) - 1)), switch(
         substr(a[1], nchar(a[1]), nchar(a[1])), 
         C = as.character, L = as.logical, 
-        N = as.numeric)(a[2]), envir = .GlobalEnv)
+        N = as.numeric, E = function(x){eval(parse(text = x))})(a[2]),
+        envir = .GlobalEnv)
     }
   }))
 }

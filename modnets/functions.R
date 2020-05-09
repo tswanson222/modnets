@@ -362,7 +362,6 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        getLL = TRUE, saveMods = TRUE, binarize = FALSE, fitCoefs = FALSE, 
                        detrend = FALSE, beepno = NULL, dayno = NULL, ...){
   t1 <- Sys.time() # START
-  fullcall <- match.call()
   if(!identical(detrend, FALSE) | (!is.null(beepno) & !is.null(dayno))){lags <- 1}
   if(any(is.na(data))){
     ww <- which(apply(data, 1, function(z) any(is.na(z))))
@@ -493,7 +492,6 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
         output$mods0$models <- NULL
         output$fitobj <- if(fitCoefs){getFitCIs(output)} else {NULL}
       }
-      attr(output, 'fullcall') <- fullcall
       if(verbose){print(Sys.time() - t1)}
       return(output)
     } else {
@@ -600,7 +598,6 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       if(fitCoefs | !saveMods){
         output$SURfit <- if(fitCoefs){getFitCIs(output)} else {NULL}
       }
-      attr(output, 'fullcall') <- fullcall
       if(verbose){print(Sys.time() - t1)}
       return(output)
     }
