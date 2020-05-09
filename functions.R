@@ -37,7 +37,7 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
                 "esm", "esm1", "esm2", "esm3", "esm4", "esm5", "m3", "m5", 
                 "mod", "PTSD", "fried", "wichers", "new", "dep1", "dep2", 
                 "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini",
-                "covid", "covid2", "esm6")
+                "covid", "covid2", "esm6", "esm7")
   if(d){return(data.frame(sort(whatData)))}
   setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
   if(!is.null(dat)){
@@ -271,10 +271,11 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
         data <- data[, c(attr(data, 'modVars'), timevars)]
         if(dat == 'esm3'){data <- data[, setdiff(colnames(data), setdiff(timevars, 'period'))]}
         if(dat == 'esm4'){data <- data[, setdiff(colnames(data), timevars)]}
-      } else if(dat %in% c('esm5', 'esm6')){
-        k <- switch(2 - (dat == 'esm6'), c('concentrat', 'period'), 'concentrat')
+      } else if(dat %in% c('esm5', 'esm6', 'esm7')){
+        k <- switch(2 - (dat != 'esm5'), c('concentrat', 'period'), 'concentrat')
         data <- data[, c(attr(data, 'modVars'), k, setdiff(timevars, 'period'))]
-        if(dat == 'esm6'){data <- na.omit(data[, 1:18]); levels(data$period) <- 1:6}
+        if(dat != 'esm5'){data <- na.omit(data[, 1:18]); levels(data$period) <- 1:6}
+        if(dat == 'esm7'){data <- subset(data, period == 3)[, setdiff(names(data), 'period')]}
       }
       assign('data', data, envir = .GlobalEnv)
       return(message('data in .GlobalEnv'))
@@ -2745,7 +2746,7 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
                                     nlam = nlam, nfolds = nfolds, gamma = gamma,
                                     method = method, useSE = useSE, lags = lags,
                                     criterion = criterion, dmnames = dmnames, 
-                                    verbose = verbose)
+                                    verbose = ifelse(is.logical(verbose), verbose, FALSE))
       t[i] <- tx <- Sys.time() - tx
       names(t)[i] <- attr(tx, "units")
       if(ALL & exists("m0", inherits = FALSE)){m <- m0}
