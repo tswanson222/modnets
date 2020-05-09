@@ -2867,7 +2867,9 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
   consec <- switch(2 - (!is.null(lags) & 'samp_ind' %in% names(attributes(data))), 
                    attr(data, 'samp_ind'), NULL)
   N <- ifelse(is.null(consec), nrow(data) - ifelse(is.null(lags), 0, lags), length(consec))
+  atts <- attributes(data)
   data <- data.frame(data)
+  attributes(data) <- atts
   if(!is.null(m)){if(all(m == 0)){m <- NULL}}
   method <- ifelse(!is.null(m), 'glinternet', ifelse(
     !method %in% c('glmnet', 'subset'), 'glmnet', method))

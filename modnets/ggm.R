@@ -970,7 +970,7 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
   ci <- (1 - ci)/2
   lags <- switch(2 - !is.null(lags), ifelse(all(lags != 0), 1, 0), 0)
   consec <- switch(2 - (lags & 'samp_ind' %in% names(attributes(data))), attr(data, 'samp_ind'), NULL)
-  n <- n0 <- ifelse(is.null(consec), nrow(data), length(consec))
+  n <- n0 <- ifelse(is.null(consec), ifelse(is(data, 'list'), nrow(data[[1]]), nrow(data)), length(consec))
   if(is.null(fits)){
     if(lags & any(!sapply(c(beepno, dayno), is.null))){
       stopifnot(!is.null(beepno) & !is.null(dayno))
