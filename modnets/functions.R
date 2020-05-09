@@ -1790,6 +1790,7 @@ detrender <- function(data, timevar = NULL, vars = NULL,
 ##### getConsec
 getConsec <- function(data, beepno = NULL, dayno = NULL, makeAtt = TRUE){
   stopifnot(!is.null(beepno) & !is.null(dayno))
+  stopifnot(is.data.frame(data))
   beepday <- list(beepno, dayno)
   stopifnot(sum(sapply(c(1, nrow(data)), function(i){
     all(sapply(beepday, length) == i)})) == 1)
@@ -2838,21 +2839,37 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
 }
 
 ##### resample: bootstrapping or multi-sample splits for variable selection
-resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion = "AIC",
+resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", criterion = "AIC",
                      method = "glmnet", rule = "OR", gamma = .5, nfolds = 10, 
                      nlam = 50, which.lam = "min", threshold = FALSE, bonf = FALSE, 
                      alpha = .05, exogenous = TRUE, split = .5, center = TRUE, 
                      scale = FALSE, varSeed = NULL, seed = NULL, verbose = TRUE, 
                      lags = NULL, binary = NULL, type = 'g', saveMods = TRUE,
                      saveData = FALSE, saveVars = FALSE, fitit = TRUE, 
-                     nCores = 1, cluster = 'mclapply', ...){
+                     nCores = 1, cluster = 'mclapply', block = FALSE,
+                     beepno = NULL, dayno = NULL, ...){
+  # The 'split' argument, for sampMethod %in% c('split', 'stability') 
+  # Is the proportion of the data to be included in the training set
   t1 <- Sys.time() # RESAMPLE START
-  if(!is.null(lags)){lags <- switch(2 - identical(as.numeric(lags), 0), NULL, 1)}
+  if(is.null(lags) & !identical(block, FALSE)){
+    message('Assuming lags = 1 since block resampling was requested')
+    lags <- 1
+  }
+  if(!is.null(lags)){
+    lags <- switch(2 - identical(as.numeric(lags), 0), NULL, 1)
+    if(any(!sapply(c(beepno, dayno), is.null))){
+      stopifnot(!is.null(beepno) & !is.null(dayno))
+      data <- getConsec(data = data, beepno = beepno, dayno = dayno)
+    }
+  }
+  consec <- switch(2 - (!is.null(lags) & 'samp_ind' %in% names(attributes(data))), 
+                   attr(data, 'samp_ind'), NULL)
+  N <- ifelse(is.null(consec), nrow(data) - ifelse(is.null(lags), 0, lags), length(consec))
+  data <- data.frame(data)
   if(!is.null(m)){if(all(m == 0)){m <- NULL}}
   method <- ifelse(!is.null(m), 'glinternet', ifelse(
     !method %in% c('glmnet', 'subset'), 'glmnet', method))
-  N <- nrow(data) - ifelse(is.null(lags), 0, lags)
-  data <- data.frame(data)
+  if(isTRUE(block)){block <- floor(3.15 * N^(1/3))}
   criterion <- toupper(match.arg(tolower(criterion), c(
     "cv", "aic", "bic", "ebic", "cp", "rss", "adjr2", "rsq", "r2")))
   if(!criterion %in% c("AIC", "BIC", "EBIC", "CV")){method <- "subset"}
@@ -2872,7 +2889,7 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
                  method = method, moderators = m, rule = rule, alpha = alpha, 
                  bonf = bonf, gamma = gamma, nfolds = nfolds, which.lam = which.lam,
                  split = split, center = center, scale = scale, exogenous = exogenous, 
-                 varSeed = varSeed, type = type, lags = lags)
+                 varSeed = varSeed, type = type, lags = lags, block = block)
   args <- tryCatch({list(...)}, error = function(e){list()}) ##### RESAMPLE ARGS
   if(length(args) != 0){preout <- append(preout, args)}
   if(is.null(lags)){preout$lags <- NULL} else {preout$rule <- NULL}
@@ -2887,6 +2904,23 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
     seeds <- sample(1:10000000, niter, replace = FALSE)
   } else {
     seeds <- seed
+  }
+  sampler2 <- function(N, size = N, block = FALSE, method = 'bootstrap', consec = NULL){
+    allinds <- switch(2 - is.null(consec), seq_len(N), consec)
+    if(identical(block, FALSE)){
+      sample(allinds, size, replace = (method == 'bootstrap'))
+    } else if(method == 'bootstrap'){
+      stopifnot(block < N & block > 1)
+      nblox <- 1
+      while(N > block * nblox){nblox <- nblox + 1}
+      possible <- seq_len(N - block)
+      starts <- replicate(nblox, sample(possible, 1))
+      sampinds <- c(sapply(starts, function(z) allinds[z:(z + block - 1)]))
+      if(length(sampinds) > N){sampinds <- sampinds[1:N]}
+      return(sampinds)
+    } else {
+      stop('Multi-split block resampling not yet implemented')
+    }
   }
   sampInd <- samps <- vars <- vars1 <- fits <- train <- test <- list()
   if((exogenous | is.null(m)) & sampMethod != 'bootstrap'){
@@ -2911,9 +2945,9 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
     } else {
       n <- N
     }
-    for(i in 1:niter){
+    for(i in 1:niter){ #### SAMPLING 1
       set.seed(seeds[i])
-      sampInd[[i]] <- sample(1:N, n, replace = (sampMethod == 'bootstrap'))
+      sampInd[[i]] <- sampler2(N = N, size = n, block = block, method = sampMethod, consec = consec)
       if(sampMethod != 'bootstrap'){
         if(is.null(lags)){
           train[[i]] <- data[sampInd[[i]], ]
@@ -2935,7 +2969,7 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
           attr(samps[[i]], 'samp_ind') <- sampInd[[i]]
         }
       }
-    }
+    } ##### SAMPLING 1 END
     staticArgs <- list(m = m, criterion = criterion, center = center, method = method, 
                        nfolds = nfolds, gamma = gamma, lags = lags, nlam = nlam, 
                        type = type, varSeed = varSeed, exogenous = exogenous, 
@@ -3039,9 +3073,9 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
       if(split <= 0 | split >= 1){stop("split size must be between 0 and 1")}
       train <- list(); test <- list()
       n <- floor(N * split)
-      for(i in 1:niter){
+      for(i in 1:niter){ ##### SAMPLING 2
         set.seed(seeds[i]) # RESAMPLE SPLIT
-        sampInd[[i]] <- sample(1:N, n, replace = FALSE)
+        sampInd[[i]] <- sampler2(N = N, size = n, block = block, method = sampMethod, consec = consec)
         if(is.null(lags)){
           train[[i]] <- data[sampInd[[i]], ]
           test[[i]] <- data[-sampInd[[i]], ]
@@ -3054,7 +3088,7 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
         samps[[i]][[1]] <- train[[i]]
         samps[[i]][[2]] <- test[[i]]
         names(samps[[i]]) <- c("train", "test")
-        if(verbose){
+        if(verbose){ ##### SAMPLING 2 END
           if(i == 1){cat("\n")}
           t2 <- Sys.time()
           cat("************ Sample Split: ", i, "/", niter, " ************\n", sep = "")
@@ -3102,16 +3136,16 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
       }
     }
     if(sampMethod == "bootstrap"){
-      for(i in 1:niter){
+      for(i in 1:niter){ ##### SAMPLING 3
         set.seed(seeds[i]) # RESAMPLE BOOT
-        sampInd[[i]] <- sample(1:N, N, replace = TRUE)
+        sampInd[[i]] <- sampler2(N = N, block = block, consec = consec) # Currently only for sampMethod == 'bootstrap'
         if(is.null(lags)){
           samps[[i]] <- data[sampInd[[i]], ]
         } else {
           samps[[i]] <- data
           attr(samps[[i]], "samp_ind") <- sampInd[[i]]
         }
-        if(verbose == TRUE){
+        if(verbose == TRUE){ ##### SAMPLING 3 END
           if(i == 1){cat("\n")}
           cat("************* Bootstrap: ", i, "/", niter, " **************\n", sep = "")
         }
@@ -3383,8 +3417,8 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "split", criterion
   }
   sci <- sapply(adjCIs0, function(z) !all(z$select_ci == z$select))
   if(any(sci)){
-    message(paste0('CIs different than p-values for: ', paste(
-      names(sci)[sci], collapse = ', ')))
+    message(paste0('CIs different than p-values for:\n', paste(
+      names(sci)[sci], collapse = '\n')))
   }
   varMods0 <- lapply(varMods0, function(z) do.call(cbind.data.frame, z))
   boots <- lapply(1:niter, function(z){

@@ -938,7 +938,7 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
                     ci = .95, caseMin = .05, caseMax = .75, caseN = 10, threshold = FALSE,
                     fits = NULL, type = 'g', saveMods = TRUE, verbose = TRUE, fitCoefs = FALSE, 
                     size = NULL, nCores = 1, cluster = 'mclapply', block = FALSE, maxiter = 10,
-                    directedDiag = FALSE, ...){
+                    directedDiag = FALSE, ...){ # Need to add beepno and dayno
   if(identical(m, 0)){m <- NULL}
   args <- tryCatch({list(...)}, error = function(e){list()})
   call <- as.list(match.call())
