@@ -3529,7 +3529,7 @@ bootCover <- function(x, true = NULL, selectedOnly = FALSE){
 ##### plotCoefs: plot coefficients from SURfit with confidence intervals
 plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue", 
                       flip = TRUE, data = NULL, select = TRUE, size = 1, 
-                      labels = TRUE, title = NULL){
+                      labels = TRUE, title = NULL, vars = 'all'){
   if(isTRUE(attr(fit, 'mlGVAR')) & 'varMods' %in% names(fit)){
     if(class(true) %in% c('logical', 'character', 'numeric')){
       if(is.numeric(true)){true <- as.logical(true - 1)}
@@ -3619,8 +3619,16 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
     if(!isTRUE(select)){dat$select <- !(dat$lower <= 0 & dat$upper >= 0)}
     dat <- dat[dat$select, ]
   }
+  if(!identical(vars, 'all')){
+    vs <- gsub('[.]y$', '', as.character(unique(dat$Y)))
+    if(is.numeric(vars)){vars <- vs[vars]}
+    dat$Y <- as.character(dat$Y)
+    dat <- subset(dat, grepl(paste0('^', vars, collapse = '|'), Y))
+    dat$Y <- factor(dat$Y)
+  }
   if(plot == TRUE){
-    plotCI <- function(dat, xlabs, true, flip = TRUE, size = 1, labels = TRUE, title = NULL){
+    plotCI <- function(dat, xlabs, true = NULL, flip = TRUE, 
+                       size = 1, labels = TRUE, title = NULL){
       invisible(suppressMessages(require(ggplot2)))
       if(is.logical(labels)){if(!labels){xlabs <- NULL}} else {xlabs <- labels}
       p <- ggplot(dat, aes(x = reorder(ord, b), y = b, group = Y)) +

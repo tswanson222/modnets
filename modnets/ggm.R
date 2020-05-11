@@ -843,7 +843,7 @@ selected <- function(object, threshold = FALSE, mod = 1){
   if(threshold != FALSE & !is.numeric(threshold)){threshold <- .05}
   if(isTRUE(attr(object, "mlGVAR"))){object <- object[[mod + 1]]}
   if(isTRUE(attr(object, "SURnet"))){
-    object <- object$SURnet
+    if('SURnet' %in% names(object)){object <- object$SURnet}
     mods0 <- object$temporal$coefs[[ifelse(threshold == FALSE, 1, 2)]]
     mods <- lapply(seq_len(nrow(mods0)), function(z){
       if(threshold == FALSE){
@@ -990,9 +990,19 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
       }
       if(!caseDrop){
         n0 <- n
-        n <- ifelse(is.null(size), n, size)
-        possible <- switch(2 - is.null(consec), seq_len(n0 - lags), consec)
-        out <- sample(possible, n, replace = TRUE)
+        n <- ifelse(is.null(size), n - lags, size)
+        allinds <- switch(2 - is.null(consec), seq_len(n0 - lags), consec)
+        if(!identical(block, FALSE) & lags){
+          N <- length(allinds); nblox <- 1
+          if(isTRUE(block)){block <- floor(3.15 * N^(1/3))}
+          while(N > block * nblox){nblox <- nblox + 1}
+          possible <- seq_len(N - block)
+          starts <- replicate(nblox, sample(possible, 1))
+          out <- c(sapply(starts, function(z) allinds[z:(z + block - 1)]))
+          if(length(out) > N){out <- out[1:N]}
+        } else {
+          out <- sample(allinds, n, replace = TRUE)
+        }
       } else {
         possible <- switch(2 - is.null(consec), seq_len(n - lags), consec)
         if(lags & block){
@@ -1502,6 +1512,8 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
                      errbars = FALSE, vline = FALSE, threshold = FALSE,
                      difference = FALSE, color = FALSE, text = FALSE,
                      textPos = 'value', multi = NULL, directedDiag = FALSE, ...){
+  nonzero <- is.character(difference)
+  difference <- ifelse(is.character(difference), TRUE, difference)
   if(!is.null(multi)){
     call <- replace(as.list(match.call())[-1], 'multi', NULL)
     if(isTRUE(multi)){multi <- list(plot = c('pairwise', 'interactions'))}
@@ -1587,6 +1599,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
   if(is.numeric(plot)){plot <- c('none', 'pairwise', 'interactions', 'all')[plot + 1]}
   pp <- match.arg(tolower(plot), c('all', 'both', 'pairwise', 'interactions', 'none'))
   pp <- switch(pp, both = 'all', none = FALSE, pp)
+  if(pp == 'all' & (!pairwise | !interactions)){pp <- ifelse(!pairwise, 'interactions', 'pairwise')}
   if(pp == 'all' & difference | lags & !lags2 & difference){pp <- 'pairwise'}
   if(pp == 'interactions'){interactions <- TRUE; pairwise <- FALSE}
   if(pp == 'pairwise'){interactions <- FALSE; pairwise <- TRUE}
@@ -1711,12 +1724,52 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
       dat$sig <- ifelse(dat$sig == 'same', as.character(dat$id1), dat$sig)
       colorValues <- c(setNames(edgelist$col, edgelist$id), colorValues)
     }
+    if(is.null(labels)){labels <- ifelse(nrow(dat) <= 50, TRUE, ifelse(type == 'edges', 'numbers', FALSE))}
+    if(is.character(labels) & length(labels) == 1){
+      k <- unique(dat0$node1)
+      kk <- unique(dat0$edge)
+      if(!pairwise & interactions){
+        mname <- unique(gsub('^.*.:', '', k))
+        k <- gsub(paste0(':', mname), '', k)
+        kk <- gsub(paste0('[|]', mname), '', kk)
+      }
+      for(i in seq_along(k)){kk <- gsub(k[i], i, kk)}
+      if(!pairwise & interactions){kk <- paste0(kk, '|M')}
+      names(kk) <- unique(dat0$edge)
+      kk <- kk[match(levels(dat$id1), names(kk))]
+      levels(dat$id1) <- levels(dat$id2) <- unname(kk)
+      k1 <- dat0$edge; k2 <- dat0$node1; k3 <- dat0$node2
+      if(!pairwise & interactions){
+        k1 <- gsub(paste0('[|]', mname), '', k1)
+        k2 <- gsub(paste0(':', mname), '', k2)
+        k3 <- gsub(paste0(':', mname), '', k3)
+      }
+      for(i in seq_along(k)){
+        k1 <- gsub(k[i], i, k1)
+        k2 <- gsub(k[i], i, k2)
+        k3 <- gsub(k[i], i, k3)
+      }
+      if(!pairwise & interactions){
+        k1 <- paste0(k1, '|M')
+        k2 <- paste0(k2, ':M')
+        k3 <- paste0(k3, ':M')
+      }
+      dat0$edge <- k1
+      dat0$node1 <- k2
+      dat0$node2 <- k3
+    }
+    if(nonzero & type == 'edges' & any(dat0$sample == 0)){
+      zeros <- dat0$edge[dat0$sample == 0]
+      dat <- subset(dat, !id1 %in% zeros & !id2 %in% zeros)
+      dat$id1 <- factor(dat$id1); dat$id2 <- factor(dat$id2)
+    }
     p <- ggplot(dat, aes(x = id1, y = id2, fill = sig)) + 
       geom_tile(colour = 'white') + xlab('') + ylab('') + 
       scale_fill_manual(values = colorValues) + theme(legend.position = 'none') + facet_grid(~ type)
     p <- p + theme_grey(base_size = 9) + 
       theme(legend.position = 'none', axis.text.x = element_text(
         size = 7.2, angle = 270, hjust = 0, colour = 'grey50'))
+    if(identical(labels, FALSE)){p <- p + theme(axis.text.y = element_blank(), axis.text.x = element_blank())}
     if(text){
       n3 <- as.character(dat[!dat$sig %in% c('sig', 'nonsig'), 'id1'])
       dat3 <- data.frame(id1 = as.character(dat[!dat$sig %in% c('sig', 'nonsig'), 'id1']), value = NA)

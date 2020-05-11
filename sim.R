@@ -232,21 +232,31 @@ intSelect <- function(x, collapse = FALSE, threshold = FALSE,
 }
 
 fullTable <- function(outs, orderBy = 'LRT', decreasing = TRUE){
-  stopifnot(all(sapply(outs, function(z) 'fits' %in% names(z))))
-  fits <- lapply(outs, '[[', 'fits')
-  fits <- setNames(lapply(seq_along(fits), function(z){
-    names(fits[[z]]) <- paste0(names(fits[[z]]), '_', gnum(names(fits)[z]))
-    fits[[z]]
-  }), names(fits))
-  tt <- SURtable(appd(fits))[[2]]
-  tt <- cbind.data.frame(setNames(do.call(
-    rbind.data.frame, strsplit(rownames(tt), '_')
-  ), c('mod', 'samp')), tt)
-  tt <- tt[order(gnum(tt$mod)), ]
-  tt <- tt[order(tt$samp), ]
+  #stopifnot(all(sapply(outs, function(z) 'fits' %in% names(z))))
+  if(all(sapply(outs, function(z) 'fits' %in% names(z)))){
+    fits <- lapply(outs, '[[', 'fits')
+    fits <- appd(setNames(lapply(seq_along(fits), function(z){
+      names(fits[[z]]) <- paste0(names(fits[[z]]), '_', gnum(names(fits)[z]))
+      fits[[z]]
+    }), names(fits)))
+    tt <- SURtable(fits)[[2]]
+    tt <- cbind.data.frame(setNames(do.call(
+      rbind.data.frame, strsplit(rownames(tt), '_')
+    ), c('mod', 'samp')), tt)
+    tt <- tt[order(gnum(tt$mod)), ]
+    tt <- tt[order(tt$samp), ]
+    rownames(tt) <- 1:nrow(tt)
+    tt$mod <- factor(tt$mod)
+    tt$samp <- factor(tt$samp)
+  } else if(!all(sapply(fits, function(z) 'SURnet' %in% names(z)))){
+    stop('Fits list not in correct format')
+  } else {
+    tt <- SURtable(fits)[[2]]
+    rt <- rownames(tt)
+    tt <- cbind.data.frame(mod = factor(rt, levels = rt[order(gnum(rt))]), tt)
+    tt <- tt[order(gnum(rt)), ]
+  }
   rownames(tt) <- 1:nrow(tt)
-  tt$mod <- factor(tt$mod)
-  tt$samp <- factor(tt$samp)
   if(orderBy %in% colnames(tt)){tt <- tt[order(tt[[orderBy]], decreasing = decreasing), ]}
   return(tt)
 }

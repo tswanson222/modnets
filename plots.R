@@ -89,6 +89,10 @@ plot.bootNet <- function(obj, type = 'edges', net = 'temporal', plot = 'all', co
 ##########
 plot.resample <- function(x, what = 'network', ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
+  if(isTRUE(what) | is(what, 'numeric')){
+    args$threshold <- ifelse(!'threshold' %in% names(args), what, args$threshold)
+    what <- 'network'
+  }
   what <- match.arg(tolower(what), c('network', 'bootstrap', 'coefs'))
   FUN <- switch(what, network = plotNet, bootstrap = plotBoot, coefs = plotCoefs)
   if(what == 'bootstrap' & !is.null(x$call$moderators)){
