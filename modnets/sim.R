@@ -2056,6 +2056,9 @@ plotting <- function(){
       if(any(startsWith(measures, 'm'))){
         measures[startsWith(measures, 'm')] <- toupper(measures[startsWith(measures, 'm')])
       }
+      if(any(startsWith(measures, 'f'))){
+        measures[startsWith(measures, 'f')] <- toupper(measures[startsWith(measures, 'f')])
+      }
       if(all(measures %in% c('ll', 'df', 'aic', 'bic'))){
         measures[measures != 'df'] <- toupper(measures[measures != 'df'])
       } else {
@@ -2093,7 +2096,7 @@ plotting <- function(){
     file
   }
   grrange <- function(g, leg = NULL, method = 1, nrow = NULL, ncol = NULL, 
-                      nrow2 = NULL, ncol2 = NULL, heights = c(10, 1)){
+                      nrow2 = NULL, ncol2 = NULL, heights = c(10, 1), ...){
     if(!is(g, 'list')){return(plot(g))}
     method <- ifelse(is.null(leg), 2, ifelse(is.numeric(method), method, 1))
     method <- pmax(1, pmin(method, 2))
@@ -2101,10 +2104,10 @@ plotting <- function(){
       if(is.null(nrow2)){nrow2 <- 2}
       stopifnot(length(heights) == nrow2)
       grid.arrange(arrangeGrob(grobs = g, nrow = nrow, ncol = ncol), 
-                   leg, nrow = nrow2, ncol = ncol2, heights = heights)
+                   leg, nrow = nrow2, ncol = ncol2, heights = heights, ...)
     } else {
       if(!is.null(leg)){g[[length(g) + 1]] <- leg}
-      grid.arrange(arrangeGrob(grobs = g, nrow = nrow, ncol = ncol))
+      grid.arrange(arrangeGrob(grobs = g, nrow = nrow, ncol = ncol), ...)
     }
   }
   funs <- list(plots = plots, fixfactors = fixfactors, 
