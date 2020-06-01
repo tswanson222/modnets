@@ -383,6 +383,9 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       vargs <- append(vargs, args[intersect(names(args), otherargs)])
     }
     type <- do.call(varSelect, vargs)
+  } else if(identical(type, 1)){
+    type <- 'g'
+    lags <- 1
   }
   if(!is.null(lags)){if(all(lags == 0)){lags <- NULL}}
   if(!is.null(lags)){
@@ -688,7 +691,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
 ##### plotNet: Plot model results
 plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 'spring', 
                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                    scale = FALSE, lag = NULL, con = 'adjR2', cat = 'nCC', 
+                    scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', 
                     plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                     binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   getEdgeColors <- function(adjMat){
@@ -837,7 +840,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
       if("binomial" %in% type){type[type == "binomial"] <- "c"}
     }
     tt <- length(type)
-    if(class(predict) == "list"){
+    if(is(predict, 'list')){
       if(isTRUE(attr(predict, "mlGVAR"))){
         predict <- predict[[switch(which.net, between = "betweenNet", "fixedNets")]]
       }

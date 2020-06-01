@@ -2009,7 +2009,7 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
                      hist = FALSE, xlab = NULL, mods = NULL, nsims = 500, 
                      xn = NULL, getCIs = FALSE, discrete = FALSE, 
                      ylab = NULL, main = NULL, midline = TRUE){
-  require(ggplot2)
+  suppressMessages(invisible(require(ggplot2)))
   if(isTRUE(discrete)){compare <- 0:1}
   if("adjMat" %in% names(out)){out <- out$mods0}
   if(any(c("models", "SURnet") %in% names(out))){
@@ -2041,7 +2041,8 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
   fr2 <- Hmisc::capitalize(from)
   xlab <- Hmisc::capitalize(xlab)
   if(!avg){
-    if(is.null(ylab)){ylab <- paste0(fr2, " ---> ", to2)}
+    if(is.null(ylab)){ylab <- bquote(.(fr2)%->%.(to2))}
+    #if(is.null(ylab)){ylab <- paste0(fr2, " ---> ", to2)}
     if(is.null(main)){mainlab <- paste0("Estimated Effect of ", fr2, " on ", to2, " across levels of ", xlab)}
   } else if(!"SURnet" %in% names(attributes(out))){
     if(is.null(ylab)){ylab <- paste0(fr2, " ~ ", to2)}

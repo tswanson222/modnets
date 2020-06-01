@@ -7,11 +7,12 @@ centTable <- function(Wmats, scale = TRUE, which.net = "temporal", labels = NULL
     Wmats <- switch(which.net, between = Wmats$betweenNet, Wmats$fixedNets)}
   if("SURnet" %in% c(names(Wmats), names(attributes(Wmats)))){
     if("SURnet" %in% names(Wmats)){Wmats <- Wmats$SURnet}
-    if(is.numeric(which.net)){which.net <- c("t", "c", "p")[which.net]}
-    which.net <- match.arg(tolower(which.net), c("temporal", "contemporaneous", "pdc"))
-    Wmats <- Wmats[[ifelse(which.net == "contemporaneous", "contemporaneous", "temporal")]]
+    if(is.numeric(which.net)){which.net <- c("t", "c", "p", 'i')[which.net]}
+    which.net <- match.arg(tolower(which.net), c("temporal", "contemporaneous", "pdc", "interactions"))
+    Wmats <- Wmats[[ifelse(which.net == "contemporaneous", "contemporaneous", ifelse(which.net == 'interactions', 'interactions', 'temporal'))]]
     if(which.net == "pdc"){Wmats <- Wmats$PDC}
-  }
+    if(which.net == 'interactions'){names(Wmats)[1] <- 'adjMat'}
+  } else if(startsWith(tolower(which.net), 'i')){stop('Interaction centrality only supported for temporal networks.')}
   if("adjMat" %in% names(Wmats)){Wmats <- t(Wmats$adjMat)}
   if(any(grepl("lag", dimnames(Wmats)))){dimnames(Wmats) <- lapply(dimnames(Wmats), function(z) gsub("[.]lag1.*|[.]y$", "", z))}
   if(!is.list(Wmats)){Wmats <- list(Wmats)}
@@ -74,11 +75,12 @@ centAuto <- function(x, which.net = "temporal", weighted = TRUE, signed = TRUE){
     x <- switch(which.net, between = x$betweenNet, x$fixedNets)}
   if("SURnet" %in% c(names(x), names(attributes(x)))){
     if("SURnet" %in% names(x)){x <- x$SURnet}
-    if(is.numeric(which.net)){which.net <- c("t", "c", "p")[which.net]}
-    which.net <- match.arg(tolower(which.net), c("temporal", "contemporaneous", "pdc"))
-    x <- x[[ifelse(which.net == "contemporaneous", "contemporaneous", "temporal")]]
+    if(is.numeric(which.net)){which.net <- c("t", "c", "p", "i")[which.net]}
+    which.net <- match.arg(tolower(which.net), c("temporal", "contemporaneous", "pdc", "interactions"))
+    x <- x[[ifelse(which.net == "contemporaneous", "contemporaneous", ifelse(which.net == 'interactions', 'interactions', "temporal"))]]
     if(which.net == "pdc"){x <- x$PDC}
-  }
+    if(which.net == 'interactions'){names(x)[1] <- 'adjMat'}
+  } 
   if("adjMat" %in% names(x)){x <- t(x$adjMat)}
   if(any(grepl("lag", dimnames(x)))){dimnames(x) <- lapply(dimnames(x), function(z) gsub("[.]lag1.*|[.]y$", "", z))}
   if(is.list(x)){return(lapply(x, centAuto, which.net = which.net, weighted = weighted, signed = signed))}
@@ -157,7 +159,8 @@ centPlot <- function(Wmats, scale = c("z-scores", "raw", "raw0", "relative"),
   if(is.logical(scale)){scale <- ifelse(scale, "z-scores", "raw")}
   invisible(suppressMessages(require(ggplot2)))
   measure <- value <- node <- type <- NULL
-  scale <- match.arg(scale)
+  scale <- tryCatch({match.arg(scale)}, error = function(e){scale})
+  #scale <- match.arg(scale)
   include0 <- c("Degree", "Strength", "OutDegree", "InDegree", "OutStrength", 
                 "InStrength", "Closeness", "Betweenness", "ExpectedInfluence", 
                 "OutExpectedInfluence", "InExpectedInfluence")
