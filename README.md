@@ -23,11 +23,11 @@ Penalized estimators for each of these models are also available, such as the LA
 ## Downloading and using the package
 Currently, the way to use the R package is as follows:
 
-1. Download the folder [https://github.com/tswanson222/modnets/tree/master/modnets](modnets) and place it in your working directory
+1. Download the folder [modnets](https://github.com/tswanson222/modnets/tree/master/modnets) and place it in your working directory
 2. In R, run: `source('modnets/functions.R')`
 3. You now have access to all functions in the package!
 
-The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the [https://github.com/tswanson222/modnets/tree/master/data](data) folder and save it inside the [modnets](modnets) folder.
+The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the [data](https://github.com/tswanson222/modnets/tree/master/data) folder and save it inside the [modnets](https://github.com/tswanson222/modnets/tree/master/modnets) folder.
 
 Because we are loading the package via the `source` command, by default all functions will be stored in the global environment. To reduce clutter and make for a cleaner setup, there are two "commands" that can be added. 
 
