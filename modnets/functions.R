@@ -1,4 +1,4 @@
-.globals <- globalenv(); suppressMessages(attach(.globals))
+clear <- TRUE; keep <- setdiff(ls(), "clear"); .globals <- globalenv(); suppressMessages(attach(.globals))
 if(!exists("pkgs")){pkgs <- c("glmnet", "mgm", "qgraph", "grpregOverlap", "systemfit", "leaps", "hierNet", "glinternet")}
 if(!"none" %in% pkgs){invisible(suppressMessages(lapply(pkgs, require, character.only = TRUE)))}
 if(exists("clear")){if(clear == TRUE){rm(list = setdiff(ls(), 'keep')); clear <- TRUE}} else {rm(pkgs)}
@@ -4052,7 +4052,6 @@ plotStability <- function(obj, pp = 1, s = 3, thresh = .5, color = "black"){
 ### ======================================================================== ###
 if(exists("clear")){
   if(isTRUE(clear)){
-    message("Clearing .GlobalEnv")
     rm(clear)
     .modnets <- new.env()
     .modnets <- globalenv()
@@ -4066,6 +4065,8 @@ if(exists("clear")){
       }
       rm(keep, envir = .GlobalEnv)
       rm(keep, envir = .modnets, inherits = TRUE)
+    } else {
+      message("Clearing .GlobalEnv")
     }
   }
 }

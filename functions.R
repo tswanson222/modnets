@@ -4052,7 +4052,6 @@ plotStability <- function(obj, pp = 1, s = 3, thresh = .5, color = "black"){
 ### ======================================================================== ###
 if(exists("clear")){
   if(isTRUE(clear)){
-    message("Clearing .GlobalEnv")
     rm(clear)
     .modnets <- new.env()
     .modnets <- globalenv()
@@ -4066,6 +4065,8 @@ if(exists("clear")){
       }
       rm(keep, envir = .GlobalEnv)
       rm(keep, envir = .modnets, inherits = TRUE)
+    } else {
+      message("Clearing .GlobalEnv")
     }
   }
 }

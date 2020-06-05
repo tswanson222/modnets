@@ -29,11 +29,7 @@ Currently, the way to use the R package is as follows:
 
 The repository will be made accessible to download in R via `devtools` soon. Also, to access the datasets with the `settings` function you will need to download the [data](https://github.com/tswanson222/modnets/tree/master/data) folder and save it inside the [modnets](https://github.com/tswanson222/modnets/tree/master/modnets) folder.
 
-Because we are loading the package via the `source` command, by default all functions will be stored in the global environment. To reduce clutter and make for a cleaner setup, there are two "commands" that can be added. 
-
-* By setting `clear <- TRUE` in the global environment, the functions will be relegated into a new environment called `.modnets`. **Note, however, that this also clears the contents of your global environment.** 
-* To address potential issues from the above, you can create a list or vector called `keep` that names the objects you want to preserve. To preserve all of your global environment, simply set `keep <- ls()`
-* To put these commands together, simply run: `keep <- ls(); clear <- TRUE; source('modnets/functions.R')`
+Although we are loading the package via the `source` command, this command will not disturb the global environment. All components of the package will be stored in a separate environment called `.modnets`. This still gives the user access to all functions without cluttering the global environment.
 
 
 # Package Functions
