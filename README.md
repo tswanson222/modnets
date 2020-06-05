@@ -27,7 +27,7 @@ Currently, the way to use the R package is as follows:
 2. In R, run: `source('modnets/functions.R')`
 3. You now have access to all functions in the package!
 
-A formal version of the package will be made accessible to download in R via `devtools` soon.
+A formal version of the package will be made accessible to download in R via `devtools` soon. The full repository may be found [here](https://github.com/tswanson222/modnets).
 
 Although we are loading the package via the `source` command, this command will not disturb the global environment. All components of the package will be stored in a separate environment called `.modnets`. This still gives the user access to all functions without cluttering the global environment.
 
