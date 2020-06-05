@@ -347,6 +347,18 @@ pars <- function(fun, ..., add = FALSE, eval = FALSE, argList = FALSE){
   if(argList){list2env(list(args = out), .GlobalEnv)}
 }
 
+##### dots: wrapper for testing
+dots <- function(k, safe = TRUE){
+  k <- paste0(deparse(substitute(k)), collapse = '')
+  tryCatch({eval(parse(text = k))}, error = function(e){
+    k <- paste0(gsub(', ...)$', '', k), ')')
+    if(safe){
+      tryCatch({eval(parse(text = k))}, error = function(ee){list()})
+    } else {
+      eval(parse(text = k))
+    }
+  })
+}
 
 ### ======================================================================== ###
 ### ======================================================================== ###
