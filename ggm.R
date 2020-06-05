@@ -702,9 +702,10 @@ modTable <- function(fits, nodes = FALSE, orderBy = TRUE, d = 4, alpha = .05,
     fits <- lapply(fits, '[[', "betweenNet")
   }
   stopifnot(all(sapply(fits, function(z) isTRUE(attr(z, "ggm")))))
-  if(!is.null(orderBy)){
+  orderBy <- ifelse(is.null(orderBy), FALSE, ifelse(identical(tolower(orderBy), 'lrt'), TRUE, orderBy))
+  if(!is.logical(orderBy)){
     orderBy <- switch(match.arg(tolower(as.character(
-      orderBy)), c("true", "ll", "loglik", "aic", "bic", "df", "rank")), 
+      orderBy)), c("ll", "loglik", "aic", "bic", "df", "rank")), 
       ll =, loglik = "LL", aic = "AIC", bic = "BIC", "df")
     fits <- fits[order(sapply(fits, function(z){
       modLL(z)[orderBy]}), decreasing = decreasing)]
@@ -723,6 +724,9 @@ modTable <- function(fits, nodes = FALSE, orderBy = TRUE, d = 4, alpha = .05,
   if(any(names(select) == "- ")){select <- select[names(select) != "- "]}
   lls0 <- cbind(lls0, LRT = numeric(nrow(lls0)))
   lls0[match(names(select), rownames(lls0)), "LRT"] <- unname(select)
+  if(isTRUE(orderBy)){
+    lls0 <- lls0[order(lls0[, 'LRT'], decreasing = TRUE), ]
+  }
   out <- list(LRT = out4, omnibus = lls0, RMSEA = rmsea0)
   if(!rmsea){out$RMSEA <- NULL}
   if(nodes != FALSE){

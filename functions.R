@@ -394,6 +394,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
     if(any(otherargs %in% names(args))){
       vargs <- append(vargs, args[intersect(names(args), otherargs)])
     }
+    if(!is.null(seed)){vargs$varSeed <- seed}
     type <- do.call(varSelect, vargs)
   } else if(identical(type, 1)){
     type <- 'g'
