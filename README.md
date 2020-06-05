@@ -108,13 +108,15 @@ plot(fit2)
 plot(fit0, threshold = .05)
 plot(fit1, threshold = .05)
 plot(fit2, threshold = .05)
-# Plot only significant edges of the network.
+# Plot only significant edges (p < threshold) of the network.
 
 plot(fit0, threshold = TRUE, predict = TRUE)
 plot(fit1, threshold = TRUE, predict = TRUE)
 plot(fit2, threshold = TRUE, predict = TRUE)
+plot(fit2, threshold = TRUE, predict = TRUE, con = 'adjR2')
 # Using 'threshold = TRUE' is the same as 'threshold = .05'
 # 'predict = TRUE' plots R2 values for each regression
+# 'con = "adjR2"' uses adjusted R2
 
 plot(fit2, mnet = TRUE)
 plot(fit2, threshold = TRUE, mnet = TRUE)

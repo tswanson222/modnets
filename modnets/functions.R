@@ -694,6 +694,7 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
   output$mods <- lapply(mods, function(z) z[-which(names(z) == "fitobj")])
   output$fitobj <- lapply(mods, function(z) z[["fitobj"]])
   if(all(lambda != "CV")){output$fitobj <- lapply(output$fitobj, function(z) z$fit)}
+  names(output$fitobj) <- names(output$mods) <- colnames(data)
   if(saveData == TRUE){output$data <- data}
   if(verbose){print(Sys.time() - t1)}
   class(output) <- c('list', ifelse(is.null(lags) | identical(as.numeric(lags), 0),'ggm', 'SURnet'))
