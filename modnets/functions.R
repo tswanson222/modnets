@@ -844,6 +844,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
     if(any(grepl("lag", colnames(object$adjMat)))){lag <- 1}
   }
   if(!is.null(predict) & !mnet & !identical(predict, FALSE)){
+    concat <- c('R2', 'adjR2', 'MSE', 'RMSE', 'nCC', 'CC', 'CCmarg')
     con <- match.arg(con, choices = c("R2", "adjR2", "MSE", "RMSE"))
     cat <- match.arg(cat, choices = c("nCC", "CC", "CCmarg"))
     type <- object$call$type
@@ -894,6 +895,15 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
         }
       }
     } else {
+      if(is.character(predict)){
+        predict <- toupper(intersect(tolower(predict[1]), tolower(concat)))
+        if(length(predict) > 0){
+          if(startsWith(predict, 'ADJ')){predict <- 'adjR2'}
+          if(startsWith(predict, 'N')){predict <- 'nCC'}
+          if(endsWith(predict, 'G')){predict <- 'CCmarg'}
+          if(grepl('CC', predict)){cat <- predict} else {con <- predict}
+        }
+      }
       predict <- predictNet(object, all = FALSE, scale = scale)
       pie <- c(); pieColor <- c()
       for(i in 1:tt){
@@ -1055,6 +1065,9 @@ getEdgeColors <- function(adjMat){
 
 ##### predictNet: Calculate prediction error
 predictNet <- function(object, data = NULL, all = FALSE, scale = FALSE){
+  if(is(data, 'ggm') | is(data, 'SURnet')){
+    return(do.call(predictDelta, list(mod1 = object, mod0 = data, scale = scale)))
+  }
   if("SURnet" %in% c(names(object), names(attributes(object)))){
     if("SURnet" %in% names(object)){object <- object$SURnet}
     data <- object$data
@@ -1198,18 +1211,19 @@ predictDelta <- function(mod1, mod0, scale = FALSE){
         type <- unname(sapply(mod1$fitobj, attr, "family"))
         if("gaussian" %in% type){type[type == "gaussian"] <- "g"}
         if("binomial" %in% type){type[type == "binomial"] <- "c"}
-      } else {
-        type <- ifelse(length(type) == 1, ifelse(
-          type %in% c("g", "gaussian"), rep("g", ncol(data)), rep("c", ncol(data))), type)
+      } else if(length(type) == 1){
+        type <- rep(substr(type, 1, 1), ncol(data))
       }
     } else {
       stopifnot(mod1$call$type == mod0$call$type)
     }
   }
   errors <- list(predictNet(mod0, all = FALSE, scale = scale), predictNet(mod1, all = FALSE, scale = scale))
+  nodes <- unique(sapply(errors, nrow))
+  if(length(nodes) > 1){stop('Cannot compare networks of different sizes')}
   p <- ifelse(all(type == "c"), 4, ifelse(all(type == "g"), 5, 8))
-  delta <- data.frame(matrix(NA, nrow = length(type), ncol = p))
-  for(i in 1:length(type)){
+  delta <- data.frame(matrix(NA, nrow = length(nodes), ncol = p))
+  for(i in seq_len(nodes)){
     if(type[i] == "g"){
       delta[i,2] <- unlist(errors[[2]][i, "R2"]) - unlist(errors[[1]][i, "R2"])
       delta[i,3] <- unlist(errors[[2]][i, "adjR2"]) - unlist(errors[[1]][i, "adjR2"])

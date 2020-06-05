@@ -55,8 +55,9 @@ Although we are loading the package via the `source` command, this command will 
 
 ## Cross-sectional moderated network
 ```r
+# Make sure 'modnets' folder is in the working directory
 source('modnets/functions.R')
-# Package is now loaded! Make sure 'modnets' folder is in working directory.
+# Package is now loaded! 
 
 ### ================================================ ###
 ### ======= SIMULATE MODERATED NETWORK DATA ======== ###
@@ -107,12 +108,23 @@ plot(fit2, threshold = .05)
 # Plot only significant edges (p < threshold) of the network.
 
 plot(fit0, threshold = TRUE, predict = TRUE)
-plot(fit1, threshold = TRUE, predict = TRUE)
-plot(fit2, threshold = TRUE, predict = TRUE)
-plot(fit2, threshold = TRUE, predict = TRUE, con = 'adjR2')
+plot(fit1, threshold = TRUE, predict = 'R2')
+plot(fit2, threshold = TRUE, predict = 'adjR2')
 # Using 'threshold = TRUE' is the same as 'threshold = .05'
 # 'predict = TRUE' plots R2 values for each regression
-# 'con = "adjR2"' uses adjusted R2
+# This can also be specified as a string, as shown
+
+plot(fit2, threshold = TRUE, predict = fit0)
+# This can also be used to visually compare networks
+# Here, the light blue ring around each node shows
+# the R2 for 'fit0', while the slightly darker piece 
+# shows the increase in R2 that we see with 'fit2'
+
+predictNet(fit2)
+predictNet(fit2, fit1)
+# We can extract these values using this function
+# And can take the differences by supplying two networks
+# Values for the second model are substracted by those from the first
 
 plot(fit2, mnet = TRUE)
 plot(fit2, threshold = TRUE, mnet = TRUE)
