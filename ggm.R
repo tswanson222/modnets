@@ -1637,6 +1637,8 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
       obj1 <- obj$pairwise
       if(lags){boots <- obj1$boots}
       type0 <- paste0('pairwise$', type0)
+    } else {
+      obj1 <- obj # THIS IS A NEW ADDITION
     }
     dat <- eval(parse(text = paste0('obj$', type0)))
     dat$type <- rep("Pairwise", nrow(dat))

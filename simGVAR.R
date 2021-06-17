@@ -831,7 +831,8 @@ mgm2 <- function(data, m = NULL, sel = 'EBIC', gamma = .25, ...){
 ### ======================================================================== ###
 setupModnets <- function(folders = '.', rm = FALSE){
   if(any(folders %in% c('.', ''))){folders <- '.'}
-  fold <- "~/C:\\ Desktop/COMPS/METHODS/CODE/modnets/"
+  #fold <- "~/C:\\ Desktop/COMPS/METHODS/CODE/modnets/"
+  fold <- "/media/tswanson222/OSDisk1/Users/psychology/Desktop/COMPS/METHODS/CODE/modnets/"
   mods <- paste0(c("functions", "ggm", "centrality", "sim", "mlGVAR", 
                    "simGVAR", "penalized", "power", "plots"), ".R")
   for(j in seq_along(folders)){
@@ -842,7 +843,8 @@ setupModnets <- function(folders = '.', rm = FALSE){
     if(isTRUE(rm)){system(paste0('rm -rf ', folders[j], '/modnets'))}
     system(paste0('mkdir ', folders[j], '/modnets'))
     for(k in seq_along(mods)){system(paste0("cp ", fold, mods[k], " ./", folders[j], "/modnets/"))}
-    path <- "setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')"
+    #path <- "setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')"
+    path <- "setwd('/media/tswanson222/OSDisk1/Users/psychology/Desktop/COMPS/METHODS/CODE/modnets')"
     f0 <- readLines(paste0(folders[j], "/modnets/functions.R"))
     f0[1] <- paste0('clear <- TRUE; keep <- setdiff(ls(), "clear"); ', f0[1])
     f2 <- which(f0 == "files <- paste0('./', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')")
@@ -856,7 +858,8 @@ setupModnets <- function(folders = '.', rm = FALSE){
 
 allModnets <- function(file = NULL, path = 'default', modfolder = NULL){
   stopifnot(!is.null(file))
-  if(is.null(modfolder)){modfolder <- '~/C: Desktop/COMPS/METHODS/CODE/modnets'}
+  #if(is.null(modfolder)){modfolder <- '~/C: Desktop/COMPS/METHODS/CODE/modnets'}
+  if(is.null(modfolder)){modfolder <- "/media/tswanson222/OSDisk1/Users/psychology/Desktop/COMPS/METHODS/CODE/modnets"}
   if(identical(path, 'default')){path <- modfolder}
   mods <- paste0(c("functions", "ggm", "centrality", "sim", "mlGVAR", 
                    "simGVAR", "penalized", "power", "plots"), ".R")

@@ -3,6 +3,7 @@ if(!exists("pkgs")){pkgs <- c("glmnet", "mgm", "qgraph", "grpregOverlap", "syste
 if(!"none" %in% pkgs){invisible(suppressMessages(lapply(pkgs, require, character.only = TRUE)))}
 if(exists("clear")){if(clear == TRUE){rm(list = setdiff(ls(), 'keep')); clear <- TRUE}} else {rm(pkgs)}
 if(".modnets" %in% search()){detach(".modnets")}
+#setwd('/media/tswanson222/OSDisk1/Users/psychology/Desktop/COMPS/METHODS/CODE/modnets')
 #setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
 files <- paste0('modnets/', c('ggm', 'centrality', 'sim', 'mlGVAR', 'simGVAR', 'penalized', 'power', 'plots'),'.R')
 invisible(sapply(files, source)); rm(files)
@@ -40,7 +41,8 @@ settings <- function(dat = NULL, moderators = NULL, lags = NULL, d = FALSE){
                 "bfi1", "bfi2", "bfi3", "obama", "bfiDat", "constantini",
                 "covid", "covid2", "esm6", "esm7")
   if(d){return(data.frame(sort(whatData)))}
-  setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
+  setwd('/media/tswanson222/OSDisk1/Users/psychology/Desktop/COMPS/METHODS/CODE/modnets')
+  #setwd('~/C: Desktop/COMPS/METHODS/CODE/modnets')
   if(!is.null(dat)){
     dat <- match.arg(dat, c(whatData, "caseDrop"))
     if("caseDrop" %in% c(dat, moderators)){
@@ -720,6 +722,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
     colMat
   }
   if(is.logical(which.net)){threshold <- TRUE; which.net <- 'temporal'}
+  if(is.numeric(which.net)){if(which.net < 1){threshold <- which.net; which.net <- 'temporal'}}
   if(any(class(object) %in% c('qgraph', 'bootnetResult', 'bootnet'))){
     if(is(object, 'bootnet')){object <- object$sample}
     if(is(object, 'bootnetResult')){
