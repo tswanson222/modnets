@@ -1294,8 +1294,8 @@ plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
       by <- switch(2 - (length(unique(x$Network)) > 1), 'Network', NULL)
     }
   }
-  if(length(unique(x$Type)) != 1 & !identical(by, 'Type')){warning('Interactions and pairwise parameters aggregated')}
-  if(length(unique(x$Network)) != 1 & !identical(by, 'Network')){warning('Multiple networks aggregated')}
+  if(length(unique(x$Type)) != 1 & !identical(by, 'Type')){warning('Interactions and pairwise parameters aggregated; try setting by = "type"')}
+  if(length(unique(x$Network)) != 1 & !identical(by, 'Network')){warning('Multiple networks aggregated; try setting by = "network"')}
   if(any(colnames(x) == 'N')){colnames(x)[colnames(x) == 'N'] <- 'nCases'}
   if(length(unique(x$nCases)) == 1){stop('Must have used more than one sample size to plot')}
   #FUN <- bootnet:::plot.netSimulator
