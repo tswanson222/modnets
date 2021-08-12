@@ -62,8 +62,10 @@ getConsec <- function(data, beepno = NULL, dayno = NULL, makeAtt = TRUE){
     beepday <- as.list(data[, c(beepno, dayno)])
     data <- data0
   }
-  consec <- mgm:::beepday2consec(beepvar = beepday[[1]], dayvar = beepday[[2]])
-  out <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+  #consec <- mgm:::beepday2consec(beepvar = beepday[[1]], dayvar = beepday[[2]])
+  #out <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+  consec <- makeConsec(beepvar = beepday[[1]], dayvar = beepday[[2]])
+  out <- lagData(data = data, lags = 1, consec = consec)[[3]][-1]
   if(makeAtt){
     attr(data, 'samp_ind') <- which(out)
     out <- data
@@ -234,6 +236,17 @@ detrender <- function(data, timevar = NULL, vars = NULL,
   }
   if(rmTimevar){data_detrend <- data_detrend[, setdiff(colnames(data_detrend), timevar)]}
   return(data_detrend)
+}
+
+##### capitalize: capitalize strings
+capitalize <- function(x){
+  unname(sapply(x, function(z){
+    z1 <- substr(z, 1, 1)
+    z2 <- substr(z, 2, nchar(z))
+    lower <- which(letters == z1)
+    if(length(lower) != 0){z1 <- LETTERS[lower]}
+    return(paste0(z1, z2))
+  }))
 }
 
 ##### getEdgeColors
@@ -686,9 +699,213 @@ pcor2 <- function(x){
   return((x + t(x))/2)
 }
 
+
+### -------------------------- QGRAPH FUNCTIONS ---------------------------- ###
+
 ##### cor0: deal with sd == 0
 cor0 <- function(x, y){
   if(all(is.na(x)) | all(is.na(y))){return(NA)}
   if(sd(x, na.rm = TRUE) == 0 | sd(y, na.rm = TRUE) == 0){return(0)}
   return(cor(x, y, use = 'pairwise.complete.obs'))
 }
+
+##### fnames: rename
+fnames <- function(x, n = ''){
+  if(is.null(names(x))){names(x) <- paste0(n, seq_along(x))}
+  out <- ifelse(names(x) == '', paste0(n, seq_along(x)), names(x))
+  return(out)
+}
+
+##### scaleNA: deal with NAs
+scaleNA <- function(x){
+  if(all(is.na(x))){
+    out <- NA
+  } else if(sd(x, na.rm = TRUE) != 0){
+    out <- (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE)
+  } else {
+    out <- rep(0, length(x))
+  }
+  return(out)
+}
+
+##### WS: clustering method
+WS <- function(x, threshWS = 0){
+  W <- qgraph::getWmat(x)
+  if(is.list(W)){
+    out <- lapply(W, WS, threshWS = threshWS)
+  } else {
+    thresh <- threshWS
+    diag(W) <- 0
+    A <- matrix(0, nrow = nrow(W), ncol = ncol(W))
+    A[W > thresh] <- 1
+    A[W < (-thresh)] <- -1
+    diag(A) <- 0
+    absA <- abs(A)
+    abs_top <- diag(absA %*% absA %*% absA)
+    top <- diag(A %*% A %*% A)
+    k <- colSums(absA)
+    bottom <- k * (k - 1)
+    CW <- top/bottom
+    absCW <- abs_top/bottom
+    out <- data.frame(cbind(clustWS = absCW, signed_clustWS = CW))
+  }
+  return(out)
+}
+
+##### zhang: clustering method
+zhang <- function(x){
+  W <- qgraph::getWmat(x)
+  if(is.list(W)){
+    out <- lapply(W, zhang)
+  } else {
+    diag(W) <- 0
+    absW <- abs(W)
+    top <- diag(W %*% W %*% W)
+    abs_top <- diag(absW %*% absW %*% absW)
+    bottom <- colSums(absW)^2 - colSums(W^2)
+    Z <- top/bottom
+    absZ <- abs_top/bottom
+    out <- data.frame(cbind(clustZhang = absZ, signed_clustZhang = Z))
+  }
+  return(out)
+}
+
+##### onnela: clustering method
+onnela <- function(x, threshON = 0){
+  W <- qgraph::getWmat(x)
+  if(is.list(W)){
+    out <- lapply(W, onnela, threshON = threshON)
+  } else {
+    thresh <- threshON
+    diag(W) <- 0
+    W[abs(W) < thresh] <- 0
+    absW <- abs(W)
+    absW13 <- absW^(1/3)
+    W13 <- matrix(nrow = nrow(W), ncol = ncol(W))
+    W13[W >= 0] <- absW13[W >= 0]
+    W13[W < 0] <- (abs(W[W < 0])^(1/3)) * (-1)
+    top <- diag(W13 %*% W13 %*% W13)
+    abs_top <- diag(absW13 %*% absW13 %*% absW13)
+    A <- matrix(0, nrow = nrow(W), ncol = ncol(W))
+    A[abs(W) > thresh] <- 1
+    k <- colSums(A)
+    bottom <- k * (k - 1)
+    on <- top/bottom
+    abs_on <- abs_top/bottom
+    out <- data.frame(cbind(clustOnnela = abs_on, signed_clustOnnela = on))
+  }
+  return(out)
+}
+
+### ----------------------- DIRECTLY FROM BOOTNET -------------------------- ###
+
+##### netsimulator: stolen bootnet:::plot.netSimulator
+netsimulator <- function(x, xvar = "factor(nCases)", yvar = c("sensitivity", "specificity", "correlation"),
+                         xfacet = "measure", yfacet = ".", color = NULL, ylim = c(0, 1), print = TRUE,
+                         xlab = "Number of cases", ylab, outlier.size = 0.5, boxplot.lwd = 0.5,
+                         style = c("fancy", "basic"), ...){
+  style <- match.arg(style)
+  if(xvar != "factor(nCases)" && xlab == "Number of cases"){
+    warning("argument 'xvar' is not 'factor(nCases)' while argument 'xlab' is still 'Number of cases'. X-axis label might be wrong.")
+  }
+  if(missing(ylab)){
+    if(xfacet != "measure"){
+      ylab <- paste(yvar, collapse = "; ")
+    } else {
+      ylab <- ""
+    }
+  }
+  # THIS FUNCTION WILL NOT WORK UNTIL THIS IS REVISED!!!!
+  #Gathered <- x %>% tidyr::gather_("measure", "value", yvar)
+  if(!is.null(color)){
+    Gathered[[color]] <- as.factor(Gathered[[color]])
+    AES <- ggplot2::aes_string(x = xvar, y = "value", fill = color)
+  } else {
+    AES <- ggplot2::aes_string(x = xvar, y = "value")
+  }
+  g <- ggplot2::ggplot(Gathered, AES) + ggplot2::facet_grid(paste0(yfacet, " ~ ", xfacet)) +
+    ggplot2::geom_boxplot(outlier.size = outlier.size, lwd = boxplot.lwd, fatten = boxplot.lwd,
+                          position = position_dodge2(preserve = "total"))
+  if(style == "fancy"){
+    g <- g + ggplot2::theme_bw() + ggplot2::scale_y_continuous(limits = ylim, breaks = seq(ylim[1], ylim[2], by = 0.1)) +
+      ggplot2::ylab(ylab) + ggplot2::xlab(xlab) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+      theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank()) +
+      geom_vline(xintercept = seq(1.5, length(unique(eval(parse(text = xvar), envir = Gathered))) - 0.5, 1), lwd = 0.5, colour = "black", alpha = 0.25) +
+      theme(legend.position = "top")
+  }
+  if(print){
+    print(g)
+    invisible(g)
+  } else {
+    return(g)
+  }
+}
+
+### ------------------------------- FROM MGM ------------------------------- ###
+
+##### makeConsec: equal to beepday2consec
+makeConsec <- function(beepvar, dayvar){
+  if(!all(dayvar == round(dayvar))){stop('dayno has to be a vector of non-negative integers')}
+  if(!all(beepvar == round(beepvar))){stop('beepno has to be a vector of non-negative integers')}
+  if(length(beepvar) != length(dayvar)){stop('beepno has to be the same length as dayno')}
+  n <- length(beepvar)
+  sameday <- c(1, (dayvar[-1] == dayvar[-n])[-1])
+  consec <- c(1, rep(NA, n - 1))
+  counter <- 1
+  for(i in 2:n){
+    bdiff <- beepvar[i] - beepvar[i - 1]
+    ddiff <- dayvar[i] - dayvar[i - 1]
+    counter <- counter + ifelse(bdiff == 1 & ddiff == 0, 1, 2)
+    consec[i] <- counter
+  }
+  return(consec)
+}
+
+##### ladData: literally just stole lagData
+lagData <- function(data, lags, consec = NULL){
+  data <- as.matrix(data)
+  max_lag <- max(lags)
+  lags_ext <- 1:max(lags)
+  n <- nrow(data)
+  p <- ncol(data)
+  n_var <- nrow(data) - max(lags)
+  n_lags <- length(lags_ext)
+  data_response <- data
+  if(!is.null(consec)){m_consec <- matrix(NA, nrow = n, ncol = n_lags)}
+  l_data_lags <- list()
+  lag_pos <- 1
+  for(lag in lags){
+    lagged_data <- matrix(NA, nrow = n, ncol = p)
+    lagged_data[(lag + 1):n, ] <- data[-((n - lag + 1):n), ]
+    lagged_data <- matrix(lagged_data, ncol = p, nrow = n)
+    colnames(lagged_data) <- paste("V", 1:p, ".lag", lag, ".", sep = "")
+    l_data_lags[[lag_pos]] <- lagged_data
+    lag_pos <- lag_pos + 1
+  }
+  if(!is.null(consec)){
+    for(lag in lags_ext){m_consec[(lag + 1):n, lag] <- consec[-((n - lag + 1):n)]}
+    m_consec_check <- cbind(consec, m_consec)
+    v_check <- apply(m_consec_check, 1, function(x){
+      if(any(is.na(x))){
+        FALSE
+      } else {
+        check_row <- x[1] - x[-1] == 1:length(x[-1])
+        check_row_relevant <- check_row[lags_ext %in% lags]
+        if(any(check_row_relevant == FALSE)){
+          FALSE
+        } else {
+          TRUE
+        }
+      }
+    })
+  } else {
+    v_check <- rep(TRUE, n)
+    v_check[1:n_lags] <- FALSE
+  }
+  outlist <- list()
+  outlist$data_response <- data_response
+  outlist$l_data_lags <- l_data_lags
+  outlist$included <- v_check
+  return(outlist)
+}
+

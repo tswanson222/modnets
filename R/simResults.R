@@ -1,4 +1,5 @@
-##### compareMods: compare simulated networks with originals
+# Likely will not use any of this!!!
+##### compareMods: compare simulated networks with originals; edited "assign" call
 compareMods <- function(fits, Sim, threshold = FALSE, Res = NULL, ind = "correlation",
                         gamma = .5, mats = NULL, rule = "OR"){
   ind <- match.arg(tolower(ind), c(
@@ -25,7 +26,8 @@ compareMods <- function(fits, Sim, threshold = FALSE, Res = NULL, ind = "correla
       Res <- graphicalVAR::mlGraphicalVAR(
         Sim$data, Sim$vars, idvar = Sim$idvar,
         subjectNetworks = FALSE, gamma = gamma)
-      assign("Res", Res, envir = .GlobalEnv)
+      #assign("Res", Res, envir = .GlobalEnv)
+      ### EDITED TO REMOVE ERROR!
     }
     if(is(Res, "mlGraphicalVAR")){
       r1 <- matrixDist(Res$fixedResults$kappa, Sim$fixedKappa, ind = ind)
@@ -258,7 +260,8 @@ results <- function(obj, nets = 1, ind = "perf", X = NULL, abbv = 10){
     return(Y1[[nets]])
   } else {
     k <- gsub("_.*", "", names(obj$calls)[1])
-    X <- subset(X, FUN == k)
+    #X <- subset(X, FUN == k)
+    X <- X[which(X$FUN == k), ]
     if(ind %in% c("cosine", "cor", "mse", "mae")){
       Y1 <- cbind(X, Y1[[nets]])
     } else {

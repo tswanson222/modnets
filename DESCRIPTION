@@ -9,6 +9,37 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
+Imports: 
+    abind,
+    corpcor,
+    ggplot2,
+    glinternet,
+    glmnet,
+    gridExtra,
+    gtools,
+    igraph,
+    interactionTest,
+    leaps,
+    lme4,
+    lmerTest,
+    Matrix,
+    methods,
+    mvtnorm,
+    parallel,
+    pbapply,
+    plyr,
+    psych,
+    qgraph,
+    reshape2,
+    systemfit
+Suggests:
+    sn,
+    arm,
+    hierNet,
+    mlVAR,
+    graphicalVAR,
+    stringr,
+    qdapRegex
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

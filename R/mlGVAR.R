@@ -487,7 +487,7 @@ mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m
         if(is.numeric(skew)){skew <- rep(skew, nNode + nNode^2)}
         if(is.character(skew)){if(all(skew == 'random')){skew <- runif(nNode + nNode^2, -10000, 10000)}}
         if(isTRUE(skew) | length(skew) != (nNode + nNode^2)){skew <- rep(3, nNode + nNode^2)}
-        Omega <- as.matrix(forceSymmetric(Omega))
+        Omega <- as.matrix(Matrix::forceSymmetric(Omega))
         Pars <- sn::rmsn(nPerson, c(mu_fixed, beta_fixed), Omega, skew)
       }
       Mus <- Pars[, 1:nNode]
@@ -573,6 +573,12 @@ mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m
                 Omega = trevModelCov(cov = trevModelArray(mean = Omega)))
   kappa <- corpcor::pseudoinverse(Theta_fixed)
   beta <- matrix(beta_fixed, nNode, nNode)
+  # FUNCTION FOR THIS TO WORK
+  trevPDC <- function(beta, kappa){
+    if(ncol(beta) == nrow(beta) + 1){beta <- beta[, -1, drop = FALSE]}
+    sigma <- solve(kappa)
+    t(beta/sqrt(diag(sigma) %o% diag(kappa) + beta^2))
+  }
   mod2 <- list(fixedKappa = kappa, fixedPCC = pcor2(Theta_fixed), fixedBeta = beta,
                fixedPDC = trevPDC(beta, kappa), between = pcor2(Omega[1:nNode, 1:nNode]))
   if(ordinal & !ordWithin){

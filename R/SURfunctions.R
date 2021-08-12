@@ -630,7 +630,8 @@ SURsampler <- function(B = NULL, S, n, seed = NULL, beta, beta2 = NULL,
   if(!is.null(seed)){set.seed(seed)}
   tx <- Sys.time()
   if(!cholesky){
-    R <- MASS::mvrnorm(n = n, mu = mu, Sigma = S)
+    R <- mvtnorm::rmvnorm(n = n, mean = mu, sigma = S)
+    #R <- MASS::mvrnorm(n = n, mu = mu, Sigma = S)
   } else {
     R <- matrix(rnorm(p * n), ncol = p) %*% chol(S)
   }

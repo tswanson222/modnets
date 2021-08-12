@@ -19,6 +19,58 @@ predictNet <- function(object, data = NULL, all = FALSE, scale = FALSE){
     return(do.call(predictDelta, list(mod1 = object, mod0 = data, scale = scale)))
   }
 
+  # Function to create design matrix for all models
+  interactionMatrix <- function(data, y, type, moderators = NULL,
+                                lags = NULL, threeWay = TRUE){
+    p <- ncol(data)
+    mainMod <- paste(colnames(data)[-y], collapse = " + ")
+    if(!is.null(lags)){
+      if(!is.null(moderators)){
+        p <- ((p - 1)/length(lags)) + 1
+        moderators <- moderators + 1
+        ints <- t(combn((1:p)[-y], 2))
+        ints_m <- c()
+        for(i in 1:nrow(ints)){ints_m[i] <- any(ints[i,] %in% moderators)}
+        ints <- ints[ints_m,]
+        if(length(lags) == 1){
+          intMods <- paste0(colnames(data)[ints[,1]], "*", colnames(data)[ints[,2]], collapse = "+")
+        } else {
+          lagInts <- list(); intMods <- list()
+          for(j in 1:length(lags)){
+            lagInts[[j]] <- data.frame(y = data[,"y"], data[,grep(paste0("lag", lags[j]), colnames(data))])
+            intMods[[j]] <- paste0(colnames(lagInts[[j]])[ints[,1]], "*", colnames(lagInts[[j]])[ints[,2]], collapse = "+")
+          }
+          for(i in 1:(length(lags) - 1)){intMods[[i]] <- paste0(intMods[[i]], " + ")}
+          intMods <- do.call(paste0, intMods)
+        }
+        form <- as.formula(paste0(colnames(data)[y], " ~ ", mainMod, " + ", intMods))
+      } else {
+        form <- as.formula(paste0(colnames(data)[y], " ~ ", mainMod))
+      }
+    } else {
+      if(!is.null(moderators) & (if((y %in% moderators) & threeWay == FALSE){length(moderators) > 1} else {TRUE})){
+        if((y %in% moderators) & threeWay == TRUE){
+          ints <- t(combn((1:p)[-y], 2))
+          intMods <- paste0("V", ints[,1], ".*V", ints[,2], ".", collapse = " + ")
+        } else {
+          if(y %in% moderators){moderators <- moderators[-which(moderators == y)]}
+          nm <- length(moderators)
+          intMods <- list()
+          for(i in 1:nm){
+            intMods[[i]] <- paste0(colnames(data)[-c(y, moderators[i])], "*V", moderators[i], ".", collapse = " + ")
+          }
+          if(nm > 1){for(i in 1:(nm - 1)){intMods[[i]] <- paste0(intMods[[i]], " + ")}}
+          intMods <- do.call(paste0, intMods)
+        }
+        form <- as.formula(paste0(colnames(data)[y], " ~ ", mainMod, " + ", intMods))
+      } else {
+        form <- as.formula(paste0(colnames(data)[y], " ~ ", mainMod))
+      }
+    }
+    X <- model.matrix(form, data)[,-1]
+    X
+  }
+
   # SURnet vs. ggm
   if("SURnet" %in% c(names(object), names(attributes(object)))){
     if("SURnet" %in% names(object)){object <- object$SURnet}
@@ -225,6 +277,31 @@ setup <- function(data, type, y = NULL, lags = NULL, scale = TRUE, allNum = FALS
   if(scale == TRUE){for(i in which(type == "g")){data[,i] <- scale(data[,i])}}
   data <- data.frame(data)
   names(data) <- paste0("V", 1:ncol(data), ".")
+  # PUTTING THIS IN JUST FOR BELOW
+  lagIt <- function(data, y, lags = 1){
+    if(max(lags) > 1){
+      lagged <- list()
+      for(i in 1:length(lags)){
+        lagged[[i]] <- data[-c((nrow(data) - lags[i] + 1):nrow(data)),]
+        names(lagged[[i]]) <- paste0(names(lagged[[i]]), "lag", lags[i], ".")
+      }
+      check <- sapply(lagged, nrow)
+      if(any(check != check[length(check)])){
+        check2 <- which(check != check[length(check)])
+        for(j in 1:length(check2)){
+          lagged[[j]] <- lagged[[j]][-c(1:(nrow(lagged[[j]]) - nrow(lagged[[length(lagged)]]))),]
+          rownames(lagged[[j]]) <- c(1:nrow(lagged[[j]]))
+        }
+      }
+      lagged <- do.call(cbind, lagged)
+    } else {
+      lagged <- data[-nrow(data),]
+      names(lagged) <- paste0(names(lagged), "lag1.")
+    }
+    response <- data[-c(1:max(lags)),]
+    new <- data.frame(y = response[,y], lagged)
+    new
+  }
   if(!is.null(lags)){data <- lagIt(data = data, y = y, lags = lags)}
   if(allNum == TRUE & scale == TRUE){
     for(j in 1:ncol(data)){data[,j] <- as.numeric(data[,j])}

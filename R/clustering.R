@@ -32,11 +32,13 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
     warning(paste0(sum(!syms), " Nonsymmetrical graph", ifelse(sum(!syms) > 1, "s ", " "), "removed"))
     Wmats <- Wmats[-which(!syms)]
   }
-  names(Wmats) <- qgraph:::fixnames(Wmats, "graph ")
+  #names(Wmats) <- qgraph:::fixnames(Wmats, "graph ")
+  names(Wmats) <- fnames(Wmats, 'graph ')
   clustOut <- lapply(Wmats, clustAuto)
   for(g in seq_along(clustOut)){
     if(!is(clustOut[[g]], "clustcoef_auto")){
-      names(clustOut[[g]]) <- qgraph:::fixnames(clustOut[[g]], "type ")
+      #names(clustOut[[g]]) <- qgraph:::fixnames(clustOut[[g]], "type ")
+      names(clustOut[[g]]) <- fnames(clustOut[[g]], 'type ')
       for(t in seq_along(clustOut[[g]])){
         if(!is.null(labels)){
           clustOut[[g]][[t]][["node"]] <- labels
@@ -73,7 +75,10 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
     if(relative | scale){
       if(relative & scale){warning("Using 'relative' and 'scale' together is not recommended")}
       for(j in which(sapply(clustOut[[i]], mode) == "numeric")){
-        if(scale){clustOut[[i]][, j] <- qgraph:::scale2(clustOut[[i]][, j])}
+        if(scale){
+          #clustOut[[i]][, j] <- qgraph:::scale2(clustOut[[i]][, j])
+          clustOut[[i]][, j] <- scaleNA(clustOut[[i]][, j])
+        }
         if(relative){
           mx <- max(abs(clustOut[[i]][, j]), na.rm = TRUE)
           if(mx != 0){clustOut[[i]][, j] <- clustOut[[i]][, j]/mx}
@@ -125,9 +130,12 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
     adjmatrix = abs(x), mode = "undirected",
     weighted = ifelse(weighted.gr, list(TRUE), list(NULL))[[1]], diag = FALSE)
   cb <- igraph::transitivity(net_ig, type = "barrat", isolates = "zero")
-  cw <- qgraph:::clustWS(x, thresholdWS)
-  cz <- qgraph:::clustZhang(x)
-  co <- qgraph:::clustOnnela(x, thresholdON)
+  #cw <- qgraph:::clustWS(x, thresholdWS)
+  #cz <- qgraph:::clustZhang(x)
+  #co <- qgraph:::clustOnnela(x, thresholdON)
+  cw <- WS(x, thresholdWS)
+  cz <- zhang(x)
+  co <- onnela(x, thresholdON)
   if(!signed.gr & !weighted.gr){output <- cbind(clustWS = cw[, 1])}
   if(!signed.gr & weighted.gr){
     output <- cbind(clustWS = cw[, 1], clustZhang = cz[, 1],
@@ -172,7 +180,7 @@ clustPlot <- function(Wmats, scale = c("z-scores", "raw", "raw0", "relative"),
                       decreasing = FALSE, plot = TRUE, signed = TRUE,
                       verbose = TRUE){
   if(is.logical(scale)){scale <- ifelse(scale, "z-scores", "raw")}
-  invisible(suppressMessages(require(ggplot2)))
+  #invisible(suppressMessages(require(ggplot2)))
   measure <- value <- node <- type <- NULL
   scale <- match.arg(scale)
   if(scale == "z-scores" & verbose & plot){message("Note: z-scores are shown on x-axis.")}

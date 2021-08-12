@@ -756,7 +756,7 @@ modSelect <- function(obj, data = NULL, fit = FALSE, select = "select",
   if(ascall){return(attr(varMods, "call"))} else {return(varMods)}
 }
 
-##### adjustedCI: uses the union-bound approach for obtaining adjCIs
+##### adjustedCI: uses the union-bound approach for obtaining adjCIs -- STOLEN FROM hdi PACKAGE!!!
 adjustedCI <- function(lci, rci, centers, ses, df.res, gamma.min, ci.level, var,
                        multi.corr = FALSE, verbose = FALSE, s0 = list(s0 = NA)){
   findInsideGamma <- function(low, high, ci.info, verbose){

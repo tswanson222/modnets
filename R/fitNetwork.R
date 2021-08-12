@@ -283,8 +283,10 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
       }
     }
     if(!is.null(beepno) & !is.null(dayno)){
-      consec <- mgm:::beepday2consec(beepvar = beepno, dayvar = dayno)
-      consec <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+      #consec <- mgm:::beepday2consec(beepvar = beepno, dayvar = dayno)
+      #consec <- mgm:::lagData(data = data, lags = 1, consec = consec)[[3]][-1]
+      consec <- makeConsec(beepvar = beepno, dayvar = dayno)
+      consec <- lagData(data = data, lags = 1, consec = consec)[[3]][-1]
       output$call$consec <- which(consec)
     } else {
       consec <- NULL

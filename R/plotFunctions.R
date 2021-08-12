@@ -400,7 +400,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
   type <- switch(type, outstrength = 'outStrength', instrength = 'inStrength',
                  outei = 'outEI', inei = 'inEI', ei = 'EI', 'NA' = 'edges', type)
   cis <- match.arg(tolower(cis), c('quantile', 'se'))
-  invisible(suppressMessages(require(ggplot2)))
+  #invisible(suppressMessages(require(ggplot2)))
   if(isTRUE(attr(obj, 'mlGVAR')) & 'varMods' %in% names(obj)){
     mlnet <- switch(net, ggm = 'between|means', 'fixed')
     if(is.null(title) & startsWith(mlnet, 'b')){title <- 'Between-subjects network\t'}
@@ -415,7 +415,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
     net <- switch(net, ggm = 'temporal', net)
     obj <- obj[[net]]
     if(net == 'contemporaneous'){boots <- obj$boots}
-    title <- switch(2 - is.null(title), paste(Hmisc::capitalize(net), 'Network\t'), title)
+    title <- switch(2 - is.null(title), paste(capitalize(net), 'Network\t'), title)
     if(identical(title, FALSE)){title <- NULL}
     if(type == 'strength' & net == 'temporal'){
       type <- 'outStrength'
@@ -500,7 +500,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
       if(pp != FALSE){cat(paste0('CS_Pair: ', cssPair, ' (cor = ', cor, ')'), '\n')}
       if(pp != FALSE){cat(paste0('CS_Int: ', cssInt, ' (cor = ', cor, ')'))}
     }
-    legLab <- Hmisc::capitalize(type)
+    legLab <- capitalize(type)
     N <- dat$N[1]
     p <- ggplot(dat, aes(x = subN, y = mean, group = type, colour = type, fill = type))
     p <- p + geom_line(lwd = 1) + geom_point()
@@ -536,7 +536,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
     id0 <- ifelse(type == 'edges', 'edge', 'node')
     dat$id1 <- factor(dat$id1, levels = dat0[[id0]][order(dat0[[order]])])
     dat$id2 <- factor(dat$id2, levels = dat0[[id0]][order(dat0[[order]])])
-    dat$type <- factor(paste0(ifelse(pp == 'pairwise', 'Pairwise (', 'Interactions ('), Hmisc::capitalize(type), ')'))
+    dat$type <- factor(paste0(ifelse(pp == 'pairwise', 'Pairwise (', 'Interactions ('), capitalize(type), ')'))
     if(color & type == 'edges'){
       if(net == 'ggm'){net <- 'temporal'}
       nn <- switch(2 - pairwise, net(fit0, n = net), netInts(fit0))
@@ -654,11 +654,11 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
       order <- 4
     }
     v2 <- TRUE
-    type2 <- switch(2 - v2, paste0(rep(dat$type, length(nets)), ' (', Hmisc::capitalize(type), ')'), type)
+    type2 <- switch(2 - v2, paste0(rep(dat$type, length(nets)), ' (', capitalize(type), ')'), type)
     dat2 <- cbind.data.frame(
       id = rep(dat[[id]], length(nets)), value = unname(unlist(dat[, gsub('mean', 'boot_mean', nets)])),
       lower = rep(dat[[lci]], length(nets)), upper = rep(dat[[uci]], length(nets)),
-      net = rep(nets, each = nrow(dat)), type = factor(Hmisc::capitalize(type2))
+      net = rep(nets, each = nrow(dat)), type = factor(capitalize(type2))
     )
     colnames(dat2)[1] <- id
     dat2[[id]] <- factor(dat2[[id]], levels = dat[[id]][switch(
@@ -914,7 +914,7 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
   if(plot == TRUE){
     plotCI <- function(dat, xlabs, true = NULL, flip = TRUE,
                        size = 1, labels = TRUE, title = NULL){
-      invisible(suppressMessages(require(ggplot2)))
+      #invisible(suppressMessages(require(ggplot2)))
       if(is.logical(labels)){if(!labels){xlabs <- NULL}} else {xlabs <- labels}
       p <- ggplot(dat, aes(x = reorder(ord, b), y = b, group = Y)) +
         facet_wrap(Y ~., scales = "free") + geom_point(size = size, na.rm = TRUE) +
@@ -986,7 +986,7 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
                      hist = FALSE, xlab = NULL, mods = NULL, nsims = 500,
                      xn = NULL, getCIs = FALSE, discrete = FALSE,
                      ylab = NULL, main = NULL, midline = TRUE){
-  suppressMessages(invisible(require(ggplot2)))
+  #suppressMessages(invisible(require(ggplot2)))
   if(isTRUE(discrete)){compare <- 0:1}
   if("adjMat" %in% names(out)){out <- out$mods0}
   if(any(c("models", "SURnet") %in% names(out))){
@@ -1014,9 +1014,9 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
     colnames(newdat) <- c("x", "y", "se", "lower", "upper")
     data <- newdat
   }
-  to2 <- Hmisc::capitalize(to)
-  fr2 <- Hmisc::capitalize(from)
-  xlab <- Hmisc::capitalize(xlab)
+  to2 <- capitalize(to)
+  fr2 <- capitalize(from)
+  xlab <- capitalize(xlab)
   if(!avg){
     if(is.null(ylab)){ylab <- bquote(.(fr2)%->%.(to2))}
     #if(is.null(ylab)){ylab <- paste0(fr2, " ---> ", to2)}
@@ -1115,7 +1115,7 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
 #' @examples
 #' 1 + 1
 intsPlot <- function(out, y = 'all', moderator = NULL, nsims = 500, alpha = .05){
-  require(ggplot2)
+  #require(ggplot2)
   if("adjMat" %in% names(out)){out <- out$mods0}
   if("models" %in% names(out)){out <- margCIs(out, modname = moderator, nsims = nsims, alpha = alpha)}
   if(is.null(moderator)){moderator <- attributes(out)$moderator}
@@ -1146,13 +1146,13 @@ intsPlot <- function(out, y = 'all', moderator = NULL, nsims = 500, alpha = .05)
     } else {
       y <- which(names(out) == y)
       dd <- data.frame(out[[y]])
-      Y <- Hmisc::capitalize(names(out)[y])
+      Y <- capitalize(names(out)[y])
     }
   } else {
     dd <- data.frame(out[[y]])
-    Y <- Hmisc::capitalize(names(out)[y])
+    Y <- capitalize(names(out)[y])
   }
-  M <- Hmisc::capitalize(moderator)
+  M <- capitalize(moderator)
   if(y %in% c("sig", "all")){
     Y <- c("Significant interaction effects", "All interactions")[which(c("sig", "all") %in% y)]
     main <- paste0(Y, " across levels of ", M)
@@ -1227,10 +1227,10 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
   if(is.null(layout)){layout <- getLayout(nets, which.net)}
   mx <- getMax(nets, nodewise, which.net)
   if(ggm){
-    moderator <- Hmisc::capitalize(attr(nets[[1]], "moderator"))
+    moderator <- capitalize(attr(nets[[1]], "moderator"))
     vals <- unname(sapply(nets, attr, "mval"))
   } else {
-    moderator <- Hmisc::capitalize(nets[[1]]$call$moderators)
+    moderator <- capitalize(nets[[1]]$call$moderators)
     vals <- unname(sapply(lapply(nets, '[[', "call"), '[[', "mval"))
   }
   layout(t(1:length(vals)))
@@ -1281,14 +1281,15 @@ plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
                 colnames(x)[grepl(cents[i], colnames(x))])
     }
   }
-  yvar <- gsub('EI', 'ExpectedInfluence', Hmisc::capitalize(yvar))
-  colnames(x) <- gsub('EI', 'ExpectedInfluence', Hmisc::capitalize(colnames(x)))
+  yvar <- gsub('EI', 'ExpectedInfluence', capitalize(yvar))
+  colnames(x) <- gsub('EI', 'ExpectedInfluence', capitalize(colnames(x)))
   if(!is.null(by)){
     by <- match.arg(tolower(by), c(tolower(xvar0), 'pairwise', 'interactions', 'beta', 'kappa', 'pcc'), several.ok = TRUE)
     if('pcc' %in% by){by <- gsub('pcc', 'PCC', by)}
-    by <- Hmisc::capitalize(by)
+    by <- capitalize(by)
     if(by %in% c('Pairwise', 'Interactions')){
-      x <- subset(x, Type == by)
+      #x <- subset(x, Type == by)
+      x <- x[which(x$Type == by), ]
       by <- switch(2 - (length(unique(x$Network)) > 1), 'Network', NULL)
     }
   }
@@ -1296,14 +1297,14 @@ plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
   if(length(unique(x$Network)) != 1 & !identical(by, 'Network')){warning('Multiple networks aggregated')}
   if(any(colnames(x) == 'N')){colnames(x)[colnames(x) == 'N'] <- 'nCases'}
   if(length(unique(x$nCases)) == 1){stop('Must have used more than one sample size to plot')}
-  FUN <- bootnet:::plot.netSimulator
-  args0 <- setdiff(formalArgs(FUN), '...')
-  allargs <- formals(FUN)[intersect(names(formals(FUN)), args0)]
+  #FUN <- bootnet:::plot.netSimulator
+  args0 <- setdiff(formalArgs(netsimulator), '...')
+  allargs <- formals(netsimulator)[intersect(names(formals(netsimulator)), args0)]
   allargs <- replace(allargs, c('x', 'yvar', 'xlab'), list(x = x, yvar = yvar, xlab = xlab))
   if(!is.null(by)){allargs$yfacet <- by}
   args <- args[intersect(names(args), args0[-1])]
   if(length(args) > 0){allargs <- replace(allargs, names(args), args)}
-  g <- do.call(FUN, replace(allargs, 'print', FALSE))
+  g <- do.call(netsimulator, replace(allargs, 'print', FALSE))
   if(!is.null(hline) & !identical(hline, FALSE)){
     g <- g + ggplot2::geom_hline(yintercept = hline, linetype = 2,
                                  colour = 'red', alpha = .3)
@@ -1353,7 +1354,8 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
       "Degree|^Out|^In"), include0)]
     centrality <- include0[grep(paste(tolower(
       centrality), collapse = "|"), tolower(include0))]
-    c0 <- c01 <- subset(c0, measure %in% centrality)
+    #c0 <- c01 <- subset(c0, measure %in% centrality)
+    c0 <- c01 <- c0[which(c0$measure %in% centrality), ]
   }
   if(which.net == "contemporaneous" & clustering != FALSE){
     c1 <- do.call(rbind, lapply(seq_along(Wmats), function(z){
@@ -1373,7 +1375,7 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
   if(!plot){
     list2env(list(c0 = c0, c1 = c1, c01 = c01), .GlobalEnv)
   } else {
-    invisible(suppressMessages(require(ggplot2)))
+    #invisible(suppressMessages(require(ggplot2)))
     g1 <- ggplot(c01, aes(x = value, y = node, group = group, color = group, shape = group)) +
       geom_path(alpha = 1, size = 1) + geom_point(size = 2) + xlab("") + ylab("") + theme_bw() +
       facet_grid(. ~ measure, scales = "free") + scale_x_continuous(breaks = c(-1, 0, 1)) +
@@ -1439,6 +1441,51 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
 plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'between'),
                      titles = TRUE, l = 3, label = NULL, xpos = 0, ypos = .5){
   args0 <- list(...)
+  # ADDED THIS JUST TO ACCOMMODATE avlay...
+  appd <- function(x, recursive = FALSE){
+    if(length(x) == 1){
+      inds <- c('correlation', 'cosine', 'mse', 'mae')
+      inds <- ifelse(is.character(x), list(inds), list(paste0(inds, x)))[[1]]
+      inds <- paste(paste0('^', inds, '$'), collapse = '|')
+      nlist <- function(x, getls = FALSE, checkString = FALSE,
+                        rmex = NULL, grep = FALSE){
+        rmexcept <- function(x, regex = FALSE, test = FALSE){
+          if(isTRUE(regex)){
+            if(length(x) > 1){x <- paste0(x, collapse = '|')}
+            x <- ls(envir = .GlobalEnv)[grep(x, ls(envir = .GlobalEnv))]
+          }
+          if(test){return(x)}
+          stopifnot(all(x %in% ls(envir = .GlobalEnv)))
+          rm(list = setdiff(ls(envir = .GlobalEnv), x), envir = .GlobalEnv)
+        }
+        if(isTRUE(x) | isTRUE(getls) | checkString){
+          if(isTRUE(x) & is.character(getls)){x <- getls}
+          x <- ls(envir = .GlobalEnv)[grep(x, ls(envir = .GlobalEnv))]
+        }
+        if(checkString){return(x)}
+        out <- lapply(x, function(z) eval(parse(text = z)))
+        names(out) <- x
+        if(!is.null(rmex)){
+          if(isTRUE(rmex)){
+            rm(list = ls(envir = .GlobalEnv), envir = .GlobalEnv)
+          } else if(is.character(rmex)){
+            rmexcept(x = rmex, regex = grep)
+          }
+        }
+        return(out)
+      }
+      out <- nlist(inds, TRUE)
+    } else {
+      out <- list()
+      for(i in seq_along(x)){out <- append(out, x[[i]])}
+      if(recursive){
+        while(all(sapply(out, is, 'list'))){
+          out <- appd(out, recursive = FALSE)
+        }
+      }
+    }
+    return(out)
+  }
   avlay <- function(..., which.net = 'temporal', threshold = FALSE,
                     collapse = FALSE, net = NULL, l = NULL, args = NULL){
     if(is.null(l)){

@@ -31,11 +31,13 @@ centTable <- function(Wmats, scale = TRUE, which.net = "temporal", labels = NULL
   if(any(grepl("lag", dimnames(Wmats)))){dimnames(Wmats) <- lapply(dimnames(Wmats), function(z) gsub("[.]lag1.*|[.]y$", "", z))}
   if(!is.list(Wmats)){Wmats <- list(Wmats)}
   if(any(sapply(Wmats, ncol) == 1)){stop("Not supported for single-node graphs")}
-  names(Wmats) <- qgraph:::fixnames(Wmats, "graph ")
+  #names(Wmats) <- qgraph:::fixnames(Wmats, "graph ")
+  names(Wmats) <- fnames(Wmats, 'graph ')
   centOut <- lapply(Wmats, centAuto, which.net = which.net, weighted = weighted, signed = signed)
   for(g in seq_along(centOut)){
     if(!is(centOut[[g]], "centrality_auto")){
-      names(centOut[[g]]) <- qgraph:::fixnames(centOut[[g]], "type ")
+      #names(centOut[[g]]) <- qgraph:::fixnames(centOut[[g]], "type ")
+      names(centOut[[g]]) <- fnames(centOut[[g]], 'type ')
       for(t in seq_along(centOut[[g]])){
         if(!is.null(labels)){
           centOut[[g]][[t]][["node.centrality"]][["node"]] <- labels
@@ -67,7 +69,10 @@ centTable <- function(Wmats, scale = TRUE, which.net = "temporal", labels = NULL
     if(relative | scale){
       if(relative & scale){warning("Using 'relative' and 'scale' together is not recommended")}
       for(j in which(sapply(centOut[[i]][["node.centrality"]], mode) == "numeric")){
-        if(scale){centOut[[i]][["node.centrality"]][, j] <- qgraph:::scale2(centOut[[i]][["node.centrality"]][, j])}
+        if(scale){
+          #centOut[[i]][["node.centrality"]][, j] <- qgraph:::scale2(centOut[[i]][["node.centrality"]][, j])
+          centOut[[i]][["node.centrality"]][, j] <- scaleNA(centOut[[i]][["node.centrality"]][, j])
+        }
         if(relative){
           mx <- max(abs(centOut[[i]][["node.centrality"]][, j]), na.rm = TRUE)
           if(mx != 0){centOut[[i]][["node.centrality"]][, j] <- centOut[[i]][["node.centrality"]][, j]/mx}
@@ -204,7 +209,7 @@ centPlot <- function(Wmats, scale = c("z-scores", "raw", "raw0", "relative"),
   if(isTRUE(attr(Wmats, "mlGVAR"))){
     Wmats <- switch(which.net, between = Wmats$betweenNet, Wmats$fixedNets)}
   if(is.logical(scale)){scale <- ifelse(scale, "z-scores", "raw")}
-  invisible(suppressMessages(require(ggplot2)))
+  #invisible(suppressMessages(require(ggplot2)))
   measure <- value <- node <- type <- NULL
   scale <- tryCatch({match.arg(scale)}, error = function(e){scale})
   #scale <- match.arg(scale)

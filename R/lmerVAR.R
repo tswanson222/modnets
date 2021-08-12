@@ -32,7 +32,7 @@ lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
                     covariates = NULL, fix = NULL, warnings = FALSE, verbose = TRUE,
                     beepno = NULL, dayno = NULL, deleteMissing = TRUE){
   t1 <- Sys.time()
-  suppressMessages(invisible(c(require(lme4), require(lmerTest))))
+  #suppressMessages(invisible(c(require(lme4), require(lmerTest))))
   if(!warnings){oldw <- getOption("warn"); options(warn = -1)}
   mnames <- m
   data <- data.frame(data)
@@ -123,7 +123,8 @@ lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
     return(as.formula(paste0(y, " ~ ", fixed, " + ", rands)))
   })
   tempMods <- setNames(lapply(seq_along(yvars), function(z){
-    tm <- suppressMessages(lmer(tempForms[[z]], data = dat1, REML = FALSE))
+    # CHECK THAT THIS SHOULD INDEED BE lmerTest!
+    tm <- suppressMessages(lmerTest::lmer(tempForms[[z]], data = dat1, REML = FALSE))
     if(verbose){setTxtProgressBar(pb, z)}
     return(tm)
   }), yvars)
@@ -147,7 +148,8 @@ lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
   })
   resDat$ID <- ids
   contempMods <- setNames(lapply(seq_along(yvars), function(z){
-    cm <- suppressMessages(lmer(contempForms[[z]], data = resDat, REML = FALSE))
+    # CHECK THAT THIS SHOULD INDEED BE lmerTest!
+    cm <- suppressMessages(lmerTest::lmer(contempForms[[z]], data = resDat, REML = FALSE))
     if(verbose){setTxtProgressBar(pb, z)}
     return(cm)
   }), yvars)
@@ -214,7 +216,7 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
   y2 <- rep(list(y), 2)
   ### BETA
   beta <- beta0 <- do.call(rbind, lapply(
-    model$tempMods, function(z) fixef(z)[x]))
+    model$tempMods, function(z) lme4::fixef(z)[x]))
   betaSE <- betaSE0 <- do.call(rbind, lapply(
     model$tempMods, function(z) arm::se.fixef(z)[x]))
   beta_pvals <- betaPs0 <- (1 - pnorm(abs(beta/betaSE))) * 2
@@ -226,7 +228,7 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
     beta_pvals <- beta_pvals[y, match(y, paste0(x, ".y"))]
   }
   ### GAMMA THETA
-  gammaTheta <- lapply(model$contempMods, fixef)
+  gammaTheta <- lapply(model$contempMods, lme4::fixef)
   gammaThetaSE <- lapply(model$contempMods, arm::se.fixef)
   gt1 <- gt2 <- matrix(NA, k, k)
   for(i in 1:k){
@@ -263,7 +265,7 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
     }
   }
   gammaOmega <- lapply(model$tempMods, function(z){
-    z2 <- fixef(z)
+    z2 <- lme4::fixef(z)
     z2 <- z2[intersect(names(z2), mvars)]
     return(z2)
   })
@@ -308,7 +310,7 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
               gammaOmega = list(mu = gammaOmega, SE = gammaOmegaSE, Pvals = gammaOmega_pvals))
   if(!is.null(m)){
     ints <- do.call(rbind, lapply(model$tempMods, function(z){
-      fixef(z)[grepl(":", names(fixef(z)))]}))
+      lme4::fixef(z)[grepl(":", names(lme4::fixef(z)))]}))
     intsSE <- do.call(rbind, lapply(model$tempMods, function(z){
       arm::se.fixef(z)[grepl(":", names(arm::se.fixef(z)))]}))
     intsPvals <- (1 - pnorm(abs(ints/intsSE))) * 2
@@ -421,10 +423,10 @@ compareVAR <- function(m1, m2, m3 = NULL, anova = NULL, type = "tempMods"){
 }
 
 ##### compareVAR2: ain't so sure what this one do
-compareVAR2 <- function(mods, p){
-  vs <- paste0(names(mods), "$mods$tempMods[[", p, "]]")
-  obj <- paste0("anova(", paste0(vs, collapse = ", "), ")")
-  for(i in 1:length(vs)){assign(names(mods)[i], mods[[i]], pos = 1)}
-  out <- eval(parse(text = obj))
-  out
-}
+#compareVAR2 <- function(mods, p){
+#  vs <- paste0(names(mods), "$mods$tempMods[[", p, "]]")
+#  obj <- paste0("anova(", paste0(vs, collapse = ", "), ")")
+#  for(i in 1:length(vs)){assign(names(mods)[i], mods[[i]], pos = 1)}
+#  out <- eval(parse(text = obj))
+#  out
+#}

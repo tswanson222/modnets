@@ -215,7 +215,7 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
     regMods <- bestMods <- list()
     for(i in 1:p){
       if(all(colnames(dat$Y) %in% colnames(dat$X))){data <- dat$X[,-i]}
-      regMods[[i]] <- summary(regsubsets(data, Y[,i], nvmax = ncol(data), method = method))
+      regMods[[i]] <- summary(leaps::regsubsets(data, Y[,i], nvmax = ncol(data), method = method))
       bestMods[[i]] <- ifelse(regMods[[i]]$which, 1, 0)[best(regMods[[i]][[ind]]), -1]
     }
     bestMods <- lapply(bestMods, function(z) names(z)[z == 1])
@@ -241,10 +241,10 @@ lassoSelect <- function(data, yvar, type = "g", criterion = "EBIC",
   if(length(type) > 1){type <- type[yvar]}
   fam <- ifelse(type %in% c("g", "gaussian"), "gaussian", "binomial")
   if(criterion == "CV"){
-    fit <- cv.glmnet(x = x, y = y, family = fam, type.measure = "deviance",
-                     nfolds = nfolds, nlambda = nlam, alpha = alpha)
+    fit <- glmnet::cv.glmnet(x = x, y = y, family = fam, type.measure = "deviance",
+                             nfolds = nfolds, nlambda = nlam, alpha = alpha)
   } else {
-    fit <- glmnet(x = x, y = y, family = fam, alpha = alpha, nlambda = nlam)
+    fit <- glmnet::glmnet(x = x, y = y, family = fam, alpha = alpha, nlambda = nlam)
   }
   getIndices <- function(fit, y, x, fam = "gaussian", criterion = "EBIC",
                          gamma = .5, lam = "null", keepFit = FALSE){
@@ -333,22 +333,22 @@ lassoSelect <- function(data, yvar, type = "g", criterion = "EBIC",
           criterion == "EBIC", list(2 * gamma * n_neighbors * log(p)), list(0))[[1]]
       allCoefs <- lapply(seq_len(n_lambdas), function(z) coef(fit)[, z])
       betas <- allCoefs[[which.min(ic_lambda)]][-1]
-      coefs <- Matrix(betas, sparse = TRUE)
+      coefs <- Matrix::Matrix(betas, sparse = TRUE)
       rownames(coefs) <- names(betas)
       fitobj <- list(fit = fit, fit0 = NA, crit = ic_lambda)
-      if(keepFit){fitobj$fit0 <- glmnet(x, y, fam, lambda = fit$lambda[which.min(ic_lambda)])}
+      if(keepFit){fitobj$fit0 <- glmnet::glmnet(x, y, fam, lambda = fit$lambda[which.min(ic_lambda)])}
       names(fitobj)[3] <- criterion
       output <- list(mod0 = names(betas)[betas != 0], coefs = coefs,
                      fitobj = fitobj, allCoefs = allCoefs)
       if(length(output$mod0) == 0){output$mod0 <- 1}
     } else {
-      coefs <- Matrix(do.call(cbind, lapply(mods, '[[', "betas")), sparse = TRUE)
+      coefs <- Matrix::Matrix(do.call(cbind, lapply(mods, '[[', "betas")), sparse = TRUE)
       rownames(coefs) <- colnames(x)
       colnames(coefs) <- paste0("mod", c("0", "1se"))
       fitobj <- list(fitCV = fit, fit0 = NA, fit1se = NA)
       if(keepFit){
-        fitobj$fit0 <- glmnet(x, y, fam, lambda = fit$lambda.min)
-        fitobj$fit1se <- glmnet(x, y, fam, lambda = fit$lambda.1se)
+        fitobj$fit0 <- glmnet::glmnet(x, y, fam, lambda = fit$lambda.min)
+        fitobj$fit1se <- glmnet::glmnet(x, y, fam, lambda = fit$lambda.1se)
       }
       attr(fitobj$fit0, "EBIC") <- mods[[1]]$EBIC
       attr(fitobj$fit1se, "EBIC") <- mods[[2]]$EBIC
@@ -376,20 +376,20 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
   y <- as.numeric(data[, 1])
   x <- data <- as.matrix(data[, -1])
   if(method == "hiernet"){
-    out1 <- capture.output({fitPath <- hierNet.path(x, y, nlam = nlam, strong = TRUE, diagonal = diag)})
-    out2 <- capture.output({fitCV <- hierNet.cv(fitPath, x, y, nfolds = nfolds)})
-    out3 <- capture.output({fit0 <- hierNet(x, y, lam = fitCV$lamhat, strong = TRUE, diagonal = diag)})
-    out4 <- capture.output({fit1se <- hierNet(x, y, lam = fitCV$lamhat.1se, strong = TRUE, diagonal = diag)})
+    out1 <- capture.output({fitPath <- hierNet::hierNet.path(x, y, nlam = nlam, strong = TRUE, diagonal = diag)})
+    out2 <- capture.output({fitCV <- hierNet::hierNet.cv(fitPath, x, y, nfolds = nfolds)})
+    out3 <- capture.output({fit0 <- hierNet::hierNet(x, y, lam = fitCV$lamhat, strong = TRUE, diagonal = diag)})
+    out4 <- capture.output({fit1se <- hierNet::hierNet(x, y, lam = fitCV$lamhat.1se, strong = TRUE, diagonal = diag)})
     mod0 <- c(fit0$bp - fit0$bn, fit0$th[lower.tri(fit0$th)])
     mod1se <- c(fit1se$bp - fit1se$bn, fit1se$th[lower.tri(fit1se$th)])
-    coefs <- Matrix(cbind(mod0, mod1se), sparse = TRUE)
+    coefs <- Matrix::Matrix(cbind(mod0, mod1se), sparse = TRUE)
   } else if(method == "glinternet"){
     if(length(type) > 1){type <- type[yvar]}
     fam <- ifelse(type %in% c("g", "gaussian"), "gaussian", "binomial")
     type <- rep(1, ncol(x))
     if(criterion == "CV"){
-      fitCV <- tryCatch({glinternet.cv(x, y, type, nFolds = nfolds, nLambda = nlam,
-                                       interactionCandidates = m, family = fam)},
+      fitCV <- tryCatch({glinternet::glinternet.cv(x, y, type, nFolds = nfolds, nLambda = nlam,
+                                                   interactionCandidates = m, family = fam)},
                         error = function(e){
                           failed <- TRUE
                           take <- 1
@@ -397,8 +397,8 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
                           while(failed == TRUE){
                             if(take <= 5){
                               if(verbose){cat("  Failed.. trying again, take =", take, "\n")}
-                              fitCV <- try(glinternet.cv(x, y, type, nFolds = nfolds, nLambda = nlam,
-                                                         interactionCandidates = m, family = fam), silent = TRUE)
+                              fitCV <- try(glinternet::glinternet.cv(x, y, type, nFolds = nfolds, nLambda = nlam,
+                                                                     interactionCandidates = m, family = fam), silent = TRUE)
                               if(class(fitCV) == "try-error"){
                                 failed <- TRUE
                                 take <- take + 1
@@ -407,8 +407,8 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
                               }
                             } else if(take <= 10){
                               if(verbose){cat("  Failed.. trying nlam = 20, take =", take, "\n")}
-                              fitCV <- try(glinternet.cv(x, y, type, nFolds = nfolds, nLambda = 20,
-                                                         interactionCandidates = m, family = fam), silent = TRUE)
+                              fitCV <- try(glinternet::glinternet.cv(x, y, type, nFolds = nfolds, nLambda = 20,
+                                                                     interactionCandidates = m, family = fam), silent = TRUE)
                               if(class(fitCV) == "try-error"){
                                 failed <- TRUE
                                 take <- take + 1
@@ -417,8 +417,8 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
                               }
                             } else {
                               if(verbose){cat("  Failed.. trying nlam = 20 & nFolds = 3, take =", take, "\n")}
-                              fitCV <- try(glinternet.cv(x, y, type, nFolds = 3, nLambda = 20,
-                                                         interactionCandidates = m, family = fam), silent = TRUE)
+                              fitCV <- try(glinternet::glinternet.cv(x, y, type, nFolds = 3, nLambda = 20,
+                                                                     interactionCandidates = m, family = fam), silent = TRUE)
                               if(class(fitCV) == "try-error"){
                                 failed <- TRUE
                                 take <- take + 1
@@ -451,16 +451,16 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
         which.lam1se <- which.lam1se + 1
       }
       fitCV$lambdaHat1Std <- fitCV$lambda[which.lam1se]
-      fit0 <- glinternet(x, y, type, lambda = fitCV$lambdaHat,
-                         interactionCandidates = m, family = fam)
-      fit1se <- glinternet(x, y, type, lambda = fitCV$lambdaHat1Std,
-                           interactionCandidates = m, family = fam)
+      fit0 <- glinternet::glinternet(x, y, type, lambda = fitCV$lambdaHat,
+                                     interactionCandidates = m, family = fam)
+      fit1se <- glinternet::glinternet(x, y, type, lambda = fitCV$lambdaHat1Std,
+                                       interactionCandidates = m, family = fam)
       attributes(fit1se)$useSE <- attributes(fitCV)$useSE <- useSE
       mod0 <- coef(fit0)[[2]]
       mod1se <- coef(fit1se)[[2]]
     } else {
-      fit <- glinternet(x, y, type, interactionCandidates = m,
-                        family = fam, nLambda = nlam)
+      fit <- glinternet::glinternet(x, y, type, interactionCandidates = m,
+                                    family = fam, nLambda = nlam)
       coefs <- coef(fit)[-1]
       mains <- 1:ncol(x)
       ints <- t(combn(mains, 2))
@@ -529,12 +529,12 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
           criterion == "EBIC", list(2 * gamma * n_neighbors * log(p)), list(0))[[1]]
       betas <- allCoefs[[which.min(ic_lambda)]]
       lambda_min <- fit$lambda[which.min(ic_lambda) + 1]
-      coefs <- Matrix(betas, sparse = TRUE)
+      coefs <- Matrix::Matrix(betas, sparse = TRUE)
       rownames(coefs) <- names(betas)
       fitobj <- list(fit = fit, fit0 = NA, crit = ic_lambda)
       if(ifelse(!is.null(m), ifelse(all(m == 0), FALSE, TRUE), TRUE) & method == "hiernet"){
-        fitobj$fit0  <- glinternet(x, y, type, interactionCandidates = m,
-                                   lambda = lambda_min, family = fam)
+        fitobj$fit0  <- glinternet::glinternet(x, y, type, interactionCandidates = m,
+                                               lambda = lambda_min, family = fam)
       }
       names(fitobj)[3] <- criterion
       output <- list(mod0 = names(betas)[betas != 0], coefs = coefs,
@@ -591,7 +591,7 @@ fitHierLASSO <- function(data, yvar, type = "g", m = NULL, criterion = "CV",
     }
     mod0 <- unlist(c(mod0coefs1, mod0coefs2))
     mod1se <- unlist(c(mod1secoefs1, mod1secoefs2))
-    coefs <- Matrix(cbind(mod0, mod1se), sparse = TRUE)
+    coefs <- Matrix::Matrix(cbind(mod0, mod1se), sparse = TRUE)
   }
   allNames <- c(colnames(data), apply(combn(colnames(data), 2), 2, paste, collapse = ":"))
   rownames(coefs) <- allNames
