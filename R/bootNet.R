@@ -679,27 +679,38 @@ cscoef <- function(obj, cor = .7, ci = .95, first = TRUE, verbose = TRUE){
   return(out)
 }
 
-##### summary.bootNet: descriptive statistics for bootNet
-##### NOT SURE IF THIS WORKING
-summary.bootNet <- function(x, centrality = TRUE){
+#' Descriptive statistics for bootNet
+#'
+#' Description
+#'
+#' @param object bootNet object
+#' @param centrality logical
+#' @param ... other arguments
+#'
+#' @return A table of descriptives
+#' @export
+#'
+#' @examples
+#' 1 + 1
+summary.bootNet <- function(object, centrality = TRUE, ...){
   inds1 <- c('edges', 'strength', 'EI')
   inds2 <- paste0('boot_', inds1)
   inds2[2:3] <- paste0(inds2[2:3], 's')
-  if('interactions' %in% names(x)){
+  if('interactions' %in% names(object)){
     cat('BLANK')
   } else {
-    samps <- lapply(inds1, function(z) x[[z]]$sample)
+    samps <- lapply(inds1, function(z) object[[z]]$sample)
     cors <- lapply(1:3, function(i){
-      boots <- x$boots[[inds2[i]]]
+      boots <- object$boots[[inds2[i]]]
       if(!grepl('edge', inds1[i])){boots <- t(boots)}
       sapply(seq_len(ncol(boots)), function(z) cor0(samps[[i]], boots[, z]))
     })
     mae <- lapply(1:3, function(i){
-      boots <- x$boots[[inds2[i]]]
+      boots <- object$boots[[inds2[i]]]
       if(!grepl('edge', inds1[i])){boots <- t(boots)}
       sapply(seq_len(ncol(boots)), function(z) mean(abs(samps[[i]] - boots[, z])))
     })
-    boots <- x$boots$boot_edges
+    boots <- object$boots$boot_edges
     sens <- sapply(seq_len(ncol(boots)), function(z){
       sum(boots[, z] != 0 & samps[[1]] != 0)/sum(samps[[1]] != 0)
     })
@@ -720,7 +731,7 @@ summary.bootNet <- function(x, centrality = TRUE){
     if(any(is.na(accu))){accu[is.na(accu)] <- 0}
     out <- cbind.data.frame(cor = cors[[1]], mae = mae[[1]], sensitivity = sens,
                             specificity = spec, precision = prec, accuracy = accu,
-                            N = attr(x, 'n'), p = length(samps[[2]]),
+                            N = attr(object, 'n'), p = length(samps[[2]]),
                             sparsity = sum(samps[[1]] == 0)/length(samps[[1]]),
                             index = 1, iter = 1:ncol(boots), type = 'Pairwise',
                             network = 'Between')

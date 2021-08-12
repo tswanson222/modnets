@@ -60,7 +60,7 @@ condPlot(
 Plot
 }
 \description{
-Plot conditional effects
+Description
 }
 \examples{
 1 + 1

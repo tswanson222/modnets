@@ -147,7 +147,7 @@ lagMat <- function(data, type = "g", m = NULL, covariates = NULL, center = TRUE,
     mods <- makeMods(X, m)
     X <- as.matrix(cbind(X, mods))
   }
-  if(class(Y) != "matrix"){
+  if(!is(Y, 'matrix')){
     Y <- as.matrix(Y, ncol = 1)
     colnames(Y) <- ynames
   }
@@ -815,8 +815,11 @@ netsimulator <- function(x, xvar = "factor(nCases)", yvar = c("sensitivity", "sp
       ylab <- ""
     }
   }
-  # THIS FUNCTION WILL NOT WORK UNTIL THIS IS REVISED!!!!
+  #Gathered <- tidyr::gather_(x, "measure", "value", yvar)
   #Gathered <- x %>% tidyr::gather_("measure", "value", yvar)
+  xx <- do.call(rbind, replicate(length(yvar), x, FALSE))[, setdiff(colnames(x), yvar)]
+  Gathered <- data.frame(xx, setNames(stack(x[, yvar, drop = FALSE])[, 2:1], c('measure', 'value')))
+  Gathered$measure <- as.character(Gathered$measure)
   if(!is.null(color)){
     Gathered[[color]] <- as.factor(Gathered[[color]])
     AES <- ggplot2::aes_string(x = xvar, y = "value", fill = color)

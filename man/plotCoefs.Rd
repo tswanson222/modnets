@@ -48,7 +48,8 @@ plotCoefs(
 A plot
 }
 \description{
-Plotting
+Plotting. I think this actually goes with resample? Also may not be restricted
+to SURfit objects
 }
 \examples{
 1 + 1

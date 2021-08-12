@@ -15,5 +15,10 @@
 #' @import stats
 #' @import ggplot2
 #' @import qgraph
-#' @importFrom utils capture.output combn data sessionInfo setTxtProgressBar txtProgressBar
-NULL
+#' @importFrom utils capture.output combn data sessionInfo setTxtProgressBar txtProgressBar stack
+
+utils::globalVariables(
+  c('B', 'Y', 'b', 'group', 'id1', 'id2', 'lower', 'node', 'ord', 'pred', 'prop0',
+    'sig', 'subN', 'upper', 'value', 'x', 'xmax', 'xmin', 'y', 'ymax', 'ymin',
+    'Type', 'measure')
+)

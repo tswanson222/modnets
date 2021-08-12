@@ -606,6 +606,7 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
   }
   output$nets1 <- nets1
   if(!identical(m, FALSE)){output$nets2 <- nets2}
+  for(i in setdiff(names(output), c('Results', 'args'))){names(output[[i]]) <- paste0('N', N)}
   class(output) <- c('list', 'mnetPower')
   class(output$Results) <- c('data.frame', 'mnetPower')
   attr(output, 'time') <- Sys.time() - t1
@@ -645,12 +646,26 @@ sampleSize <- function(p, m = 0, lags = 0, print = TRUE){
   }
 }
 
-##### summary.mnetPower: descriptive statistics for power simulation results
-summary.mnetPower <- function(x, ind = 'all', order = NULL, decreasing = FALSE){
-  if(is(x, 'list')){x <- x$Results}
-  inds <- list(N = unique(x$N), p = unique(x$p), sparsity = unique(x$sparsity),
-               network = unique(x$network), type = unique(x$type))
-  if('m2' %in% colnames(x)){inds$m2 <- unique(x$m2)}
+#' Descriptive statistics for power simulation results
+#'
+#' Description
+#'
+#' @param object mnetPowerSim output
+#' @param ind performance indices
+#' @param order character
+#' @param decreasing logical
+#' @param ... other arguments
+#'
+#' @return summary table
+#' @export
+#'
+#' @examples
+#' 1 + 1
+summary.mnetPower <- function(object, ind = 'all', order = NULL, decreasing = FALSE, ...){
+  if(is(object, 'list')){object <- object$Results}
+  inds <- list(N = unique(object$N), p = unique(object$p), sparsity = unique(object$sparsity),
+               network = unique(object$network), type = unique(object$type))
+  if('m2' %in% colnames(object)){inds$m2 <- unique(object$m2)}
   inds <- expand.grid(inds, stringsAsFactors = FALSE)
   if(length(unique(inds$network)) > 1){
     if(length(unique(inds$type)) > 1){
@@ -658,14 +673,14 @@ summary.mnetPower <- function(x, ind = 'all', order = NULL, decreasing = FALSE){
     }
   }
   nn <- colnames(inds)
-  x$fdr <- 1 - x$precision
-  x$type <- as.character(x$type)
-  x$network <- as.character(x$network)
-  niter <- max(x$iter)
+  object$fdr <- 1 - object$precision
+  object$type <- as.character(object$type)
+  object$network <- as.character(object$network)
+  niter <- max(object$iter)
   ys <- c('cor', 'mae', 'sensitivity', 'specificity', 'precision', 'accuracy', 'fdr')
   means <- sds <- medians <- ses <- list()
   for(i in seq_len(nrow(inds))){
-    tdat <- x
+    tdat <- object
     for(j in seq_len(ncol(inds))){
       tdat <- tdat[tdat[, nn[j]] == inds[i, j], ]
     }
@@ -696,5 +711,105 @@ summary.mnetPower <- function(x, ind = 'all', order = NULL, decreasing = FALSE){
     if(length(decreasing) != length(order)){decreasing <- rep(decreasing[1], length(order))}
     for(i in seq_along(order)){out <- out[order(out[, order[i]], decreasing = decreasing[i]), ]}
   }
+  return(out)
+}
+
+##### performance: sensitivity, specificity, precision, accuracy
+performance <- function(est, trueMod, threshold = FALSE, combine = FALSE,
+                        inds = "all", rule = "OR", getVals = FALSE,
+                        mcc = TRUE, rmNAs = TRUE){
+  if(combine){
+    nn <- switch(2 - is.null(names(est)), paste0("fit", 1:length(est)), names(est))
+    xx <- lapply(lapply(est, performance, trueMod, threshold,
+                        inds = inds, rule = rule), function(z) data.frame(t(z)))
+    nn2 <- colnames(xx[[1]])
+    xx <- lapply(seq_along(nn2), function(z){
+      data.frame(t(do.call(cbind, lapply(xx, '[', z))), row.names = nn)})
+    names(xx) <- nn2
+    return(xx)
+  }
+  if(all(inds == "all")){
+    inds <- c("kappa", "beta", "PCC", "PDC")
+    atts <- names(attributes(est))
+    if(any(c("mlGVAR", "lmerVAR") %in% atts) | is(est, "mlGraphicalVAR")){
+      inds <- c(inds, "between")
+    }
+    if(is(est, "matrix") & is(trueMod, "matrix")){inds <- "beta"}
+  }
+  inds <- match.arg(tolower(inds), c('kappa', 'beta', 'pcc', 'pdc', 'between'), several.ok = TRUE)
+  if(any(grepl('^p', inds))){inds[grepl('^p', inds)] <- toupper(inds[grepl('^p', inds)])}
+  tt <- FALSE
+  if(length(inds) > 1){
+    if(isTRUE(attr(trueMod, "simMLgvar")) | is(trueMod, "simMLgvar")){
+      trueMod <- setNames(lapply(inds, function(z){
+        n2 <- as.matrix(net(trueMod, z))
+        if(z == "between"){diag(n2) <- 0}
+        dimnames(n2) <- NULL
+        return(n2)
+      }), inds)
+      #tt <- !is(est, "mlGraphicalVAR")
+    } else if(is(trueMod, "mlVARsim")){
+      inds <- c("temporal", "contemporaneous", "between")
+      trueMod <- setNames(lapply(inds, function(z){
+        #n2 <- t(as.matrix(mlVAR::getNet(trueMod, z)))
+        n2 <- net(trueMod, z)
+        dimnames(n2) <- NULL
+        return(n2)
+      }), inds)
+    }
+    nets1 <- setNames(lapply(inds, function(z){
+      n1 <- as.matrix(net(est, z, threshold, rule))
+      if(tt & z == "PDC"){n1 <- t(n1)}
+      dimnames(n1) <- NULL
+      return(n1)
+    }), inds)
+  } else {
+    if(!is(est, "matrix")){est <- net(est, inds)}
+    nets1 <- setNames(list(est), inds)
+    trueMod <- setNames(list(trueMod), inds)
+  }
+  p <- unique(sapply(trueMod, nrow))
+  trueVals <- lapply(inds, function(z){
+    if(z %in% c("PCC", "between", "contemporaneous", "kappa")){
+      z1 <- trueMod[[z]][lower.tri(trueMod[[z]])]
+    } else {
+      z1 <- as.vector(trueMod[[z]])
+    }
+    return(list(truePos = which(z1 != 0), trueNeg = which(z1 == 0)))
+  })
+  estVals <- lapply(inds, function(z){
+    if(z %in% c("PCC", "between", "contemporaneous", "kappa")){
+      z1 <- nets1[[z]][lower.tri(nets1[[z]])]
+    } else {
+      z1 <- as.vector(nets1[[z]])
+    }
+    return(list(estPos = which(z1 != 0), estNeg = which(z1 == 0)))
+  })
+  tp <- mapply(function(x1, x2){
+    length(intersect(x1[[1]], x2[[1]]))}, estVals, trueVals)
+  tn <- mapply(function(x1, x2){
+    length(intersect(x1[[2]], x2[[2]]))}, estVals, trueVals)
+  fp <- sapply(lapply(estVals, '[[', 1), length) - tp
+  fn <- sapply(lapply(estVals, '[[', 2), length) - tn
+  sensitivity <- tp/(tp + fn)
+  specificity <- tn/(tn + fp)
+  precision <- tp/(tp + fp)
+  accuracy <- (tp + tn)/(tp + fp + tn + fn)
+  out <- cbind.data.frame(sensitivity, specificity, precision, accuracy)
+  if(mcc){
+    numerator <- ((tp * tn) - (fp * fn))
+    denom <- (tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)
+    mcc <- numerator/ifelse(denom == 0, 1, sqrt(denom))
+    out <- cbind.data.frame(out, mcc = mcc)
+  }
+  if(any(is.na(out)) & rmNAs){out[is.na(out)] <- 0}
+  rownames(out) <- inds
+  if(getVals){
+    out2 <- cbind.data.frame(tp, tn, fp, fn)
+    rownames(out2) <- inds
+    out <- list(performance = out, indices = out2,
+                estVals = estVals, trueVals = trueVals)
+  }
+  if(tt){out <- t(out)}
   return(out)
 }

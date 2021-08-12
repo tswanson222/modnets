@@ -1,8 +1,8 @@
- #' Plot moderated network models
+#' Plot moderated network models
 #'
 #' Core function for plotting various types of network models.
 #'
-#' @param object network
+#' @param x network
 #' @param which.net character
 #' @param threshold numeric or logical
 #' @param layout character
@@ -28,7 +28,7 @@
 #'
 #' @examples
 #' 1 + 1
-plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
                     scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
                     plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
@@ -46,45 +46,45 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
   }
   if(is.logical(which.net)){threshold <- TRUE; which.net <- 'temporal'}
   if(is.numeric(which.net)){if(which.net < 1){threshold <- which.net; which.net <- 'temporal'}}
-  if(any(class(object) %in% c('qgraph', 'bootnetResult', 'bootnet'))){
-    if(is(object, 'bootnet')){object <- object$sample}
-    if(is(object, 'bootnetResult')){
-      if(object$default == 'graphicalVAR'){
+  if(any(class(x) %in% c('qgraph', 'bootnetResult', 'bootnet'))){
+    if(is(x, 'bootnet')){x <- x$sample}
+    if(is(x, 'bootnetResult')){
+      if(x$default == 'graphicalVAR'){
         xx <- unname(which(sapply(c('t', 'c', 'b', 'p'), function(z) startsWith(which.net, z))))
         if(length(xx) == 0){stop('Must specify which.net')}
         which.net <- switch(xx, 'beta', 'kappa', 'beta', match.arg(toupper(which.net), c('PCC', 'PDC')))
-        object <- object$results[[match(which.net, names(object$results))]]
-        if(which.net == 'beta'){object <- object[, -1]}
+        x <- x$results[[match(which.net, names(x$results))]]
+        if(which.net == 'beta'){x <- x[, -1]}
       }
     }
-    object <- getWmat(object)
+    x <- getWmat(x)
   }
-  if(is(object, 'bootNet') | (isTRUE(attr(object, 'resample')) & 'fit0' %in% names(object))){
-    object <- object$fit0
+  if(is(x, 'bootNet') | (isTRUE(attr(x, 'resample')) & 'fit0' %in% names(x))){
+    x <- x$fit0
   }
-  if(is(object, 'mgmSim')){
-    names(object)[grep('^trueNet$|^b1$', names(object))] <- 'adjMat'
-    dimnames(object$adjMat) <- rep(list(1:ncol(object$adjMat)), 2)
-    object$edgeColors <- getEdgeColors(object$adjMat)
-    if('b2' %in% names(object)){object$modEdges <- 1 * (object$b2 != 0) + 1}
+  if(is(x, 'mgmSim')){
+    names(x)[grep('^trueNet$|^b1$', names(x))] <- 'adjMat'
+    dimnames(x$adjMat) <- rep(list(1:ncol(x$adjMat)), 2)
+    x$edgeColors <- getEdgeColors(x$adjMat)
+    if('b2' %in% names(x)){x$modEdges <- 1 * (x$b2 != 0) + 1}
   }
-  if(is(object, 'mgm')){object <- net(object, which.net, threshold)}
-  atts <- names(attributes(object))
-  if(!is(object, 'list') | 'simMLgvar' %in% atts){
+  if(is(x, 'mgm')){x <- net(x, which.net, threshold)}
+  atts <- names(attributes(x))
+  if(!is(x, 'list') | 'simMLgvar' %in% atts){
     predict <- NULL; nodewise <- FALSE
-    if(is(object, "mlVARsim") | 'simMLgvar' %in% atts){
-      if('mm' %in% names(object) & which.net %in% c('temporal', 'beta')){
+    if(is(x, "mlVARsim") | 'simMLgvar' %in% atts){
+      if('mm' %in% names(x) & which.net %in% c('temporal', 'beta')){
         nodewise <- TRUE
-        modEdges <- t(1 * (object$mm$mb2 != 0) + 1)
+        modEdges <- t(1 * (x$mm$mb2 != 0) + 1)
       }
-      object <- t(net(object, which.net))
+      x <- t(net(x, which.net))
     }
-    stopifnot(ncol(object) == nrow(object))
-    if(isTRUE(names)){names <- colnames(object)}
-    object <- list(adjMat = object, edgeColors = getEdgeColors(object))
+    stopifnot(ncol(x) == nrow(x))
+    if(isTRUE(names)){names <- colnames(x)}
+    x <- list(adjMat = x, edgeColors = getEdgeColors(x))
     if(nodewise){
       nodewise <- FALSE
-      object$modEdges <- modEdges
+      x$modEdges <- modEdges
     }
   }
   if(any(c("SURnet", "mlGVAR", "lmerVAR") %in% atts)){
@@ -92,91 +92,91 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
     which.net <- match.arg(tolower(which.net), c(
       "temporal", "contemporaneous", "between", "beta", "pdc", "pcc"))
     which.net <- switch(which.net, pcc = "contemporaneous", beta = "temporal", which.net)
-    if(isTRUE(attr(object, "mlGVAR"))){
-      object <- object[[switch(which.net, between = "betweenNet", "fixedNets")]]
+    if(isTRUE(attr(x, "mlGVAR"))){
+      x <- x[[switch(which.net, between = "betweenNet", "fixedNets")]]
     }
-    if("SURnet" %in% names(object)){
-      if(!is.null(mselect) & length(object$call$moderators) > 1 & isTRUE(object$call$exogenous)){
-        if(isTRUE(mselect)){mselect <- object$call$moderators[1]}
-        adjm <- netInts(fit = object, n = 'temporal', threshold = TRUE,
+    if("SURnet" %in% names(x)){
+      if(!is.null(mselect) & length(x$call$moderators) > 1 & isTRUE(x$call$exogenous)){
+        if(isTRUE(mselect)){mselect <- x$call$moderators[1]}
+        adjm <- netInts(fit = x, n = 'temporal', threshold = TRUE,
                         avg = FALSE, rule = 'none', empty = FALSE,
                         mselect = mselect)
-        object$SURnet$temporal$modEdges <- abs(sign(adjm)) + 1
+        x$SURnet$temporal$modEdges <- abs(sign(adjm)) + 1
       }
-      object <- object$SURnet
+      x <- x$SURnet
     }
-    if(!"adjMat" %in% names(object)){
-      object[c("adjMat", "edgeColors")] <- eval(parse(text = paste0("object$", switch(
+    if(!"adjMat" %in% names(x)){
+      x[c("adjMat", "edgeColors")] <- eval(parse(text = paste0("x$", switch(
         which.net, pdc = "temporal$PDC", which.net))))[c("adjMat", "edgeColors")]
-      if(!startsWith(which.net, "c") & "modEdges" %in% names(object$temporal)){
-        object$modEdges <- object$temporal$modEdges
+      if(!startsWith(which.net, "c") & "modEdges" %in% names(x$temporal)){
+        x$modEdges <- x$temporal$modEdges
       }
     }
   }
-  obmods <- object$call$moderators
-  exo <- ifelse('exogenous' %in% names(object$call), object$call$exogenous, TRUE)
-  if(isTRUE(attr(object, 'ggm')) & ifelse(
+  obmods <- x$call$moderators
+  exo <- ifelse('exogenous' %in% names(x$call), x$call$exogenous, TRUE)
+  if(isTRUE(attr(x, 'ggm')) & ifelse(
     all(!sapply(list(obmods, mselect), is.null)),
     length(obmods) > 1 & exo, FALSE)){
     if(isTRUE(mselect)){mselect <- obmods[1]}
-    adjm <- netInts(fit = object, n = 'between', threshold = TRUE,
+    adjm <- netInts(fit = x, n = 'between', threshold = TRUE,
                     avg = !nodewise, rule = rule, empty = FALSE,
                     mselect = mselect)
     if(nodewise){
-      object$nodewise$modEdgesNW <- abs(sign(adjm)) + 1
-      diag(object$nodewise$modEdgesNW) <- 0
+      x$nodewise$modEdgesNW <- abs(sign(adjm)) + 1
+      diag(x$nodewise$modEdgesNW) <- 0
     } else {
-      object$modEdges <- abs(sign(adjm)) + 1
-      diag(object$modEdges) <- 0
+      x$modEdges <- abs(sign(adjm)) + 1
+      diag(x$modEdges) <- 0
     }
   }
   if(threshold != FALSE){
     if(!is.numeric(threshold)){threshold <- .05}
-    if(mnet & "mnet" %in% names(object)){
-      mn <- object$call$moderators
-      adj1 <- net(object, "beta", threshold, rule)
-      if(isTRUE(attr(object, "SURnet"))){
-        rn <- gsub("[.]y$", "", rownames(object$mnet$adjMat))
+    if(mnet & "mnet" %in% names(x)){
+      mn <- x$call$moderators
+      adj1 <- net(x, "beta", threshold, rule)
+      if(isTRUE(attr(x, "SURnet"))){
+        rn <- gsub("[.]y$", "", rownames(x$mnet$adjMat))
         ind <- which(rn == mn)
-        object$mnet$adjMat[-ind, -ind] <- adj1
-        object$mnet$adjMat[-ind, ind] <- object$mnet$adjMat[-ind, ind] * ifelse(
-          object$temporal$coefs$pvals[, mn] <= threshold, 1, 0)
+        x$mnet$adjMat[-ind, -ind] <- adj1
+        x$mnet$adjMat[-ind, ind] <- x$mnet$adjMat[-ind, ind] * ifelse(
+          x$temporal$coefs$pvals[, mn] <= threshold, 1, 0)
       } else {
-        ind <- nrow(object$mnet$adjMat)
-        object$mnet$adjMat[-ind, -ind] <- adj1
-        mps <- object$mods0$Bm
+        ind <- nrow(x$mnet$adjMat)
+        x$mnet$adjMat[-ind, -ind] <- adj1
+        mps <- x$mods0$Bm
         mps2 <- matrix(0, nrow = nrow(adj1), ncol = 4)
         mps2[match(rownames(mps), rownames(adj1)), ] <- mps
-        object$mnet$adjMat[ind, -ind] <- object$mnet$adjMat[ind, -ind] * ifelse(mps2[, 4] <= threshold, 1, 0)
-        #object$mnet$adjMat[ind, -ind] <- object$mnet$adjMat[ind, -ind] * ifelse(object$mods0$Bm[, 4] <= threshold, 1, 0)
+        x$mnet$adjMat[ind, -ind] <- x$mnet$adjMat[ind, -ind] * ifelse(mps2[, 4] <= threshold, 1, 0)
+        #x$mnet$adjMat[ind, -ind] <- x$mnet$adjMat[ind, -ind] * ifelse(x$mods0$Bm[, 4] <= threshold, 1, 0)
       }
     } else {
       if("ggm" %in% atts & isTRUE(nodewise)){
-        object$nodewise$adjNW <- net(object, "beta", threshold, rule, TRUE)
+        x$nodewise$adjNW <- net(x, "beta", threshold, rule, TRUE)
       } else {
-        object$adjMat <- net(object, which.net, threshold, rule)
+        x$adjMat <- net(x, which.net, threshold, rule)
       }
     }
   }
   if(isTRUE(names)){
-    names <- gsub("[.]y$", "", rownames(object$adjMat))
-    if(length(names) == 0){names <- 1:nrow(object$adjMat)}
+    names <- gsub("[.]y$", "", rownames(x$adjMat))
+    if(length(names) == 0){names <- 1:nrow(x$adjMat)}
   } else if(is.null(names) | all(names == FALSE)){
-    names <- 1:nrow(object$adjMat)
+    names <- 1:nrow(x$adjMat)
   }
-  names <- names[1:nrow(object$adjMat)]
-  if(is.null(lag) & "adjMats" %in% names(object)){
+  names <- names[1:nrow(x$adjMat)]
+  if(is.null(lag) & "adjMats" %in% names(x)){
     stop("More than one lag modeled; need to specify which to plot")
-  } else if(!"adjMats" %in% names(object)){
-    if(any(grepl("lag", colnames(object$adjMat)))){lag <- 1}
+  } else if(!"adjMats" %in% names(x)){
+    if(any(grepl("lag", colnames(x$adjMat)))){lag <- 1}
   }
   if(!is.null(predict) & !mnet & !identical(predict, FALSE)){
     concat <- c('R2', 'adjR2', 'MSE', 'RMSE', 'nCC', 'CC', 'CCmarg')
     con <- match.arg(con, choices = c("R2", "adjR2", "MSE", "RMSE"))
     cat <- match.arg(cat, choices = c("nCC", "CC", "CCmarg"))
-    type <- object$call$type
-    if("ggm" %in% names(attributes(object))){
-      type <- unname(sapply(object$fitobj, attr, "family"))
+    type <- x$call$type
+    if("ggm" %in% names(attributes(x))){
+      type <- unname(sapply(x$fitobj, attr, "family"))
       if("gaussian" %in% type){type[type == "gaussian"] <- "g"}
       if("binomial" %in% type){type[type == "binomial"] <- "c"}
     }
@@ -186,7 +186,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
         predict <- predict[[switch(which.net, between = "betweenNet", "fixedNets")]]
       }
       predict <- list(predictNet(predict, all = FALSE, scale = scale),
-                      predictNet(object, all = FALSE, scale = scale))
+                      predictNet(x, all = FALSE, scale = scale))
       stopifnot(length(predict) == 2)
       pie <- list(); pieColor <- list()
       for(i in 1:tt){
@@ -231,7 +231,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
           if(grepl('CC', predict)){cat <- predict} else {con <- predict}
         }
       }
-      predict <- predictNet(object, all = FALSE, scale = scale)
+      predict <- predictNet(x, all = FALSE, scale = scale)
       pie <- c(); pieColor <- c()
       for(i in 1:tt){
         if(type[i] == "g"){
@@ -252,57 +252,57 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
     pie <- NULL; pieColor <- NULL
   }
   if(!is.null(lag)){
-    if(lag != 1 | lag == 1 & "adjMats" %in% names(object)){
-      if(lag > length(object$adjMats)){
-        lag <- which(sapply(lapply(lapply(object$adjMats, colnames),
+    if(lag != 1 | lag == 1 & "adjMats" %in% names(x)){
+      if(lag > length(x$adjMats)){
+        lag <- which(sapply(lapply(lapply(x$adjMats, colnames),
                                    function(z) grep(paste0("lag", lag), z)), length) != 0)
       }
-      qgraph(input = t(object$adjMats[[lag]]), layout = layout, labels = names,
-             edge.color = t(object$edgeColors[[lag]]), edge.labels = elabs,
+      qgraph(input = t(x$adjMats[[lag]]), layout = layout, labels = names,
+             edge.color = t(x$edgeColors[[lag]]), edge.labels = elabs,
              edge.label.cex = elsize, DoNotPlot = !plot, pie = pie,
              pieColor = pieColor, ...)
     } else if(!mnet){
-      if("modEdges" %in% names(object) & mlty){lty <- t(object$modEdges)} else {lty <- 1}
-      qgraph(input = t(object$adjMat), layout = layout, edge.color = t(object$edgeColors),
+      if("modEdges" %in% names(x) & mlty){lty <- t(x$modEdges)} else {lty <- 1}
+      qgraph(input = t(x$adjMat), layout = layout, edge.color = t(x$edgeColors),
              labels = names, DoNotPlot = !plot, pie = pie, pieColor = pieColor,
              edge.labels = elabs, lty = lty, edge.label.cex = elsize, ...)
     } else {
       if(class(names) %in% c("numeric", "integer")){
-        names <- 1:ncol(object$mnet$adjMat)
+        names <- 1:ncol(x$mnet$adjMat)
       } else {
-        names <- gsub(".lag1.", "", colnames(object$mnet$adjMat))
+        names <- gsub(".lag1.", "", colnames(x$mnet$adjMat))
       }
-      lty <- t(object$mnet$modEdges)
-      qgraph(input = t(object$mnet$adjMat), layout = layout, labels = names,
-             edge.color = t(object$mnet$edgeColors), DoNotPlot = !plot,
-             pie = pie, pieColor = pieColor, shape = object$mnet$shape,
+      lty <- t(x$mnet$modEdges)
+      qgraph(input = t(x$mnet$adjMat), layout = layout, labels = names,
+             edge.color = t(x$mnet$edgeColors), DoNotPlot = !plot,
+             pie = pie, pieColor = pieColor, shape = x$mnet$shape,
              edge.labels = elabs, lty = lty, edge.label.cex = elsize, ...)
     }
   } else {
     if(!nodewise){
       if(!mnet){
-        if(binarize){object$adjMat[object$adjMat != 0] <- 1; object$edgeColors <- NA}
-        if("modEdges" %in% names(object) & mlty){lty <- object$modEdges} else {lty <- 1}
-        qgraph(input = object$adjMat, layout = layout, edge.color = object$edgeColors,
+        if(binarize){x$adjMat[x$adjMat != 0] <- 1; x$edgeColors <- NA}
+        if("modEdges" %in% names(x) & mlty){lty <- x$modEdges} else {lty <- 1}
+        qgraph(input = x$adjMat, layout = layout, edge.color = x$edgeColors,
                labels = names, DoNotPlot = !plot, pie = pie, pieColor = pieColor,
                edge.labels = elabs, lty = lty, edge.label.cex = elsize, ...)
       } else {
-        pp <- ncol(object$mnet$adjMat) - 1
+        pp <- ncol(x$mnet$adjMat) - 1
         if(class(names) %in% c("numeric", "integer")){
           names <- 1:(pp + 1)
         } else {
-          names <- c(names, colnames(object$mnet$adjMat)[pp + 1])
+          names <- c(names, colnames(x$mnet$adjMat)[pp + 1])
         }
-        lty <- object$mnet$modEdges
-        qgraph(input = object$mnet$adjMat, layout = layout, labels = names,
-               edge.color = object$mnet$edgeColors, DoNotPlot = !plot, pie = pie,
+        lty <- x$mnet$modEdges
+        qgraph(input = x$mnet$adjMat, layout = layout, labels = names,
+               edge.color = x$mnet$edgeColors, DoNotPlot = !plot, pie = pie,
                pieColor = pieColor, edge.labels = elabs, edge.label.cex = elsize,
-               lty = lty, directed = object$mnet$d, shape = c(rep("circle", pp), "square"), ...)
+               lty = lty, directed = x$mnet$d, shape = c(rep("circle", pp), "square"), ...)
       }
     } else {
-      if("modEdgesNW" %in% names(object$nodewise) & mlty){lty <- object$nodewise$modEdgesNW} else {lty <- 1}
-      qgraph(input = object$nodewise$adjNW, layout = layout, labels = names,
-             edge.color = object$nodewise$edgeColsNW, DoNotPlot = !plot,
+      if("modEdgesNW" %in% names(x$nodewise) & mlty){lty <- x$nodewise$modEdgesNW} else {lty <- 1}
+      qgraph(input = x$nodewise$adjNW, layout = layout, labels = names,
+             edge.color = x$nodewise$edgeColsNW, DoNotPlot = !plot,
              pie = pie, pieColor = pieColor, edge.labels = elabs,
              edge.label.cex = elsize, lty = lty, ...)
     }
@@ -313,7 +313,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
 #'
 #' Currently only available for caseDrop
 #'
-#' @param obj network
+#' @param x network
 #' @param type character
 #' @param net character
 #' @param plot character
@@ -342,7 +342,7 @@ plotNet <- function(object, which.net = 'temporal', threshold = FALSE, layout = 
 #'
 #' @examples
 #' 1 + 1
-plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = .7,
+plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7,
                      order = 'mean', ci = .95, pairwise = TRUE, interactions = TRUE,
                      labels = NULL, title = NULL, cis = 'quantile', true = NULL,
                      errbars = FALSE, vline = FALSE, threshold = FALSE,
@@ -363,20 +363,20 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
       nrow = 2, heights = c(1, 10)))
   }
   args <- tryCatch({list(...)}, error = function(e){list()})
-  fit0 <- switch(2 - ('fit0' %in% names(obj)), obj$fit0, list())
-  if(isTRUE(attr(obj, 'resample'))){
-    if(!'data' %in% names(obj)){return(plotCoefs(fit = obj, ...))}
+  fit0 <- switch(2 - ('fit0' %in% names(x)), x$fit0, list())
+  if(isTRUE(attr(x, 'resample'))){
+    if(!'data' %in% names(x)){return(plotCoefs(fit = x, ...))}
     if(length(fit0) == 0){
       fit0 <- switch(2 - ('fit0' %in% names(args)), args$fit0, TRUE)
     }
-    obj <- do.call(bootNet, append(list(data = obj, fit0 = fit0, directedDiag = directedDiag),
+    x <- do.call(bootNet, append(list(data = x, fit0 = fit0, directedDiag = directedDiag),
                                    replace(args, 'fit0', NULL)))
   }
-  if(!identical(threshold, FALSE) & 'bootFits' %in% names(obj)){
-    dat <- paste0('obj$fit0$', ifelse('temporal' %in% names(obj), 'SURnet$data', 'data'))
-    if(isTRUE(attr(obj$bootFits, 'resample'))){attributes(obj$bootFits)$resample <- NULL}
-    obj <- bootNet(data = eval(parse(text = dat)), fits = obj$bootFits,
-                   threshold = threshold, fit0 = obj$fit0,
+  if(!identical(threshold, FALSE) & 'bootFits' %in% names(x)){
+    dat <- paste0('x$fit0$', ifelse('temporal' %in% names(x), 'SURnet$data', 'data'))
+    if(isTRUE(attr(x$bootFits, 'resample'))){attributes(x$bootFits)$resample <- NULL}
+    x <- bootNet(data = eval(parse(text = dat)), fits = x$bootFits,
+                   threshold = threshold, fit0 = x$fit0,
                    directedDiag = directedDiag)
   }
   runonce <- TRUE
@@ -401,20 +401,20 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
                  outei = 'outEI', inei = 'inEI', ei = 'EI', 'NA' = 'edges', type)
   cis <- match.arg(tolower(cis), c('quantile', 'se'))
   #invisible(suppressMessages(require(ggplot2)))
-  if(isTRUE(attr(obj, 'mlGVAR')) & 'varMods' %in% names(obj)){
+  if(isTRUE(attr(x, 'mlGVAR')) & 'varMods' %in% names(x)){
     mlnet <- switch(net, ggm = 'between|means', 'fixed')
     if(is.null(title) & startsWith(mlnet, 'b')){title <- 'Between-subjects network\t'}
-    fits <- obj$varMods[[grep(mlnet, names(obj$varMods))]]
-    fit0 <- switch(2 - ('fit0' %in% names(args)), args$fit0, obj[[grep(mlnet, names(obj))]])
-    data <- obj$netData[[grep(mlnet, names(obj$netData))]]
+    fits <- x$varMods[[grep(mlnet, names(x$varMods))]]
+    fit0 <- switch(2 - ('fit0' %in% names(args)), args$fit0, x[[grep(mlnet, names(x))]])
+    data <- x$netData[[grep(mlnet, names(x$netData))]]
     args <- append(list(data = data, fits = fits, fit0 = fit0), replace(args, 'fit0', NULL))
-    obj <- do.call(bootNet, args)
+    x <- do.call(bootNet, args)
   }
-  lags <- any(c('temporal', 'contemporaneous') %in% names(obj))
+  lags <- any(c('temporal', 'contemporaneous') %in% names(x))
   if(lags){
     net <- switch(net, ggm = 'temporal', net)
-    obj <- obj[[net]]
-    if(net == 'contemporaneous'){boots <- obj$boots}
+    x <- x[[net]]
+    if(net == 'contemporaneous'){boots <- x$boots}
     title <- switch(2 - is.null(title), paste(capitalize(net), 'Network\t'), title)
     if(identical(title, FALSE)){title <- NULL}
     if(type == 'strength' & net == 'temporal'){
@@ -428,7 +428,7 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
   } else {
     if(!type %in% c('edges', 'strength', 'EI')){type <- 'edges'}
     net <- 'ggm'
-    boots <- obj$boots
+    boots <- x$boots
   }
   lags2 <- lags & (net == 'temporal')
   if(is.logical(plot)){plot <- ifelse(plot, 'all', 'none')}
@@ -441,22 +441,22 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
   if(pp == 'pairwise'){interactions <- FALSE; pairwise <- TRUE}
   type0 <- ifelse(type %in% c('outStrength', 'inStrength'), paste0('strength$', type), type)
   type0 <- ifelse(type %in% c('outEI', 'inEI'), paste0('EI$', type), type0)
-  if(!"interactions" %in% names(obj)){interactions <- FALSE}
+  if(!"interactions" %in% names(x)){interactions <- FALSE}
   obj1 <- list()
   if(interactions | !pairwise){
-    obj1 <- obj$interactions
+    obj1 <- x$interactions
     if(lags){boots <- obj1$boots}
-    p1 <- dat <- eval(parse(text = paste0('obj$interactions$', type0)))
+    p1 <- dat <- eval(parse(text = paste0('x$interactions$', type0)))
     if(pairwise){
       text <- FALSE
-      obj1 <- obj$pairwise
-      obj2 <- obj$interactions
+      obj1 <- x$pairwise
+      obj2 <- x$interactions
       if('diffs' %in% names(obj1) & 'diffs' %in% names(obj2)){
         obj1$diffs <- setNames(lapply(seq_along(obj1$diffs), function(z){
           rbind(obj1$diffs[[z]], obj2$diffs[[z]])
         }), names(obj1$diffs))
       }
-      p2 <- eval(parse(text = paste0('obj$pairwise$', type0)))
+      p2 <- eval(parse(text = paste0('x$pairwise$', type0)))
       dat <- rbind.data.frame(p2, p1)
       dat$type <- rep(c("Pairwise", "Interactions"), each = nrow(dat)/2)
     } else {
@@ -464,28 +464,28 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
       dat$type <- rep("Interactions", nrow(dat))
     }
   } else {
-    boots <- obj$boots
-    if("pairwise" %in% names(obj)){
-      obj1 <- obj$pairwise
+    boots <- x$boots
+    if("pairwise" %in% names(x)){
+      obj1 <- x$pairwise
       if(lags){boots <- obj1$boots}
       type0 <- paste0('pairwise$', type0)
     } else {
-      obj1 <- obj # THIS IS A NEW ADDITION
+      obj1 <- x # THIS IS A NEW ADDITION
     }
-    dat <- eval(parse(text = paste0('obj$', type0)))
+    dat <- eval(parse(text = paste0('x$', type0)))
     dat$type <- rep("Pairwise", nrow(dat))
   }
   if('diffs' %in% names(obj1)){
     obj1 <- obj1$diffs
   } else if(lags & difference){
-    obj1 <- obj$diffs
+    obj1 <- x$diffs
   }
   if(!identical(text, FALSE) & type == 'edges'){ # had !lags
     boots <- boots[[switch(2 - interactions, ifelse(
       !lags, 'boot_int_edges', 'boot_edges'), 'boot_edges')]]
   }
   if(grepl('EI', type)){type <- gsub('I', 'Influence', gsub('E', 'Expected', type))}
-  if(isTRUE(attr(obj, "caseDrop"))){
+  if(isTRUE(attr(x, "caseDrop"))){
     dat <- dat2 <- dat[order(dat$subN), ]
     ci <- paste0("q", c((1 - ci)/2, 1 - (1 - ci)/2) * 100)
     if(length(unique(dat$type)) == 1 & FALSE){ # MAY DELETE THIS WHOLE PART
@@ -638,8 +638,8 @@ plotBoot <- function(obj, type = 'edges', net = 'temporal', plot = 'all', cor = 
     lci <- ifelse(cis == 'quantile', 'boot_lower', 'sample_lower')
     uci <- ifelse(cis == 'quantile', 'boot_upper', 'sample_upper')
     if(ci != .95 & cis == 'quantile' & type == 'edges'){
-      dat$boot_lower <- unname(apply(obj$boots$boot_edges, 1, quantile, probs = (1 - ci)/2))
-      dat$boot_upper <- unname(apply(obj$boots$boot_edges, 1, quantile, probs = 1 - (1 - ci)/2))
+      dat$boot_lower <- unname(apply(x$boots$boot_edges, 1, quantile, probs = (1 - ci)/2))
+      dat$boot_upper <- unname(apply(x$boots$boot_edges, 1, quantile, probs = 1 - (1 - ci)/2))
     }
     v2 <- all(unique(dat$type) == c('Pairwise', 'Interactions'))
     if(!v2 & order > 3 & order != 6){order <- 1}
@@ -735,8 +735,6 @@ plotPvals <- function(obj, outcome = 1, predictor = 1, alpha = .05){
   lines(sort(ps), seq(.05, 1, length = n), lwd = 2)
 }
 
-##### plotStability: plot stability paths for a given variable
-
 #' Plot stability paths for a given variable
 #'
 #' You heard me
@@ -788,11 +786,10 @@ plotStability <- function(obj, pp = 1, s = 3, thresh = .5, color = "black"){
   }
 }
 
-
-##### plotCoefs: plot coefficients from SURfit with confidence intervals
 #' Plot coefficients from 'SURfit' with confidence intervals
 #'
-#' Plotting
+#' Plotting. I think this actually goes with resample? Also may not be restricted
+#' to SURfit objects
 #'
 #' @param fit SURfit object
 #' @param true logical
@@ -841,7 +838,8 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
       x[grepl(paste0("eq", i), x$predictor), "Y"] <- as.character(fit$eq[[i]]$terms[[2]])
     }
     x$Y <- as.factor(x$Y)
-    x$predictor <- as.factor(qdapRegex::rm_between(x$predictor, "eq", "_"))
+    #x$predictor <- as.factor(qdapRegex::rm_between(x$predictor, "eq", "_"))
+    x$predictor <- as.factor(sapply(strsplit(x$predictor, '_'), function(z) paste0(z[-1], collapse = '_')))
     x <- data.frame(Y = x$Y, predictor = x$predictor, lower = x$lower, b = x$b, upper = x$upper)
     if(!is.null(true)){
       dat <- tryCatch({eval(fit$call$data)}, error = function(e){
@@ -938,6 +936,8 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 
 #' Plot network using output from covNet
 #'
+#' Description
+#'
 #' @param object network
 #' @param border something
 #' @param color character
@@ -954,11 +954,13 @@ plotCovNet <- function(object, border = NULL, color = NULL, ...){
   shape <- c(rep("circle", px), rep("square", p))
   if(!is.null(border)){border <- c(rep(1, px), rep(border, p))}
   if(!is.null(color)){color <- c(rep("white", px), rep(color, p))}
-  plotNet(object = object, directed = object$d, shape = shape,
+  plotNet(x = object, directed = object$d, shape = shape,
           border.width = border, color = color, ...)
 }
 
 #' Plot conditional effects
+#'
+#' Description
 #'
 #' @param out network
 #' @param to y
@@ -1262,7 +1264,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #' 1 + 1
 plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
                       xlab = 'Number of cases', title = NULL, ...){
-  args <- list(...)
+  args <- tryCatch({list(...)}, error = function(e){list()})
   if(is(x, 'list')){x <- x$Results}
   if(identical(yvar, 'default')){yvar <- c('sensitivity', 'specificity', 'correlation')}
   if(any(colnames(x) == 'cor')){colnames(x)[colnames(x) == 'cor'] <- 'correlation'}
@@ -1288,8 +1290,7 @@ plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
     if('pcc' %in% by){by <- gsub('pcc', 'PCC', by)}
     by <- capitalize(by)
     if(by %in% c('Pairwise', 'Interactions')){
-      #x <- subset(x, Type == by)
-      x <- x[which(x$Type == by), ]
+      x <- subset(x, Type == by)
       by <- switch(2 - (length(unique(x$Network)) > 1), 'Network', NULL)
     }
   }
@@ -1354,8 +1355,7 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
       "Degree|^Out|^In"), include0)]
     centrality <- include0[grep(paste(tolower(
       centrality), collapse = "|"), tolower(include0))]
-    #c0 <- c01 <- subset(c0, measure %in% centrality)
-    c0 <- c01 <- c0[which(c0$measure %in% centrality), ]
+    c0 <- c01 <- subset(c0, measure %in% centrality)
   }
   if(which.net == "contemporaneous" & clustering != FALSE){
     c1 <- do.call(rbind, lapply(seq_along(Wmats), function(z){
@@ -1371,7 +1371,8 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
   c01 <- c01[order(c01$node), ]
   c01 <- c01[order(c01$group), ]
   rownames(c01) <- 1:nrow(c01)
-  c01$node <- stringr::str_sub(c01$node, 1, 6)
+  #c01$node <- stringr::str_sub(c01$node, 1, 6)
+  c01$node <- substr(c01$node, 1, 6)
   if(!plot){
     list2env(list(c0 = c0, c1 = c1, c01 = c01), .GlobalEnv)
   } else {
@@ -1388,7 +1389,21 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
   }
 }
 
-##### plotNet2: plot the temporal and contemporaneous networks in the same window
+#' Plot the temporal and contemporaneous networks in the same window
+#'
+#' Description
+#'
+#' @param object SUR output
+#' @param whichNets Vector of which networks to plot
+#' @param whichTemp Which version of the temporal network should be plotted
+#' @param titles Titles
+#' @param ... other arguments
+#'
+#' @return A plot
+#' @export
+#'
+#' @examples
+#' 1 + 1
 plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
                      titles = c("PDC ", "PCC "), ...){
   whichTemp <- match.arg(whichTemp)
@@ -1492,12 +1507,12 @@ plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'betwe
       x <- list(...)
       stopifnot(length(x) > 0)
       if(length(x) == 1){x <- x[[1]]} else if(collapse){x <- appd(x)}
-      args0 <- list(object = NA, which.net = which.net,
+      args0 <- list(x = NA, which.net = which.net,
                     threshold = threshold, plot = FALSE)
       if(!is.null(net)){args0$which.net <- net}
       args <- append(args[setdiff(names(args), names(args0))], args0)
       averageLayout(lapply(x, function(z) do.call(
-        plotNet, replace(args, 'object', list(object = z)))))
+        plotNet, replace(args, 'x', list(x = z)))))
     } else if(identical(l, 1) | identical(l, 2) | identical(l, 3) | identical(l, 4)){
       layout(switch(l, t(1:2), t(matrix(1:4, 2, 2)),
                     matrix(c(1, 1, 2, 2, 4, 3, 3, 4), nrow = 2, ncol = 4, byrow = T),
@@ -1505,7 +1520,7 @@ plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'betwe
     }
   }
   avlay(l = l)
-  args0$object <- object
+  args0$x <- object
   stopifnot(length(nets) == 3)
   mains <- c('Temporal network', 'Partial Contemporaneous Correlations', 'Between-subjects network')
   invisible(lapply(1:3, function(i){

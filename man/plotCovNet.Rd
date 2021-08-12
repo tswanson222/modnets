@@ -19,7 +19,7 @@ plotCovNet(object, border = NULL, color = NULL, ...)
 Plot
 }
 \description{
-Plot network using output from covNet
+Description
 }
 \examples{
 1 + 1
