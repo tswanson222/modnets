@@ -40,6 +40,8 @@
 #' @return Lots of stuff
 #' @export
 #'
+#' @family some family
+#'
 #' @examples
 #' 1 + 1
 resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", criterion = "AIC",

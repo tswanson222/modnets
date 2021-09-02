@@ -24,6 +24,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -47,6 +48,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -70,6 +72,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -93,6 +96,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -116,6 +120,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -139,6 +144,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -162,6 +168,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -185,6 +192,7 @@ plotNet(
   lag = NULL,
   con = "R2",
   cat = "nCC",
+  covNet = FALSE,
   plot = TRUE,
   elabs = FALSE,
   elsize = 1,
@@ -220,6 +228,8 @@ plotNet(
 
 \item{cat}{character}
 
+\item{covNet}{logical}
+
 \item{plot}{logical}
 
 \item{elabs}{logical}
@@ -242,6 +252,11 @@ A plot
 \description{
 Core function for plotting various types of network models.
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{plot}: For ggms!
+}}
+
 \examples{
 1 + 1
 }

@@ -1,8 +1,8 @@
-#' @rdname plotNet
+#' @describeIn plotNet For ggms!
 #' @export
 plot.ggm <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                      predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                     scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                     scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                      plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                      binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
@@ -13,7 +13,7 @@ plot.ggm <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spr
 #' @export
 plot.SURnet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                         predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                         plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                         binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
@@ -24,7 +24,7 @@ plot.SURnet <- function(x, which.net = 'temporal', threshold = FALSE, layout = '
 #' @export
 plot.mlGVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                         predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                         plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                         binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
@@ -35,7 +35,7 @@ plot.mlGVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = '
 #' @export
 plot.lmerVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                          predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                         scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                         scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                          plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                          binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
@@ -46,7 +46,7 @@ plot.lmerVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = 
 #' @export
 plot.mgmSim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                         predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                         plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                         binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
@@ -57,7 +57,7 @@ plot.mgmSim <- function(x, which.net = 'temporal', threshold = FALSE, layout = '
 #' @export
 plot.mlVARsim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                           predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                          scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                          scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                           plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                           binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
@@ -68,7 +68,7 @@ plot.mlVARsim <- function(x, which.net = 'temporal', threshold = FALSE, layout =
 #' @export
 plot.simMLgvar <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                            predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                           scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                           scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                            plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                            binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]

@@ -606,7 +606,7 @@ SURsampler <- function(B = NULL, S, n, seed = NULL, beta, beta2 = NULL,
                        time = FALSE, allDat = TRUE){
   p <- ncol(S)
   if(!is.null(B)){
-    if(class(B) == "list"){B <- do.call(rbind, B)}
+    if(is(B, 'list')){B <- do.call(rbind, B)}
     if(missing(beta)){
       if(ncol(B) == (p + 1)){
         beta <- B
@@ -616,14 +616,14 @@ SURsampler <- function(B = NULL, S, n, seed = NULL, beta, beta2 = NULL,
       }
     }
   }
-  if(class(beta) == "list"){beta <- do.call(rbind, beta)}
+  if(is(beta, 'list')){beta <- do.call(rbind, beta)}
   if(dim(beta)[2] != dim(beta)[1] + 1){
     if(dim(beta)[2] == dim(beta)[1]){
       beta <- cbind(0, beta)
     } else {stop("Invalid dimensions for beta matrix")}
   }
   if(!is.null(beta2)){
-    if(class(beta2) == "list"){beta2 <- do.call(rbind, beta2)}
+    if(is(beta2, 'list')){beta2 <- do.call(rbind, beta2)}
     stopifnot(dim(beta2)[2] == dim(beta2)[1] - 1)
   }
   if(length(mu) == 1){mu <- rep(mu, p)}

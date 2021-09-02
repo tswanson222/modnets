@@ -97,11 +97,63 @@ fitNetwork(
 }
 \value{
 A ggm or SURnetwork
+\describe{
+\item{call}{Contains all provided input arguments. If saveData = TRUE, it also contains the data}
+\item{pairwise}{Contains a list with all information about estimated pairwise
+interactions. wadj contains the p x p weighted adjacency matrix, if p is
+the number of variables in the network. signs has the same dimensions as
+wadj and contains the signs for the entries of wadj: 1 indicates a positive
+sign, -1 a negative sign and 0 an undefined sign. A sign is undefined if an
+edge is a function of more than one parameter. This is the case for
+interactions involving a categorical variable with more than 2 categories.
+edgecolor also has the same dimensions as wadj contains a color for each
+edge, depending on signs. It is provided for more convenient plotting. If
+only pairwise interactions are modeled (d = 1), wadj contains all
+conditional independence relations. The matrices edgecolor_cb contain a
+color blind friendly color scheme. edge_lty contains a matrix with 1s for
+positive/undefined signs and 2s for negative signes, which can be used as
+input to the lty argument in qgraph() in order to plot edges with negative
+sign as dashed lines.}
+\item{interactions}{A list with three entries that
+relate each interaction in the model to all its parameters. This is
+different to the output provided in factorgraph, where one value is
+assigned to each interaction. indicator contains a list with k-1 entries,
+one for each order of modeled interaction, which contain the estimated
+(nonzero) interactions. weightsAgg contains a list with k-1 entries, which
+in turn contain R lists, where R is the number of interactions (and rows in
+the corresponding list entry inindicator) that were estimated (nonzero) in
+the given entry. Each of these entries contains the mean of the absolute
+values of all parameters involved in this interaction. weights has the same
+structure as weightsAgg, but does contain all parameters involved in the
+interaction instead of the mean of their absolute values. signs has the
+same structure as weightsAgg/weights and provides the sign of the
+interaction, if defined.}
+\item{intercepts}{A list with p entries, which
+contain the intercept/thresholds for each node in the network. In case a
+given node is categorical with m categories, there are m thresholds for
+this variable.}
+\item{nodemodels}{A list with p glmnet() models, from
+which all above output is computed. Also contains the coefficients models
+for the selected lambda and the applied tau threshold tau.}
+}
 }
 \description{
 The main function that ties everything together for both cross-sectional and
 idiographic (temporal) network models, moderated or otherwise.
 }
+\details{
+If I grow a beard, does the rest of the world grow a beard too? Hard to
+say for sure, but I'd bet so.
+
+Yes, I believe so.
+}
 \examples{
 1 + 1
 }
+\seealso{
+The end of the world, especially \code{\link{varSelect}}
+
+Other some family: 
+\code{\link{resample}()}
+}
+\concept{some family}

@@ -3,7 +3,7 @@
 \name{net}
 \alias{net}
 \alias{netInts}
-\title{Get adjanceny matrices from fit objects}
+\title{Get adjacency matrices from fit objects}
 \usage{
 net(
   fit,

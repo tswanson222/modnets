@@ -197,14 +197,15 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
             }
           }
         }
-        #parallel::clusterExport(cl, c(FUN, 'fitNetwork', objects, 'simNet', 'simNet2', 'getFitCIs'), envir = environment())
-        parallel::clusterExport(cl, c(FUN, 'fitNetwork', objects, 'simNet', 'getFitCIs'), envir = environment())
+        parallel::clusterExport(cl, c(FUN, 'fitNetwork', objects, 'simNet', 'simNet2', 'getFitCIs'), envir = environment())
+        #parallel::clusterExport(cl, c(FUN, 'fitNetwork', objects, 'simNet', 'getFitCIs'), envir = environment())
       }
     } else {
       cl <- nCores
     }
   }
-  #if(FUN == 'simNet'){FUN <- 'simNet2'}
+  if(FUN == 'simNet'){FUN <- 'simNet2'}
+  run <- function(x){eval(parse(text = x))}
   Data <- Fits <- list()
   if(length(parms) == 0){
     if(nCores > 1){
@@ -222,8 +223,9 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
               args2$m <- ord
             }
           }
-          args3 <- switch(2 - (FUN == 'simNet'), list(nets = args2), args2)
-          Data <- tryCatch({do.call(match.fun(FUN), args3)}, error = function(e){TRUE})
+          args3 <- switch(2 - (FUN == 'simNet2'), list(nets = args2), args2)
+          #Data <- tryCatch({do.call(match.fun(FUN), args3)}, error = function(e){TRUE})
+          Data <- tryCatch({do.call(run(FUN), args3)}, error = function(e){TRUE})
           t0 <- t0 + 1
           if(t0 >= maxiter | any(Data > div)){
             if(tolower(cluster) != 'mclapply'){parallel::stopCluster(cl)}
@@ -272,8 +274,9 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
               args2$m <- ord
             }
           }
-          args3 <- switch(2 - (FUN == 'simNet'), list(nets = args2), args2)
-          Data[[i]] <- tryCatch({do.call(match.fun(FUN), args3)}, error = function(e){TRUE})
+          args3 <- switch(2 - (FUN == 'simNet2'), list(nets = args2), args2)
+          #Data[[i]] <- tryCatch({do.call(match.fun(FUN), args3)}, error = function(e){TRUE})
+          Data[[i]] <- tryCatch({do.call(run(FUN), args3)}, error = function(e){TRUE})
           t0 <- t0 + 1
           if(t0 >= maxiter | any(Data[[i]] > div)){
             close(pb)
@@ -326,9 +329,10 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
             }
           }
           args3 <- replace(args2, colnames(vars), as.list(vars0[i]))
-          args3 <- switch(2 - (FUN == 'simNet'), list(nets = args3), args3)
+          args3 <- switch(2 - (FUN == 'simNet2'), list(nets = args3), args3)
           Data <- tryCatch({
-            do.call(match.fun(FUN), args3)},
+            #do.call(match.fun(FUN), args3)},
+            do.call(run(FUN), args3)},
             error = function(e){TRUE})
           t0 <- t0 + 1
           if(t0 >= maxiter | any(Data > div)){
@@ -385,9 +389,10 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
               }
             }
             args3 <- replace(args2, colnames(vars), as.list(vars[j, ]))
-            args3 <- switch(2 - (FUN == 'simNet'), list(nets = args3), args3)
+            args3 <- switch(2 - (FUN == 'simNet2'), list(nets = args3), args3)
             out0 <- tryCatch({
-              do.call(match.fun(FUN), args3)},
+              #do.call(match.fun(FUN), args3)},
+              do.call(run(FUN), args3)},
               error = function(e){TRUE})
             t0 <- t0 + 1
             if(t0 >= maxiter | any(out0 > div)){

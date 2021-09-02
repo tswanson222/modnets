@@ -309,7 +309,49 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
   return(out)
 }
 
-##### mlGVARsim: main workhorse for simulating VAR and mlGVAR data
+#' Main workhorse for simulating VAR and mlGVAR data
+#'
+#' Description
+#'
+#' @param nTime numeric
+#' @param nPerson numeric
+#' @param nNode numeric
+#' @param m numeric or logical
+#' @param m2 numeric
+#' @param m1 numeric
+#' @param m0 numeric
+#' @param lag numeric or logical
+#' @param thetaVar numeric
+#' @param mu_SD numeric
+#' @param init_beta_SD numeric
+#' @param fixedMuSD numeric
+#' @param shrink_fixed numeric
+#' @param propPos numeric
+#' @param m1SD numeric
+#' @param m2SD numeric
+#' @param m1_range numeric, two values
+#' @param m2_range numeric, two values
+#' @param shrink_deviation numeric
+#' @param getM logical
+#' @param contemporaneous character
+#' @param GGMsparsity numeric
+#' @param mcenter logical
+#' @param skew logical
+#' @param skewErr logical
+#' @param ordinal logical
+#' @param nLevels numeric
+#' @param ordWithin logical
+#' @param minOrd numeric
+#' @param thresholds numeric vector
+#' @param mseed numeric
+#' @param onlyNets logical
+#' @param modType character
+#'
+#' @return Simulated mlGVAR or VAR data
+#' @export
+#'
+#' @examples
+#' 1 + 1
 mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m1 = .7,
                       m0 = 1, lag = 1, thetaVar = NULL, mu_SD = NULL, init_beta_SD = NULL,
                       fixedMuSD = 1, shrink_fixed = 0.9, propPos = .5, m1SD = .1, m2SD = .1,

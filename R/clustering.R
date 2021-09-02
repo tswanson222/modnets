@@ -93,7 +93,6 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
   return(LongCent)
 }
 
-##### clustAuto: mimics clustcoef_auto
 #' Mimics clustcoef_auto
 #'
 #' @param x something
@@ -157,7 +156,6 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
   return(Res)
 }
 
-##### clustPlot: mimics clusteringPlot
 #' Mimics clusteringPlot
 #'
 #' @param Wmats Models

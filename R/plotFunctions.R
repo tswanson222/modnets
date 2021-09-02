@@ -14,6 +14,7 @@
 #' @param lag numeric or logical
 #' @param con character
 #' @param cat character
+#' @param covNet logical
 #' @param plot logical
 #' @param elabs logical
 #' @param elsize numeric
@@ -30,7 +31,7 @@
 #' 1 + 1
 plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                    scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC',
+                    scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                     plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
                     binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   getEdgeColors <- function(adjMat){
@@ -44,8 +45,25 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
     dimnames(colMat) <- dimnames(adjMat)
     colMat
   }
-  if(is.logical(which.net)){threshold <- TRUE; which.net <- 'temporal'}
+  if(is.logical(which.net)){threshold <- which.net; which.net <- 'temporal'}
   if(is.numeric(which.net)){if(which.net < 1){threshold <- which.net; which.net <- 'temporal'}}
+  if(isTRUE(covNet)){
+    check <- isTRUE('covariates' %in% names(x$mods0))
+    if(!check){stop('No covariates detected in fitted object')}
+    object <- covNet(object = x, mnet = mnet, threshold = threshold)
+    call <- replace(as.list(match.call())[-1], c('x', 'covNet', 'directed', 'mnet'),
+                    list(x = object, covNet = FALSE, directed = object$d, mnet = FALSE))
+    p <- attr(object, "cov")
+    px <- ncol(object$data) - p
+    call$shape <- c(rep("circle", px), rep("square", p))
+    if(any(startsWith(names(call), 'border'))){
+      border <- which(startsWith(names(call), 'border'))
+      call <- append(call[-border], list(border.width = c(rep(1, px), rep(call[[border]], p))))
+    }
+    if('color' %in% names(call)){call$color <- c(rep('white', px), rep(call$color, p))}
+    return(do.call(plotNet, call))
+  }
+  if(is.character(which.net) & length(which.net) == 1){if(startsWith(tolower(which.net), 'coef')){return(plotCoefs(x, ...))}}
   if(any(class(x) %in% c('qgraph', 'bootnetResult', 'bootnet'))){
     if(is(x, 'bootnet')){x <- x$sample}
     if(is(x, 'bootnetResult')){
@@ -862,6 +880,8 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
       fit <- ifelse("adjCIs" %in% names(fit), list(fit$adjCIs),
                     ifelse("freqs" %in% names(fit), list(fit$freqs),
                            list(fit$fitCIs)))[[1]]
+    } else if(any(c('fitobj', 'SURfit') %in% names(fit))){
+      fit <- getFitCIs(fit)
     }
     if(is.logical(true)){true <- NULL}
     ynames <- names(fit)
@@ -932,30 +952,6 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
   } else {
     return(dat)
   }
-}
-
-#' Plot network using output from covNet
-#'
-#' Description
-#'
-#' @param object network
-#' @param border something
-#' @param color character
-#' @param ... other arguments
-#'
-#' @return Plot
-#' @export
-#'
-#' @examples
-#' 1 + 1
-plotCovNet <- function(object, border = NULL, color = NULL, ...){
-  p <- attr(object, "cov")
-  px <- ncol(object$data) - p
-  shape <- c(rep("circle", px), rep("square", p))
-  if(!is.null(border)){border <- c(rep(1, px), rep(border, p))}
-  if(!is.null(color)){color <- c(rep("white", px), rep(color, p))}
-  plotNet(x = object, directed = object$d, shape = shape,
-          border.width = border, color = color, ...)
 }
 
 #' Plot conditional effects
@@ -1452,61 +1448,33 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
   }
 }
 
-##### plotNet3: Designed for mlGVAR and lmerVAR output
+#' Easy plotting for mlGVAR and lmerVAR output
+#'
+#' Description
+#'
+#' @param object mlGVAR or lmerVAR object
+#' @param ... other arguments
+#' @param nets which networks to plot
+#' @param titles character
+#' @param l numeric
+#' @param label something
+#' @param xpos numeric
+#' @param ypos numeric
+#'
+#' @return Plot
+#' @export
+#'
+#' @examples
+#' 1 + 1
 plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'between'),
                      titles = TRUE, l = 3, label = NULL, xpos = 0, ypos = .5){
   args0 <- list(...)
-  # ADDED THIS JUST TO ACCOMMODATE avlay...
-  appd <- function(x, recursive = FALSE){
-    if(length(x) == 1){
-      inds <- c('correlation', 'cosine', 'mse', 'mae')
-      inds <- ifelse(is.character(x), list(inds), list(paste0(inds, x)))[[1]]
-      inds <- paste(paste0('^', inds, '$'), collapse = '|')
-      nlist <- function(x, getls = FALSE, checkString = FALSE,
-                        rmex = NULL, grep = FALSE){
-        rmexcept <- function(x, regex = FALSE, test = FALSE){
-          if(isTRUE(regex)){
-            if(length(x) > 1){x <- paste0(x, collapse = '|')}
-            x <- ls(envir = .GlobalEnv)[grep(x, ls(envir = .GlobalEnv))]
-          }
-          if(test){return(x)}
-          stopifnot(all(x %in% ls(envir = .GlobalEnv)))
-          rm(list = setdiff(ls(envir = .GlobalEnv), x), envir = .GlobalEnv)
-        }
-        if(isTRUE(x) | isTRUE(getls) | checkString){
-          if(isTRUE(x) & is.character(getls)){x <- getls}
-          x <- ls(envir = .GlobalEnv)[grep(x, ls(envir = .GlobalEnv))]
-        }
-        if(checkString){return(x)}
-        out <- lapply(x, function(z) eval(parse(text = z)))
-        names(out) <- x
-        if(!is.null(rmex)){
-          if(isTRUE(rmex)){
-            rm(list = ls(envir = .GlobalEnv), envir = .GlobalEnv)
-          } else if(is.character(rmex)){
-            rmexcept(x = rmex, regex = grep)
-          }
-        }
-        return(out)
-      }
-      out <- nlist(inds, TRUE)
-    } else {
-      out <- list()
-      for(i in seq_along(x)){out <- append(out, x[[i]])}
-      if(recursive){
-        while(all(sapply(out, is, 'list'))){
-          out <- appd(out, recursive = FALSE)
-        }
-      }
-    }
-    return(out)
-  }
   avlay <- function(..., which.net = 'temporal', threshold = FALSE,
                     collapse = FALSE, net = NULL, l = NULL, args = NULL){
     if(is.null(l)){
       x <- list(...)
       stopifnot(length(x) > 0)
-      if(length(x) == 1){x <- x[[1]]} else if(collapse){x <- appd(x)}
+      #if(length(x) == 1){x <- x[[1]]} else if(collapse){x <- appd(x)}
       args0 <- list(x = NA, which.net = which.net,
                     threshold = threshold, plot = FALSE)
       if(!is.null(net)){args0$which.net <- net}

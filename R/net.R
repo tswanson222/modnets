@@ -1,4 +1,4 @@
-#' Get adjanceny matrices from fit objects
+#' Get adjacency matrices from fit objects
 #'
 #' Used all the time
 #'

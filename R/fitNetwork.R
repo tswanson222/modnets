@@ -3,6 +3,11 @@
 #' The main function that ties everything together for both cross-sectional and
 #' idiographic (temporal) network models, moderated or otherwise.
 #'
+#' If I grow a beard, does the rest of the world grow a beard too? Hard to
+#' say for sure, but I'd bet so.
+#'
+#' Yes, I believe so.
+#'
 #' @param data data.frame
 #' @param moderators numeric
 #' @param type character
@@ -34,7 +39,51 @@
 #' @param ... other arguments
 #'
 #' @return A ggm or SURnetwork
+#' \describe{
+#'   \item{call}{Contains all provided input arguments. If saveData = TRUE, it also contains the data}
+#'   \item{pairwise}{Contains a list with all information about estimated pairwise
+#'   interactions. wadj contains the p x p weighted adjacency matrix, if p is
+#'   the number of variables in the network. signs has the same dimensions as
+#'   wadj and contains the signs for the entries of wadj: 1 indicates a positive
+#'   sign, -1 a negative sign and 0 an undefined sign. A sign is undefined if an
+#'   edge is a function of more than one parameter. This is the case for
+#'   interactions involving a categorical variable with more than 2 categories.
+#'   edgecolor also has the same dimensions as wadj contains a color for each
+#'   edge, depending on signs. It is provided for more convenient plotting. If
+#'   only pairwise interactions are modeled (d = 1), wadj contains all
+#'   conditional independence relations. The matrices edgecolor_cb contain a
+#'   color blind friendly color scheme. edge_lty contains a matrix with 1s for
+#'   positive/undefined signs and 2s for negative signes, which can be used as
+#'   input to the lty argument in qgraph() in order to plot edges with negative
+#'   sign as dashed lines.}
+#'   \item{interactions}{A list with three entries that
+#'   relate each interaction in the model to all its parameters. This is
+#'   different to the output provided in factorgraph, where one value is
+#'   assigned to each interaction. indicator contains a list with k-1 entries,
+#'   one for each order of modeled interaction, which contain the estimated
+#'   (nonzero) interactions. weightsAgg contains a list with k-1 entries, which
+#'   in turn contain R lists, where R is the number of interactions (and rows in
+#'   the corresponding list entry inindicator) that were estimated (nonzero) in
+#'   the given entry. Each of these entries contains the mean of the absolute
+#'   values of all parameters involved in this interaction. weights has the same
+#'   structure as weightsAgg, but does contain all parameters involved in the
+#'   interaction instead of the mean of their absolute values. signs has the
+#'   same structure as weightsAgg/weights and provides the sign of the
+#'   interaction, if defined.}
+#'   \item{intercepts}{A list with p entries, which
+#'   contain the intercept/thresholds for each node in the network. In case a
+#'   given node is categorical with m categories, there are m thresholds for
+#'   this variable.}
+#'   \item{nodemodels}{A list with p glmnet() models, from
+#'   which all above output is computed. Also contains the coefficients models
+#'   for the selected lambda and the applied tau threshold tau.}
+#' }
+#'
 #' @export
+#'
+#' @family some family
+#'
+#' @seealso The end of the world, especially \code{\link{varSelect}}
 #'
 #' @examples
 #' 1 + 1
@@ -352,73 +401,6 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
     if(verbose){print(Sys.time() - t1)}
     return(output)
   }
-}
-
-#' Weird function that I'm not sure will be necessary
-#'
-#' Seems to mostly be for plotting with plotCovNet
-#'
-#' @param object fitNetwork object
-#' @param mnet logical
-#' @param threshold numeric or logical
-#'
-#' @return A network
-#' @export
-#'
-#' @examples
-#' 1 + 1
-covNet <- function(object, mnet = TRUE, threshold = .05){
-  if(threshold == TRUE){threshold <- .05}
-  if(class(mnet) == "character"){
-    object$mods0$covariates$Bcovs <- list(object$mods0$Bm)
-    names(object$mods0$covariates$Bcovs) <- mnet
-    data <- object$mods0$dat
-    mnet <- FALSE
-  } else {
-    data <- if(mnet){object$mods0$dat} else {object$data}
-    data <- data.frame(data, object$mods0$covariates$covs)
-  }
-  if(mnet){if(!"mnet" %in% names(object)){mnet <- FALSE}}
-  cs <- length(object$mods0$covariates$Bcovs)
-  bb <- if(mnet){object$mnet$adjMat} else {object$adjMat}
-  cp <- ncol(bb)
-  cadj <- cedges <- matrix(0, cp + cs, cp + cs)
-  cd <- matrix(FALSE, cp + cs, cp + cs)
-  cadj[1:cp, 1:cp] <- bb
-  dimnames(cadj) <- dimnames(cedges) <- dimnames(cd) <- rep(list(colnames(data)), 2)
-  if(mnet){cd[1:cp, 1:cp] <- object$mnet$d}
-  for(i in 1:cs){
-    np <- nrow(object$mods0$covariates$Bcovs[[i]])
-    if(threshold != FALSE){
-      cadj[cp + i, 1:np] <- ifelse(object$mods0$covariates$Bcovs[[i]][, 4] <= threshold,
-                                   object$mods0$covariates$Bcovs[[i]][, 1], 0)
-    } else {
-      cadj[cp + i, 1:np] <- object$mods0$covariates$Bcovs[[i]][, 1]
-    }
-  }
-  p <- ifelse(mnet, cp - 1, cp)
-  if("modEdges" %in% names(object)){
-    if(mnet){cedges[1:cp, 1:cp] <- object$mnet$modEdges} else {cedges[1:cp, 1:cp] <- object$modEdges}
-    cedges[-c(1:cp), 1:p] <- 1
-  }
-  cd[-c(1:cp), 1:p] <- TRUE
-  getEdgeColors <- function(adjMat){
-    obj <- sign(as.vector(adjMat))
-    colMat <- rep(NA, length(obj))
-    if(any(obj == 1)){colMat[obj == 1] <- "darkgreen"}
-    if(any(obj == 0)){colMat[obj == 0] <- "darkgrey"}
-    if(any(obj == -1)){colMat[obj == -1] <- "red"}
-    colMat <- matrix(colMat, ncol = ncol(adjMat), nrow = nrow(adjMat))
-    colnames(colMat) <- colnames(adjMat)
-    rownames(colMat) <- rownames(adjMat)
-    colMat
-  }
-  out <- list(adjMat = cadj, edgeColors = getEdgeColors(cadj), modEdges = cedges, d = cd, data = data)
-  if(all(cedges == 0)){out$modEdges <- NULL}
-  attributes(out)$mnet <- mnet
-  attributes(out)$threshold <- threshold
-  attributes(out)$covs <- ifelse(mnet, cs + 1, cs)
-  out
 }
 
 ##### nodewise: nodewise regression, with option to simulate/add moderators
@@ -1049,10 +1031,23 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
   return(out)
 }
 
-##### getFitCIs: provides model coefficients with CIs
+#' Provides model coefficients with CIs
+#'
+#' Requires that either 'fitobj' or 'SURfit' is included in the object
+#'
+#' @param fit fitNetwork object
+#' @param allNames not sure
+#' @param alpha error level
+#'
+#' @return List of tables
+#' @export
+#'
+#' @examples
+#' 1 + 1
 getFitCIs <- function(fit, allNames = NULL, alpha = .05){
   if("SURnet" %in% names(fit)){
     if(!'SURfit' %in% names(fit)){stop('Requires SURfit')}
+    if(is(fit$SURfit, 'fitCoefs')){return(fit$SURfit)}
     fit <- append(fit$SURnet, list(fitobj = fit$SURfit$eq))
   }
   if(is.null(allNames)){
@@ -1060,7 +1055,12 @@ getFitCIs <- function(fit, allNames = NULL, alpha = .05){
   } else if(all(c("mods", "call") %in% names(allNames))){
     allNames <- lapply(allNames$mods, function(z) rownames(z$model)[-1])
   }
-  fitobj <- fit$fitobj
+  if('fitobj' %in% names(fit)){
+    fitobj <- fit$fitobj
+  } else {
+    fitobj <- fit
+  }
+  if(is(fitobj, 'fitCoefs')){return(fitobj)}
   fitCoefs <- suppressWarnings(suppressMessages(
     lapply(seq_along(fitobj), function(z){
       coefs1 <- summary(fitobj[[z]])$coefficients[-1, , drop = FALSE]
@@ -1077,5 +1077,6 @@ getFitCIs <- function(fit, allNames = NULL, alpha = .05){
       return(coefs)
     })))
   names(fitCoefs) <- names(fitobj)
+  class(fitCoefs) <- c('list', 'fitCoefs')
   return(fitCoefs)
 }

@@ -119,3 +119,8 @@ Multiple resampling procedures for selecting variables for a final network model
 \examples{
 1 + 1
 }
+\seealso{
+Other some family: 
+\code{\link{fitNetwork}()}
+}
+\concept{some family}
