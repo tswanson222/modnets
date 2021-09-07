@@ -18,7 +18,7 @@ plotNet3(
 \arguments{
 \item{object}{mlGVAR or lmerVAR object}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 
 \item{nets}{which networks to plot}
 

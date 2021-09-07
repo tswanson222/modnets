@@ -2,23 +2,47 @@
 % Please edit documentation in R/selected.R
 \name{selected}
 \alias{selected}
-\title{Shows which variables were selected for each node of the network}
+\title{Shows which variables were selected for each node of a network}
 \usage{
-selected(object, threshold = FALSE, mod = 1)
+selected(object, threshold = FALSE, mod = c("temporal", "between"))
 }
 \arguments{
-\item{object}{fitNetwork object}
+\item{object}{Output from either \code{fitNetwork()} or \code{mlGVAR()}}
 
-\item{threshold}{numeric or logical}
+\item{threshold}{Can be a numeric value between \code{0} and \code{1}, or
+defaults to \code{.05} when set to \code{TRUE}}
 
-\item{mod}{not sure}
+\item{mod}{Only relevant to models fit with \code{mlGVAR()}}
 }
 \value{
-A table
+A table where the columns represent nodes, and the rows show which
+variables were selected in predicting each node. For moderated networks,
+the output is a list that separates main effects (\code{mods}) from
+interaction effects (\code{ints}).
 }
 \description{
-Shows which variables were selected for each node of the network
+Provides a quick representation showing which variables were selected as
+predictors of each node in a network, both for unmoderated and moderated
+networks. Especially useful as a way to see which variables were selected in
+a variable selection procedure, such as through the \code{varSelect()} and
+\code{resample()} functions.
+}
+\details{
+The \code{threshold} argument allows the user to set a threshold for
+p-values, such that the output only reflects the predictors that are
+significant at that threshold. This argument can be utilized whether or not a
+variable selection procedure has been employed.
 }
 \examples{
-1 + 1
+\dontrun{
+
+fit1 <- fitNetwork(data)
+selected(fit1, threshold = TRUE)
+
+fit2 <- mlGVAR(data, m = TRUE)
+selected(fit2, threshold = TRUE, mod = 'between')
+
+fit3 <- fitNetwork(data, type = 'varSelect')
+selected(fit3)
+}
 }

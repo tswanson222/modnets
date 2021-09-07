@@ -75,7 +75,7 @@ mlGVAR(
 
 \item{deleteMissing}{logical}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 ML-GVAR models

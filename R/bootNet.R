@@ -26,7 +26,7 @@
 #' @param directedDiag logical
 #' @param beepno something
 #' @param dayno something
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A bootNet object
 #' @export
@@ -685,7 +685,7 @@ cscoef <- function(obj, cor = .7, ci = .95, first = TRUE, verbose = TRUE){
 #'
 #' @param object bootNet object
 #' @param centrality logical
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A table of descriptives
 #' @export

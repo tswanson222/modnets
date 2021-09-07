@@ -108,7 +108,7 @@ resample(
 
 \item{dayno}{something}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 Lots of stuff

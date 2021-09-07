@@ -35,7 +35,7 @@
 #' @param block logical
 #' @param beepno something
 #' @param dayno something
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return Lots of stuff
 #' @export
@@ -673,7 +673,7 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
 #' @param thresh numeric
 #' @param ascall logical
 #' @param type character
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return a list of information for fitNetwork
 #' @export

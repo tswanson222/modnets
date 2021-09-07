@@ -36,7 +36,7 @@
 #' @param detrend logical
 #' @param beepno something
 #' @param dayno something
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A ggm or SURnetwork
 #' \describe{

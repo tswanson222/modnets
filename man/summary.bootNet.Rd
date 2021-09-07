@@ -11,7 +11,7 @@
 
 \item{centrality}{logical}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A table of descriptives

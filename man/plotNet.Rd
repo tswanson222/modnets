@@ -244,7 +244,7 @@ plotNet(
 
 \item{mselect}{something}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A plot

@@ -37,7 +37,7 @@
 #' @param const numeric
 #' @param fixedPar something
 #' @param V2 numeric
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A buncha stuff
 #' @export

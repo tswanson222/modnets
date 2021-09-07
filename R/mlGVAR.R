@@ -24,7 +24,7 @@
 #' @param beepno something
 #' @param dayno something
 #' @param deleteMissing logical
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return ML-GVAR models
 #' @export

@@ -14,7 +14,7 @@
 #' @param covs something
 #' @param sur logical
 #' @param consec something
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return Models
 #' @export

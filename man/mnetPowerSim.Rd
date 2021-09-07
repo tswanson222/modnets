@@ -114,7 +114,7 @@ mnetPowerSim(
 
 \item{V2}{numeric}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 Power simulation results

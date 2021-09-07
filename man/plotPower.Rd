@@ -42,7 +42,7 @@ plotPower(
 
 \item{title}{character}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 Plot

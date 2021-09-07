@@ -2,25 +2,41 @@
 % Please edit documentation in R/mnetPowerSim.R
 \name{sampleSize}
 \alias{sampleSize}
-\title{Tells the minimum possible sample size given some fixed p, m, and lags}
+\title{Reports the minimum sample size required to fit a network model}
 \usage{
 sampleSize(p, m = 0, lags = 0, print = TRUE)
 }
 \arguments{
-\item{p}{numeric}
+\item{p}{Number of nodes}
 
-\item{m}{numeric}
+\item{m}{Number of moderator variables (defaults to \code{0})}
 
-\item{lags}{numeric}
+\item{lags}{Number of lags (currently only supports \code{0} and \code{1})}
 
-\item{print}{logical}
+\item{print}{if \code{FALSE}, then the minimum sample size is returned and
+can be assigned to an object.}
 }
 \value{
-sample size minimum
+Minimum sample size to fit a network model according to the
+specified parameters.
 }
 \description{
-Good for stuff
+Indicates the minimum sample size required to fit a moderated or unmoderated
+network model based on the number of nodes \code{p}, number of moderators
+\code{m}, and the number of lags.
+}
+\details{
+When \code{lags = 0}, the minimum sample size \emph{N} refers to the number
+of subjects, whereas when \code{lags = 1} it is assumed that a single subject
+is being measured at multiple time points, where \emph{N} refers to the
+number of time points.
 }
 \examples{
-1 + 1
+sampleSize(p = 10)
+
+sampleSize(p = 10, m = 1)
+
+sampleSize(p = 10, m = 1, lags = 1)
+
+minSamp <- sampleSize(p = 10, m = 1, lags = 1, print = FALSE)
 }

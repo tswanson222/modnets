@@ -30,7 +30,7 @@ modSelect(
 
 \item{type}{character}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 a list of information for fitNetwork

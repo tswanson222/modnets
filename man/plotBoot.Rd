@@ -102,7 +102,7 @@ plotBoot(
 
 \item{directedDiag}{logical}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A plot

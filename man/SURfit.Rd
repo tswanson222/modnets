@@ -45,7 +45,7 @@ SURfit(
 
 \item{consec}{something}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 Models

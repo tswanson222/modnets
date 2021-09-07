@@ -101,7 +101,7 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 #'
 #' @param x output from resample function
 #' @param what network, bootstrap, or coefs
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A plot
 #' @export

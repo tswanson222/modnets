@@ -1,19 +1,46 @@
-##### show which variables were selected in each model
-#' Shows which variables were selected for each node of the network
+#' Shows which variables were selected for each node of a network
 #'
-#' @param object fitNetwork object
-#' @param threshold numeric or logical
-#' @param mod not sure
+#' Provides a quick representation showing which variables were selected as
+#' predictors of each node in a network, both for unmoderated and moderated
+#' networks. Especially useful as a way to see which variables were selected in
+#' a variable selection procedure, such as through the \code{varSelect()} and
+#' \code{resample()} functions.
 #'
-#' @return A table
+#' The \code{threshold} argument allows the user to set a threshold for
+#' p-values, such that the output only reflects the predictors that are
+#' significant at that threshold. This argument can be utilized whether or not a
+#' variable selection procedure has been employed.
+#'
+#' @param object Output from either \code{fitNetwork()} or \code{mlGVAR()}
+#' @param threshold Can be a numeric value between \code{0} and \code{1}, or
+#'   defaults to \code{.05} when set to \code{TRUE}
+#' @param mod Only relevant to models fit with \code{mlGVAR()}
+#'
+#' @return A table where the columns represent nodes, and the rows show which
+#'   variables were selected in predicting each node. For moderated networks,
+#'   the output is a list that separates main effects (\code{mods}) from
+#'   interaction effects (\code{ints}).
 #' @export
 #'
 #' @examples
-#' 1 + 1
-selected <- function(object, threshold = FALSE, mod = 1){
+#' \dontrun{
+#'
+#' fit1 <- fitNetwork(data)
+#' selected(fit1, threshold = TRUE)
+#'
+#' fit2 <- mlGVAR(data, m = TRUE)
+#' selected(fit2, threshold = TRUE, mod = 'between')
+#'
+#' fit3 <- fitNetwork(data, type = 'varSelect')
+#' selected(fit3)
+#' }
+selected <- function(object, threshold = FALSE, mod = c('temporal', 'between')){
   ints <- NULL
   if(threshold != FALSE & !is.numeric(threshold)){threshold <- .05}
-  if(isTRUE(attr(object, "mlGVAR"))){object <- object[[mod + 1]]}
+  if(isTRUE(attr(object, "mlGVAR"))){
+    mod <- match.arg(tolower(mod), c('temporal', 'between'))
+    object <- object[[ifelse(mod == 'temporal', 2, 3)]]
+  }
   if(isTRUE(attr(object, "SURnet"))){
     if('SURnet' %in% names(object)){object <- object$SURnet}
     mods0 <- object$temporal$coefs[[ifelse(threshold == FALSE, 1, 2)]]

@@ -37,7 +37,7 @@
 #' @param cluster character
 #' @param fixedPar something
 #' @param V2 numeric
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return Power simulation results
 #' @export
@@ -620,21 +620,38 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
   return(output)
 }
 
-#' Tells the minimum possible sample size given some fixed p, m, and lags
+#' Reports the minimum sample size required to fit a network model
 #'
-#' Good for stuff
+#' Indicates the minimum sample size required to fit a moderated or unmoderated
+#' network model based on the number of nodes \code{p}, number of moderators
+#' \code{m}, and the number of lags.
 #'
-#' @param p numeric
-#' @param m numeric
-#' @param lags numeric
-#' @param print logical
+#' When \code{lags = 0}, the minimum sample size \emph{N} refers to the number
+#' of subjects, whereas when \code{lags = 1} it is assumed that a single subject
+#' is being measured at multiple time points, where \emph{N} refers to the
+#' number of time points.
 #'
-#' @return sample size minimum
+#' @param p Number of nodes
+#' @param m Number of moderator variables (defaults to \code{0})
+#' @param lags Number of lags (currently only supports \code{0} and \code{1})
+#' @param print if \code{FALSE}, then the minimum sample size is returned and
+#'   can be assigned to an object.
+#'
+#' @return Minimum sample size to fit a network model according to the
+#'   specified parameters.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' sampleSize(p = 10)
+#'
+#' sampleSize(p = 10, m = 1)
+#'
+#' sampleSize(p = 10, m = 1, lags = 1)
+#'
+#' minSamp <- sampleSize(p = 10, m = 1, lags = 1, print = FALSE)
 sampleSize <- function(p, m = 0, lags = 0, print = TRUE){
+  m <- as.numeric(m)
+  lags <- as.numeric(lags)
   if(identical(as.numeric(lags), 0) | is.null(lags)){
     params <- p * (m + 1) + (m * (m - 1))/2
   } else {
@@ -660,7 +677,7 @@ sampleSize <- function(p, m = 0, lags = 0, print = TRUE){
 #' @param ind performance indices
 #' @param order character
 #' @param decreasing logical
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return summary table
 #' @export

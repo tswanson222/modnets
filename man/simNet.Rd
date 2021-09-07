@@ -114,7 +114,7 @@ simNet(
 
 \item{V2}{numeric}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A buncha stuff

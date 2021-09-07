@@ -21,7 +21,7 @@ plotNet2(
 
 \item{titles}{Titles}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A plot

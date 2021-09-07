@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{ordinalize}
 \alias{ordinalize}
-\title{Turn continuous data into ordinal data}
+\title{Convert continuous variables into ordinal variables}
 \usage{
 ordinalize(
   data,
@@ -15,26 +15,49 @@ ordinalize(
 )
 }
 \arguments{
-\item{data}{data}
+\item{data}{An \code{n x k} dataframe or matrix containing only numeric
+values. Can also be a numeric vector.}
 
-\item{m}{moderator}
+\item{m}{The column number or name of the moderator variable, if applicable.
+Leave as \code{NULL} if there is no moderator, and set to \code{TRUE} if the moderator is
+the last column in the matrix or dataframe.}
 
-\item{nLevels}{numeric}
+\item{nLevels}{Number of levels for the ordinal variables.}
 
-\item{thresholds}{numeric}
+\item{thresholds}{List of length \code{k}, where each element is a numeric
+vector of length \code{(nLevels - 1)} containing the splitpoints for
+grouping each variable into ordered categories.}
 
-\item{mthresh}{numeric}
+\item{mthresh}{Vector of length \code{(nLevels - 1)} containing thresholds to
+group values of the moderator into ordered categories.}
 
-\item{mord}{logical}
+\item{mord}{if \code{FALSE}, then the moderator will not be converted into an
+ordinal variable (if applicable).}
 
-\item{minOrd}{numeric}
+\item{minOrd}{The minimum number of unique values allowed for each variable.}
 }
 \value{
-ordinal data
+A dataframe or matrix containing the ordinalized data.
 }
 \description{
-Yeah
+Allows for easy conversion of continuous variables into ordinal variables.
+}
+\details{
+If a moderator value is specified via the \code{m} argument, that variable
+will automatically be relegated to the last column of the resultant dataframe
+or matrix. It will also be renamed "M"
 }
 \examples{
-1 + 1
+dat <- data.frame(sapply(1:5, function(z) rnorm(100)))
+ord_dat <- ordinalize(dat)
+
+# Including a moderator, without converting the moderator into an ordinal variable
+ord_dat <- ordinalize(dat, m = 5, mord = FALSE)
+
+colnames(dat)[5] <- 'M'
+ord_dat <- ordinalize(dat, m = 'M', mord = FALSE)
+
+# Use thresholds to break each variable into quartiles
+thresh <- lapply(dat, function(z) quantile(z, probs = c(.25, .5, .75)))
+ord_dat <- ordinalize(dat, thresholds = thresh)
 }

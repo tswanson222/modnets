@@ -33,7 +33,7 @@ plotMods(
 
 \item{which.net}{character}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 Plot

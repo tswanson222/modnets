@@ -22,7 +22,7 @@
 #' @param binarize logical
 #' @param mlty logical
 #' @param mselect something
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A plot
 #' @export
@@ -353,7 +353,7 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
 #' @param textPos character
 #' @param multi logical
 #' @param directedDiag logical
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A plot
 #' @export
@@ -1180,7 +1180,7 @@ intsPlot <- function(out, y = 'all', moderator = NULL, nsims = 500, alpha = .05)
 #' @param predict something
 #' @param layout character
 #' @param which.net character
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return Plot
 #' @export
@@ -1251,7 +1251,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #' @param hline numeric
 #' @param xlab character
 #' @param title character
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return Plot
 #' @export
@@ -1393,7 +1393,7 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
 #' @param whichNets Vector of which networks to plot
 #' @param whichTemp Which version of the temporal network should be plotted
 #' @param titles Titles
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #'
 #' @return A plot
 #' @export
@@ -1453,7 +1453,7 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
 #' Description
 #'
 #' @param object mlGVAR or lmerVAR object
-#' @param ... other arguments
+#' @param ... Additional arguments.
 #' @param nets which networks to plot
 #' @param titles character
 #' @param l numeric

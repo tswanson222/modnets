@@ -421,12 +421,3 @@ compareVAR <- function(m1, m2, m3 = NULL, anova = NULL, type = "tempMods"){
     return(anova(M1, M2, M3))
   }
 }
-
-##### compareVAR2: ain't so sure what this one do
-#compareVAR2 <- function(mods, p){
-#  vs <- paste0(names(mods), "$mods$tempMods[[", p, "]]")
-#  obj <- paste0("anova(", paste0(vs, collapse = ", "), ")")
-#  for(i in 1:length(vs)){assign(names(mods)[i], mods[[i]], pos = 1)}
-#  out <- eval(parse(text = obj))
-#  out
-#}

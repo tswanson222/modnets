@@ -11,7 +11,7 @@
 
 \item{what}{network, bootstrap, or coefs}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A plot

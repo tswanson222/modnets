@@ -81,7 +81,7 @@ bootNet(
 
 \item{dayno}{something}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 A bootNet object

@@ -15,7 +15,7 @@
 
 \item{decreasing}{logical}
 
-\item{...}{other arguments}
+\item{...}{Additional arguments.}
 }
 \value{
 summary table
