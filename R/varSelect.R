@@ -38,6 +38,8 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
   if(any(mall)){
     m <- switch(mall, NULL, 1:ncol(dat))
     if(mall == 2){ALL <- TRUE}
+  } else if(isTRUE(is.character(m))){
+    m <- which(colnames(data) %in% m)
   }
   if(is.null(lags)){
     if(length(m) >= ncol(dat) - 1){exogenous <- FALSE}
@@ -53,6 +55,7 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
         vs <- colnames(dat)
         if(!is.null(m) & !ALL){mname <- vs[m]}
         if(!is.null(covs)){
+          if(is.character(covs)){covs <- which(colnames(dat) %in% covs)}
           dat <- dat[, -covs]
           if(!is.null(m) & !ALL){m <- which(colnames(dat) %in% mname)}
         }

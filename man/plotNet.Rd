@@ -252,11 +252,6 @@ A plot
 \description{
 Core function for plotting various types of network models.
 }
-\section{Methods (by generic)}{
-\itemize{
-\item \code{plot}: For ggms!
-}}
-
 \examples{
 1 + 1
 }

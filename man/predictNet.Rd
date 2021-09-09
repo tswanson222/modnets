@@ -7,21 +7,50 @@
 predictNet(object, data = NULL, all = FALSE, scale = FALSE)
 }
 \arguments{
-\item{object}{network}
+\item{object}{Output from \code{fitNetwork()} or from \code{mlGVAR()}. If
+using output from \code{mlGVAR()}, then one of the two networks must be
+provided (i.e., either \code{fixedNets} or \code{betweenNet}).}
 
-\item{data}{dataset, or network for comparison}
+\item{data}{The dataset used to fit the network model, or another network of
+the same type and size to be compared with the network specified in the
+first argument. If the prediction error for only one network is desired,
+and the dataset is included as an element of the relevant object, then this
+can be left as \code{NULL}.}
 
-\item{all}{logical}
+\item{all}{if \code{TRUE} then returns a list containing the observed
+outcomes used to fit the models, their predicted values, and the prediction
+error for each outcome.}
 
-\item{scale}{logical}
+\item{scale}{Logical; determines whether or not to standardize the data
+before computing prediction error. DEPRECATED!}
 }
 \value{
-Table
+A table showing different measures of prediction error associated
+with each node of the network. Or, if two networks are provided, a table
+that shows the difference in prediction error for each node across the two
+networks. Specifically, this is computed by taking the statistics for
+\code{data} and subtracting them from those for \code{object}.
+
+If \code{all = TRUE}, then the following output is returned:
+\describe{
+\item{Y}{The observed values of the outcome variables based on the data provided.}
+\item{preds}{The predicted values of the outcomes based on the models provided.}
+\item{errors}{Table containing prediction error statistics for each node.}
+}
 }
 \description{
-See the prediction error based on different statistics for either GGMs or SURs.
-Also can compare and find the change values (such as R-squared change) between two networks
+See the prediction error based on different statistics for either GGMs or
+SURs. Also can compare and find the change values (such as R-squared change)
+between two networks of the same size (i.e., with the same nodes).
 }
 \examples{
-1 + 1
+\dontrun{
+out1 <- fitNetwork(data, covariates = 5)
+out2 <- fitNetwork(data, moderators = 5)
+
+predictNet(out1)
+predictNet(out1, all = TRUE)
+
+predictNet(out1, out2)
+}
 }

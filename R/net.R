@@ -1,24 +1,73 @@
 #' Get adjacency matrices from fit objects
 #'
-#' Used all the time
+#' \code{net} returns the adjacency matrix for any network model fit using
+#' functions from the \code{modnets} package. \code{netInts} returns a matrix of
+#' interaction terms associated with a moderated network.
 #'
-#' @param fit model
-#' @param n character
-#' @param threshold numeric or logical
-#' @param rule chatacter
-#' @param binary logical
-#' @param nodewise logical
-#' @param d numeric
-#' @param r something
-#' @param avg logical
-#' @param empty logical
-#' @param mselect logical
+#' For GGMs when a non-symmetric matrix is requested, columns will represent
+#' outcomes and rows will represent predictors. For temporal networks, columns
+#' represent predictors and rows represent outcomes.
 #'
-#' @return A network matrix
+#' @param fit A fitted network model. Can be the output from
+#'   \code{fitNetwork()}, \code{mlGVAR()}, \code{lmerVAR()}, \code{bootNet()},
+#'   \code{resample()}, \code{simNet()}, or \code{mlGVARsim()}.
+#' @param n When multiple networks exist for a single object, this allows the
+#'   user to indicate which adjacency matrix to return. For a GGM, all values of
+#'   this argument return the same adjacency matrix. For a SUR network,
+#'   \code{"beta"} and \code{"temporal"} return the coefficients associated with
+#'   the temporal network, while \code{"pdc"} returns the Partial Directed
+#'   Correlations, or the standardized temporal network.
+#'   \code{"contemporaneous"} and \code{"pcc"} return the standardized
+#'   contemporaneous network (Partial Contemporaneous Correlations).
+#'   \code{"kappa"} returns the unstandardized residual covariance matrix. All
+#'   of these terms apply for multilevel networks, but \code{"between"} can also
+#'   return the between-subjects network. If a numeric or logical value is
+#'   supplied, however, this argument will function as the \code{threshold}
+#'   argument. A numeric value will set a threshold at the supplied value, while
+#'   \code{TRUE} will set a threshold of .05.
+#' @param threshold A numeric or logical value to set a p-value threshold.
+#'   \code{TRUE} will automatically set the threshold at .05.
+#' @param rule Only applies to GGMs (including between-subjects networks) when a
+#'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
+#'   both corresponding coefficients have p-values below the threshold, while
+#'   the \code{"OR"} rule will preserve an edge so long as one of the two
+#'   coefficients have a p-value below the supplied threshold.
+#' @param binary Logical. If \code{TRUE} then the weighted adjacency matrix will
+#'   be converted into an unweighted adjacency matrix.
+#' @param nodewise Logical, only applies to GGMs (including between-subjects
+#'   networks). If \code{TRUE} then the adjacency matrix will retain all
+#'   coefficients in their original form. In this case, values in rows represent
+#'   the coefficients predicting the columns.
+#' @param d Numeric. Only used for output of \code{mlGVARsim()} in relation to
+#'   the contemporaneous network. Sets the number of decimal places to round the
+#'   output to. DEPRECATED!
+#' @param r Numeric. Chooses which rows/columns to remove from the output, if
+#'   desired.
+#' @param avg Logical. For \code{netInts()}, determines whether to take the
+#'   average two corresponding interaction terms.
+#' @param empty Logical. Determines the output of \code{netInts()} when
+#'   \code{fit} is not a moderated network. If \code{TRUE} then an empty list
+#'   will be returned. If \code{FALSE} then a matrix of zeros will be returned.
+#' @param mselect Only used for \code{netInts()} when there is more than one
+#'   exogenous moderator. Allows the user to indicate which moderator should be
+#'   used to construct the interaction matrix.
+#'
+#' @return An adjacency matrix representing a network or a matrix of interaction
+#'   terms.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- fitNetwork(data)
+#'
+#' net(x, threshold = .05)
+#'
+#' y <- mlGVAR(data)
+#'
+#' net(y, n = 'beta')
+#' net(y, n = 'pcc')
+#' net(y, n = 'between')
+#' }
 net <- function(fit, n = "beta", threshold = FALSE, rule = "OR",
                 binary = FALSE, nodewise = FALSE, d = 14, r = NULL){
   if(inherits(fit, c('splitNets', 'try-error'))){return(NULL)}
@@ -30,9 +79,14 @@ net <- function(fit, n = "beta", threshold = FALSE, rule = "OR",
     if(!is.null(r)){out <- out[-r, -r]}
     return(out)
   }
-  if(isTRUE(n)){
+  if(isTRUE(n) | is.numeric(n)){
     if(tolower(threshold) %in% c('and', 'or')){rule <- threshold}
-    n <- threshold <- "beta"
+    if(is.numeric(n)){
+      threshold <- n
+      n <- "beta"
+    } else {
+      n <- threshold <- "beta"
+    }
   }
   n <- match.arg(tolower(n), c(
     "beta", "contemporaneous", "between", "pdc", "pcc", "kappa", "temporal"))
@@ -121,9 +175,14 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
   if(is(fit, 'mgmSim')){if('b2' %in% names(fit)){return(fit$b2)} else {return(eout(fit, empty))}}
   if(is(fit, 'bootNet') | (isTRUE(attr(fit, 'resample')) & 'fit0' %in% names(fit))){fit <- fit$fit0}
   if(isTRUE(n) & isTRUE(threshold)){avg <- TRUE}
-  if(isTRUE(n)){
+  if(isTRUE(n) | is.numeric(n)){
     if(tolower(as.character(threshold)) %in% rules){rule <- threshold}
-    n <- threshold <- "temporal"
+    if(is.numeric(n)){
+      threshold <- n
+      n <- "temporal"
+    } else {
+      n <- threshold <- "temporal"
+    }
   }
   n <- match.arg(tolower(n), c("temporal", "between"))
   atts <- names(attributes(fit))

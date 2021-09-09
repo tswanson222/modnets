@@ -63,7 +63,11 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
     if('color' %in% names(call)){call$color <- c(rep('white', px), rep(call$color, p))}
     return(do.call(plotNet, call))
   }
-  if(is.character(which.net) & length(which.net) == 1){if(startsWith(tolower(which.net), 'coef')){return(plotCoefs(x, ...))}}
+  if(is.character(which.net) & length(which.net) == 1){
+    if(startsWith(tolower(which.net), 'coef')){
+      return(plotCoefs(x, plot = plot, ...))
+    }
+  }
   if(any(class(x) %in% c('qgraph', 'bootnetResult', 'bootnet'))){
     if(is(x, 'bootnet')){x <- x$sample}
     if(is(x, 'bootnetResult')){
@@ -383,7 +387,7 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
   args <- tryCatch({list(...)}, error = function(e){list()})
   fit0 <- switch(2 - ('fit0' %in% names(x)), x$fit0, list())
   if(isTRUE(attr(x, 'resample'))){
-    if(!'data' %in% names(x)){return(plotCoefs(fit = x, ...))}
+    if(!'data' %in% names(x)){return(plotCoefs(fit = x, title = title, ...))}
     if(length(fit0) == 0){
       fit0 <- switch(2 - ('fit0' %in% names(args)), args$fit0, TRUE)
     }
@@ -1511,6 +1515,58 @@ g_legend <- function(a.gplot, silent = TRUE){
   return(legend)
 }
 
-
-
-
+##### covNet
+covNet <- function(object, mnet = TRUE, threshold = .05){
+  if(isTRUE(threshold)){threshold <- .05}
+  if(class(mnet) == "character"){
+    object$mods0$covariates$Bcovs <- list(object$mods0$Bm)
+    names(object$mods0$covariates$Bcovs) <- mnet
+    data <- object$mods0$dat
+    mnet <- FALSE
+  } else {
+    data <- if(mnet){object$mods0$dat} else {object$data}
+    data <- data.frame(data, object$mods0$covariates$covs)
+  }
+  if(mnet){if(!"mnet" %in% names(object)){mnet <- FALSE}}
+  cs <- length(object$mods0$covariates$Bcovs)
+  bb <- if(mnet){object$mnet$adjMat} else {object$adjMat}
+  cp <- ncol(bb)
+  cadj <- cedges <- matrix(0, cp + cs, cp + cs)
+  cd <- matrix(FALSE, cp + cs, cp + cs)
+  cadj[1:cp, 1:cp] <- bb
+  dimnames(cadj) <- dimnames(cedges) <- dimnames(cd) <- rep(list(colnames(data)), 2)
+  if(mnet){cd[1:cp, 1:cp] <- object$mnet$d}
+  for(i in 1:cs){
+    np <- nrow(object$mods0$covariates$Bcovs[[i]])
+    if(threshold != FALSE){
+      cadj[cp + i, 1:np] <- ifelse(object$mods0$covariates$Bcovs[[i]][, 4] <= threshold,
+                                   object$mods0$covariates$Bcovs[[i]][, 1], 0)
+    } else {
+      cadj[cp + i, 1:np] <- object$mods0$covariates$Bcovs[[i]][, 1]
+    }
+  }
+  p <- ifelse(mnet, cp - 1, cp)
+  if("modEdges" %in% names(object)){
+    if(mnet){cedges[1:cp, 1:cp] <- object$mnet$modEdges} else {cedges[1:cp, 1:cp] <- object$modEdges}
+    cedges[-c(1:cp), 1:p] <- 1
+  }
+  cd[-c(1:cp), 1:p] <- TRUE
+  getEdgeColors <- function(adjMat){
+    obj <- sign(as.vector(adjMat))
+    colMat <- rep(NA, length(obj))
+    if(any(obj == 1)){colMat[obj == 1] <- "darkgreen"}
+    if(any(obj == 0)){colMat[obj == 0] <- "darkgrey"}
+    if(any(obj == -1)){colMat[obj == -1] <- "red"}
+    colMat <- matrix(colMat, ncol = ncol(adjMat), nrow = nrow(adjMat))
+    colnames(colMat) <- colnames(adjMat)
+    rownames(colMat) <- rownames(adjMat)
+    colMat
+  }
+  out <- list(adjMat = cadj, edgeColors = getEdgeColors(cadj), modEdges = cedges, d = cd, data = data)
+  if(all(cedges == 0)){out$modEdges <- NULL}
+  attributes(out)$mnet <- mnet
+  attributes(out)$threshold <- threshold
+  attributes(out)$covs <- ifelse(mnet, cs + 1, cs)
+  class(out) <- c('list', 'covNet')
+  return(out)
+}

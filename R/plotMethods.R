@@ -1,4 +1,5 @@
-#' @describeIn plotNet For ggms!
+# @describeIn plotNet For ggms!
+#' @rdname plotNet
 #' @export
 plot.ggm <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                      predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
@@ -97,17 +98,29 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 
 #' Plot method for output of resample function
 #'
-#' Description
+#' Allows one to plot results from the \code{resample()} function based on a few
+#' different options.
 #'
-#' @param x output from resample function
-#' @param what network, bootstrap, or coefs
+#' @param x Output from the \code{resample()} function.
+#' @param what Can be one of three options. \code{what = "network"} will plot
+#'   the final network model selected from resampling. \code{what = "bootstrap"}
+#'   will run \code{bootNet()} based on the final model to create bootstrapped
+#'   estimates of confidence bands around each edge estimate. \code{what =
+#'   "coefs"} will plot the confidence intervals based on the model parameters in
+#'   the final network.
 #' @param ... Additional arguments.
 #'
-#' @return A plot
+#' @return A network plot, bootstrap plot, or confidence interval plot.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- resample(data)
+#'
+#' plot(x, 'network')
+#' plot(x, 'bootstrap')
+#' plot(x, 'coefs')
+#' }
 plot.resample <- function(x, what = 'network', ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
   if(isTRUE(what) | is(what, 'numeric')){

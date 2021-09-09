@@ -7,18 +7,30 @@
 \method{plot}{resample}(x, what = "network", ...)
 }
 \arguments{
-\item{x}{output from resample function}
+\item{x}{Output from the \code{resample()} function.}
 
-\item{what}{network, bootstrap, or coefs}
+\item{what}{Can be one of three options. \code{what = "network"} will plot
+the final network model selected from resampling. \code{what = "bootstrap"}
+will run \code{bootNet()} based on the final model to create bootstrapped
+estimates of confidence bands around each edge estimate. \code{what =
+  "coefs"} will plot the confidence intervals based on the model parameters in
+the final network.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A plot
+A network plot, bootstrap plot, or confidence interval plot.
 }
 \description{
-Description
+Allows one to plot results from the \code{resample()} function based on a few
+different options.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- resample(data)
+
+plot(x, 'network')
+plot(x, 'bootstrap')
+plot(x, 'coefs')
+}
 }

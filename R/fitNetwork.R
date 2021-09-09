@@ -100,6 +100,16 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
   # Alternative way of specifying that there is a lag
   if(!identical(detrend, FALSE) | (!is.null(beepno) & !is.null(dayno))){lags <- 1}
 
+  # Check if moderators are specified by name -- NEW
+  if(isTRUE(is.character(moderators)) & !identical(moderators, 'all')){
+    moderators <- which(colnames(data) %in% moderators)
+  }
+
+  # Check if covariates are specified by name -- NEW
+  if(isTRUE(is.character(covariates))){
+    covariates <- which(colnames(data) %in% covariates)
+  }
+
   # Check for missing values
   if(any(is.na(data))){
     ww <- which(apply(data, 1, function(z) any(is.na(z))))
