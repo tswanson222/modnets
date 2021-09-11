@@ -444,7 +444,7 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
     }
     if(!saveVars & criterion != "CV"){out <- out[-c(3:4)]}
     if(fitit){
-      tryfit <- tryCatch({modSelect(obj = out, data = data, fit = TRUE, saveMods = FALSE)},
+      tryfit <- tryCatch({modSelect(obj = out, data = data, fit = TRUE, saveMods = saveMods)},
                          error = function(e){TRUE})
       if(!isTRUE(tryfit)){out$fit0 <- tryfit}
     }
@@ -644,7 +644,7 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
   out <- list(call = preout, adjCIs = adjCIs0)
   out$samples <- list(coefs = finalCoefs0, iters = boots, seeds = seeds)
   if(fitit){
-    tryfit <- tryCatch({modSelect(obj = out, data = data, fit = TRUE, saveMods = FALSE)},
+    tryfit <- tryCatch({modSelect(obj = out, data = data, fit = TRUE, saveMods = saveMods)},
                        error = function(e){TRUE})
     if(!isTRUE(tryfit)){out$fit0 <- tryfit}
   }

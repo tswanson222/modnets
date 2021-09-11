@@ -34,7 +34,8 @@ Imports:
 Suggests:
     sn,
     arm,
-    hierNet
+    hierNet,
+    psychTools
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

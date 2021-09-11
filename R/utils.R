@@ -391,7 +391,7 @@ margCIs <- function(mods, data = NULL, modname = NULL, alpha = .05, nsims = 500,
   names(ci_diff) <- vs
   attributes(ci_diff)$moderator <- modname
   if(!is.null(compare)){attributes(ci_diff)$compare <- compare[1:2]}
-  ci_diff
+  return(ci_diff)
 }
 
 ##### getInts: retrieve interactions effects; e.g., which ones apply to both variables

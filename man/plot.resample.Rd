@@ -9,21 +9,34 @@
 \arguments{
 \item{x}{Output from the \code{resample()} function.}
 
-\item{what}{Can be one of three options. \code{what = "network"} will plot
-the final network model selected from resampling. \code{what = "bootstrap"}
-will run \code{bootNet()} based on the final model to create bootstrapped
-estimates of confidence bands around each edge estimate. \code{what =
-  "coefs"} will plot the confidence intervals based on the model parameters in
-the final network.}
+\item{what}{Can be one of three options for all \code{resample()} outputs:
+\code{what = "network"} will plot the final network model selected from
+resampling. \code{what = "bootstrap"} will run \code{bootNet()} based on
+the final model to create bootstrapped estimates of confidence bands around
+each edge estimate. \code{what = "coefs"} will plot the confidence
+intervals based on the model parameters in the final network. Additionally,
+if the object was fit with \code{sampMethod = "stability"}, a stability
+plot can be created with the \code{"stability"} option. Otherwise, if
+\code{sampMethod = "bootstrap"} or \code{sampMethod = "split"}, a plot of
+the empirical distribution function of p-values can be displayed with the
+\code{"pvals"} option.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A network plot, bootstrap plot, or confidence interval plot.
+Plots various aspects of output from the \code{\link{resample}()}
+function.
 }
 \description{
 Allows one to plot results from the \code{resample()} function based on a few
 different options.
+}
+\details{
+For the \code{what} argument, the options correspond with calls to the
+following functions: \itemize{ \item{\code{"network": \link{plotNet}()}}
+\item{\code{"bootstrap": \link{plotBoot}()}} \item{\code{"coefs":
+\link{plotCoefs}()}} \item{\code{"stability": \link{plotStability}()}}
+\item{\code{"pvals": \link{plotPvals}()}} }
 }
 \examples{
 \dontrun{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/fitNetwork.R
 \name{getFitCIs}
 \alias{getFitCIs}
-\title{Provides model coefficients with CIs}
+\title{Provides model coefficients with confidence intervals}
 \usage{
 getFitCIs(fit, allNames = NULL, alpha = 0.05)
 }

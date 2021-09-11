@@ -2,25 +2,47 @@
 % Please edit documentation in R/plotFunctions.R
 \name{plotPvals}
 \alias{plotPvals}
-\title{Plot the ECDF of pvalues from resample}
+\title{Plot the ECDF of p-values from resampling}
 \usage{
-plotPvals(obj, outcome = 1, predictor = 1, alpha = 0.05)
+plotPvals(x, outcome = 1, predictor = 1, title = TRUE, alpha = 0.05)
 }
 \arguments{
-\item{obj}{output from resample}
+\item{x}{Output from \code{resample()}, given that \code{sampMethod =
+"bootstrap"} or \code{sampMethod = "split"}.}
 
-\item{outcome}{numeric}
+\item{outcome}{Character string or numeric value (in terms of columns in the
+dataset) to indicate which outcome to plot the p-value distribution for.}
 
-\item{predictor}{numeric}
+\item{predictor}{Character string or numeric value (in terms of columns in
+the dataset) to indicate which predictor to plot the p-value distribution
+for.}
 
-\item{alpha}{numeric}
+\item{title}{If \code{TRUE}, then a default title will be given according to
+the outcome and predictor that are specified. If \code{FALSE}, then no
+title will be plotted. A custom title may also be supplied by the user.}
+
+\item{alpha}{The false discovery rate. Defaults to .05}
 }
 \value{
-A plot
+Returns a plot based on the relationship between a particular outcome
+and predictor.
 }
 \description{
-Plots pvalues or something
+Plots the empirical cumulative distribution function of the p-values related
+to iterated resampling via bootstrapping or multi-sample splitting.
+}
+\details{
+See Meinshausen, Meier, & Buhlmann (2009) for details.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- resample(data, sampMethod = "bootstrap")
+x <- resample(data, sampMethod = "split")
+plot(x, what = 'pvals')
+}
+}
+\references{
+Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
+high-dimensional regression. Journal of the American Statistical Association.
+104, 1671-1681.
 }

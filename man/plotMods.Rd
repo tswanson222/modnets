@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotFunctions.R
 \name{plotMods}
 \alias{plotMods}
-\title{Better way to visualize mvals}
+\title{Plot conditional networks at different levels of the moderator}
 \usage{
 plotMods(
   nets,
@@ -17,30 +17,53 @@ plotMods(
 )
 }
 \arguments{
-\item{nets}{list of networks}
+\item{nets}{List of network models fit with \code{fitNetwork()}, where
+\code{mval} has been specified.}
 
-\item{nodewise}{logical}
+\item{nodewise}{See corresponding argument in \code{plotNet()}.}
 
-\item{elsize}{numeric}
+\item{elsize}{Numeric value to indicate the size of the edge labels.}
 
-\item{vsize}{numeric}
+\item{vsize}{Numeric value to indicate the size of the nodes. If \code{NULL},
+then a default value will be determined based on the number of nodes in the
+network.}
 
-\item{elabs}{logical}
+\item{elabs}{If \code{TRUE}, then edges will be labeled with their numeric
+values.}
 
-\item{predict}{something}
+\item{predict}{See corresponding argument in \code{plotNet()}.}
 
-\item{layout}{character}
+\item{layout}{Can be a character string, corresponding to the options in
+\code{qgraph()}, or can be a matrix that defines the layout (e.g., based on
+the \code{averageLayout()} function). Recommended to leave as \code{NULL},
+so that the layout will be based on the list of networks provided.}
 
-\item{which.net}{character}
+\item{which.net}{See corresponding argument in \code{plotNet()}.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-Plot
+Returns a plot where multiple conditional networks are plotted side
+by side.
 }
 \description{
-Gotta check on this but seems cool
+An easy wrapper for plotting the same network at different levels of a
+moderator. Using the \code{mval} argument of the \code{fitNetwork()}
+function, you can create multiple models---conditional networks---wherein the
+same model is fit at different values of the moderator.
+}
+\details{
+Importantly, this function will fix a common layout across all conditional
+networks so that the network can be easily compared (visually) at different
+levels of the moderator.
 }
 \examples{
-1 + 1
+data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
+
+fit0 <- fitNetwork(data, moderators = 'depressed', mval = 0)
+fit1 <- fitNetwork(data, moderators = 'depressed', mval = 1)
+fit2 <- fitNetwork(data, moderators = 'depressed', mval = 2)
+
+fits <- list(fit0, fit1, fit2)
+plotMods(fits)
 }

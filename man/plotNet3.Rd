@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotFunctions.R
 \name{plotNet3}
 \alias{plotNet3}
-\title{Easy plotting for mlGVAR and lmerVAR output}
+\title{Plot temporal, contemporaneous, and between-subject networks}
 \usage{
 plotNet3(
   object,
@@ -16,28 +16,40 @@ plotNet3(
 )
 }
 \arguments{
-\item{object}{mlGVAR or lmerVAR object}
+\item{object}{Output from \code{mlGVAR()} or \code{lmerVAR()}.}
 
 \item{...}{Additional arguments.}
 
-\item{nets}{which networks to plot}
+\item{nets}{Character vector of length 3 indicating which networks to plot,
+and in what order. Same options as for \code{which.net} in
+\code{plotNet()}.}
 
-\item{titles}{character}
+\item{titles}{If \code{TRUE}, then uses default titles for temporal,
+contemporaneous, and between-subject networks. If \code{FALSE}, then no
+titles will be used. Can also be a character vector to provide custom plot
+titles.}
 
-\item{l}{numeric}
+\item{l}{A numeric value to indicate a type of pane layout.}
 
-\item{label}{something}
+\item{label}{Can include a character string for text annotation.}
 
-\item{xpos}{numeric}
+\item{xpos}{Numeric, x-axis value for where the text annotation should go.
+Between 0 and 1.}
 
-\item{ypos}{numeric}
+\item{ypos}{numeric, y-axis value for where the text annotation should go.
+Between 0 and 1.}
 }
 \value{
-Plot
+Returns 3 network plots.
 }
 \description{
-Description
+Quick, easy plotting for \code{mlGVAR()} and \code{lmerVAR()} output. Allows
+one to plot three networks in the same window: temporal, contemporaneous, and
+between-subject.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- mlGVAR(data)
+plotNet3(x)
+}
 }

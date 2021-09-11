@@ -9,7 +9,7 @@
 \alias{plot.mgmSim}
 \alias{plot.mlVARsim}
 \alias{plot.simMLgvar}
-\title{Plot moderated network models}
+\title{Plot moderated and unmoderated network models}
 \usage{
 plotNet(
   x,
@@ -204,54 +204,109 @@ plotNet(
 )
 }
 \arguments{
-\item{x}{network}
+\item{x}{Output from any of the \code{modnets} model fitting or simulation
+functions.}
 
-\item{which.net}{character}
+\item{which.net}{When multiple networks exist for a single object, this
+allows the user to indicate which network to plot. For a GGM, all values of
+this argument return the same adjacency matrix. For a SUR network,
+\code{"beta"} and \code{"temporal"} plot the temporal network, while
+\code{"pdc"} plots the Partial Directed Correlations, or the standardized
+temporal network. \code{"contemporaneous"} and \code{"pcc"} plot the
+standardized contemporaneous network (Partial Contemporaneous
+Correlations). All of these terms apply for multilevel networks, but
+\code{"between"} can also plot the between-subjects network. Additionally,
+the value \code{"coef"} will plot the model coefficients and confidence
+intervals, defaulting to the \code{plotCoefs()} function. Moreover, with
+GGMs or outputs from \code{mlGVAR()} with a moderated between-subjects
+network, the value \code{"ints"} will call the \code{intsPlot()} function.
+If a numeric or logical value is supplied, however, this argument will
+function as the \code{threshold} argument. A numeric value will set a
+threshold at the supplied value, while \code{TRUE} will set a threshold of
+.05.}
 
-\item{threshold}{numeric or logical}
+\item{threshold}{A numeric or logical value to set a p-value threshold.
+\code{TRUE} will automatically set the threshold at .05.}
 
-\item{layout}{character}
+\item{layout}{Character. Corresponds to the \code{layout} argument in the
+\code{qgraph()} function.}
 
-\item{predict}{logical or network}
+\item{predict}{If \code{TRUE}, then prediction error associated with each
+node will be plotted as a pie graph around the nodes. For continuous
+variables, the type of prediction error is determined by the \code{con}
+argument. For categorical variables, the type of error is determined by the
+\code{cat} argument. Alternatively, another network model constituted by
+the same nodes can be supplied in order to plot the difference in
+prediction error, such as R-squared change.}
 
-\item{mnet}{logical}
+\item{mnet}{Logical. If \code{TRUE}, the moderator will be plotted as a
+square "node" in the network, along with main effects represented as
+directed edges.}
 
-\item{names}{logical}
+\item{names}{If \code{TRUE}, then the variable names associated with the
+model will be plotted as labels on the nodes. If \code{FALSE}, then nodes
+will be labeled with numbers rather than names. Alternatively, a character
+vector can be provided to serve as custom labels for the nodes.}
 
-\item{nodewise}{logical}
+\item{nodewise}{Only applies to GGMs. If \code{TRUE}, then nodewise edges
+will be plotted rather than the undirected averages of corresponding edges.}
 
-\item{scale}{logical}
+\item{scale}{Logical. Only applies when \code{predict} does not equal
+\code{FALSE}. The value of this argument is sent to the \code{predictNet()}
+function.}
 
-\item{lag}{numeric or logical}
+\item{lag}{DEPRECATED!}
 
-\item{con}{character}
+\item{con}{Character string indicating which type of prediction error to plot
+for continuous variables, if \code{predict} does not equal \code{FALSE}.
+Options are: \code{"R2", "adjR2", "MSE", "RMSE"}}
 
-\item{cat}{character}
+\item{cat}{Character string indicating which type of prediction error to plot
+for categorical variables, if \code{predict} does not equal \code{FALSE}.
+Options are: \code{"nCC", "CC", "CCmarg"}}
 
-\item{covNet}{logical}
+\item{covNet}{Logical. Only applies when a covariate is modeled. Allows the
+covariate to be plotted as a separate square "node".}
 
-\item{plot}{logical}
+\item{plot}{Logical. If \code{FALSE}, then a \code{qgraph} object will be
+returned rather than plotted.}
 
-\item{elabs}{logical}
+\item{elabs}{Logical. If \code{TRUE}, the values of the edges will be plotted
+as labels on the edges.}
 
 \item{elsize}{numeric}
 
-\item{rule}{character}
+\item{rule}{Only applies to GGMs (including between-subjects networks) when a
+threshold is supplied. The \code{"AND"} rule will only preserve edges when
+both corresponding coefficients have p-values below the threshold, while
+the \code{"OR"} rule will preserve an edge so long as one of the two
+coefficients have a p-value below the supplied threshold.}
 
-\item{binarize}{logical}
+\item{binarize}{Logical. If \code{TRUE}, the network will be plotted as an
+unweighted network. Only applies to GGMs.}
 
-\item{mlty}{logical}
+\item{mlty}{Logial. If \code{FALSE}, then moderated edges are displayed as
+solid lines. If \code{TRUE}, then moderated edges are shown as dashed
+lines.}
 
-\item{mselect}{something}
+\item{mselect}{If the model contains more than one moderator, input the
+character string naming which moderator you would like the plot to reflect.
+Only affects which lines are dashed or solid. Not compatible with the
+\code{mnet} argument.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A plot
+Displays a network plot, or returns a \code{qgraph} object if
+\code{plot = FALSE}.
 }
 \description{
-Core function for plotting various types of network models.
+Core function for plotting various types of network models. Accessible
+through the \code{plot()} S3 generic.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- fitNetwork(data)
+plot(x)
+}
 }

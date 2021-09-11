@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotFunctions.R
 \name{plotNet2}
 \alias{plotNet2}
-\title{Plot the temporal and contemporaneous networks in the same window}
+\title{Plot temporal and contemporaneous networks in the same window}
 \usage{
 plotNet2(
   object,
@@ -13,22 +13,41 @@ plotNet2(
 )
 }
 \arguments{
-\item{object}{SUR output}
+\item{object}{Output from \code{fitNetwork()}, specifically with a SUR model.}
 
-\item{whichNets}{Vector of which networks to plot}
+\item{whichNets}{Vector of length 2 indicating which networks to plot.
+\code{"beta"} and \code{"temporal"} both refer to the unstandardized
+temporal network coefficients, while \code{"PDC"} refers to the
+standardized temporal network. \code{"PCC"} and \code{"contemporaneous"}
+both refer to the standardized residual covariance matrix (the
+contemporaneous network). If the \code{object} is fitted with
+\code{mlGVAR()} or \code{lmerVAR()}, then \code{"between"} is also an
+option for plotting the between-subjects network.}
 
-\item{whichTemp}{Which version of the temporal network should be plotted}
+\item{whichTemp}{Which version of the temporal network should be plotted,
+either \code{"temporal"} or \code{"PDC"}. This argument is ignored if
+\code{whichNets} is not \code{NULL}.}
 
-\item{titles}{Titles}
+\item{titles}{Character vector of length 2 where custom names for the two
+network plots can be supplied.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A plot
+Returns two network plots side by side.
 }
 \description{
-Description
+Designed for easy-to-use plotting with temporal networks. Essentially just a
+wrapper for running \code{plotNet()} twice---once for a temporal network, and
+again for a contemporaneous network---and plotting the two networks in the
+same window. Good for a quick glance at results from a SUR network. Also
+compatible with \code{mlGVAR()} and \code{lmerVAR()} outputs, although can
+only plot two networks in the same window. \code{plotNet3()} can be used to
+plot 3 networks.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- fitNetwork(data, lags = TRUE)
+plotNet2(x)
+}
 }

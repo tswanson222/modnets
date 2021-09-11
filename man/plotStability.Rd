@@ -2,27 +2,52 @@
 % Please edit documentation in R/plotFunctions.R
 \name{plotStability}
 \alias{plotStability}
-\title{Plot stability paths for a given variable}
+\title{Plot stability selection paths for a given outcome}
 \usage{
-plotStability(obj, pp = 1, s = 3, thresh = 0.5, color = "black")
+plotStability(
+  x,
+  outcome = 1,
+  s = c("simult", "split1", "split2"),
+  thresh = 0.5,
+  typeLegend = TRUE
+)
 }
 \arguments{
-\item{obj}{output from resample}
+\item{x}{Output of \code{resample()} where \code{sampMethod = "stability"}.}
 
-\item{pp}{numeric}
+\item{outcome}{Character string or numeric value (in terms of columns in the
+dataset) to indicate which outcome to plot the stability path for.}
 
-\item{s}{numeric}
+\item{s}{Character string or numeric value. This indicates which stability
+path to return a plot for. Either the first sample split \code{"split1"},
+the second sample split \code{"split2"}, or the path for simultaneous
+selection \code{"simult"}, which is the default.}
 
-\item{thresh}{numeric}
+\item{thresh}{The selection threshold, which is represented as a horizontal
+red line on the plot. Defaults to .5}
 
-\item{color}{character}
+\item{typeLegend}{Logical. If \code{FALSE}, linetype legend is removed.}
 }
 \value{
-A plot
+Plot of the stability path associated with a given outcome.
 }
 \description{
-You heard me
+Creates a plot to show the stability path for a particular variable in terms
+of how frequently it was chosen in stability selection.
+}
+\details{
+See Meinshausen & Buhlmann (2010) for details on stability selection. Cannot
+be used when the criterion for stability selection was set as
+cross-validation.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- resample(data, sampMethod = "stability")
+plot(x, what = "stability")
+}
+}
+\references{
+Meinshausen, N., & Buhlmann, P. (2010). Stability selection.
+Journal of the Royal Statistical Society: Series B (Statistical
+Methodology). 72, 417-423
 }

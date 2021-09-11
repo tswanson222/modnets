@@ -1041,7 +1041,7 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
   return(out)
 }
 
-#' Provides model coefficients with CIs
+#' Provides model coefficients with confidence intervals
 #'
 #' Requires that either 'fitobj' or 'SURfit' is included in the object
 #'

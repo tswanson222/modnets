@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotFunctions.R
 \name{plotCoefs}
 \alias{plotCoefs}
-\title{Plot coefficients from 'SURfit' with confidence intervals}
+\title{Plot model coefficients with confidence intervals}
 \usage{
 plotCoefs(
   fit,
@@ -20,37 +20,58 @@ plotCoefs(
 )
 }
 \arguments{
-\item{fit}{SURfit object}
+\item{fit}{Output from \code{fitNetwork()}, \code{bootNet()}, or
+\code{resample()}. Can also be the \code{fixedNets} or \code{betweenNet}
+elements of the \code{mlGVAR()} output.}
 
-\item{true}{logical}
+\item{true}{An adjacency matrix containing the true parameter values, if
+known. This can be used in conjunction with a simulated network, in that
+the user can supply the true network and plot those values against the
+estimated values.}
 
-\item{alpha}{numeric}
+\item{alpha}{Alpha level that is used to compute confidence intervals.}
 
-\item{plot}{logical}
+\item{plot}{Logical. If \code{FALSE}, a dataframe containing all of the
+confidence interval data will be returned.}
 
-\item{col}{character}
+\item{col}{Character string. Color of the points associated with the
+\code{true} values.}
 
-\item{flip}{logical}
+\item{flip}{Logical. If \code{FALSE}, the facets will be turned 90 degrees.}
 
-\item{data}{data}
+\item{data}{Supply the original dataset if not already included in the
+\code{fit} object.}
 
-\item{select}{logical}
+\item{select}{Relevant to the \code{resample()} output. Determines whether
+all variables should be plotted, or only those that were selected according
+to the resampling or variable selection procedure.}
 
-\item{size}{numeric}
+\item{size}{Numeric. Size of the point estimates.}
 
-\item{labels}{logical}
+\item{labels}{If logical, determines whether or not variable labels should be
+included. If a character vector, can be used to customize variable labels.}
 
-\item{title}{character}
+\item{title}{Custom plot title.}
 
-\item{vars}{character or numeric}
+\item{vars}{Defaults to \code{"all"}. Determines which variables should be
+plotted.}
 }
 \value{
-A plot
+Plot displaying estimated model coefficients and confidence
+intervals.
 }
 \description{
-Plotting. I think this actually goes with resample? Also may not be restricted
-to SURfit objects
+Return a plot or dataframe showing the point estimates from each model, along
+with confidence intervals based on the estimated standard errors.
+}
+\details{
+This is differentiated from the output of \code{bootNet()} and
+\code{plotBoot()} in that the confidence intervals are computed directly from
+model parameters rather than estimated from bootstrapping.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- fitNetwork(data)
+plot(x, which.net = 'coef')
+}
 }

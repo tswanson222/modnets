@@ -1,34 +1,89 @@
-#' Plot moderated network models
+#' Plot moderated and unmoderated network models
 #'
-#' Core function for plotting various types of network models.
+#' Core function for plotting various types of network models. Accessible
+#' through the \code{plot()} S3 generic.
 #'
-#' @param x network
-#' @param which.net character
-#' @param threshold numeric or logical
-#' @param layout character
-#' @param predict logical or network
-#' @param mnet logical
-#' @param names logical
-#' @param nodewise logical
-#' @param scale logical
-#' @param lag numeric or logical
-#' @param con character
-#' @param cat character
-#' @param covNet logical
-#' @param plot logical
-#' @param elabs logical
+#' @param x Output from any of the \code{modnets} model fitting or simulation
+#'   functions.
+#' @param which.net When multiple networks exist for a single object, this
+#'   allows the user to indicate which network to plot. For a GGM, all values of
+#'   this argument return the same adjacency matrix. For a SUR network,
+#'   \code{"beta"} and \code{"temporal"} plot the temporal network, while
+#'   \code{"pdc"} plots the Partial Directed Correlations, or the standardized
+#'   temporal network. \code{"contemporaneous"} and \code{"pcc"} plot the
+#'   standardized contemporaneous network (Partial Contemporaneous
+#'   Correlations). All of these terms apply for multilevel networks, but
+#'   \code{"between"} can also plot the between-subjects network. Additionally,
+#'   the value \code{"coef"} will plot the model coefficients and confidence
+#'   intervals, defaulting to the \code{plotCoefs()} function. Moreover, with
+#'   GGMs or outputs from \code{mlGVAR()} with a moderated between-subjects
+#'   network, the value \code{"ints"} will call the \code{intsPlot()} function.
+#'   If a numeric or logical value is supplied, however, this argument will
+#'   function as the \code{threshold} argument. A numeric value will set a
+#'   threshold at the supplied value, while \code{TRUE} will set a threshold of
+#'   .05.
+#' @param threshold A numeric or logical value to set a p-value threshold.
+#'   \code{TRUE} will automatically set the threshold at .05.
+#' @param layout Character. Corresponds to the \code{layout} argument in the
+#'   \code{qgraph()} function.
+#' @param predict If \code{TRUE}, then prediction error associated with each
+#'   node will be plotted as a pie graph around the nodes. For continuous
+#'   variables, the type of prediction error is determined by the \code{con}
+#'   argument. For categorical variables, the type of error is determined by the
+#'   \code{cat} argument. Alternatively, another network model constituted by
+#'   the same nodes can be supplied in order to plot the difference in
+#'   prediction error, such as R-squared change.
+#' @param mnet Logical. If \code{TRUE}, the moderator will be plotted as a
+#'   square "node" in the network, along with main effects represented as
+#'   directed edges.
+#' @param names If \code{TRUE}, then the variable names associated with the
+#'   model will be plotted as labels on the nodes. If \code{FALSE}, then nodes
+#'   will be labeled with numbers rather than names. Alternatively, a character
+#'   vector can be provided to serve as custom labels for the nodes.
+#' @param nodewise Only applies to GGMs. If \code{TRUE}, then nodewise edges
+#'   will be plotted rather than the undirected averages of corresponding edges.
+#' @param scale Logical. Only applies when \code{predict} does not equal
+#'   \code{FALSE}. The value of this argument is sent to the \code{predictNet()}
+#'   function.
+#' @param lag DEPRECATED!
+#' @param con Character string indicating which type of prediction error to plot
+#'   for continuous variables, if \code{predict} does not equal \code{FALSE}.
+#'   Options are: \code{"R2", "adjR2", "MSE", "RMSE"}
+#' @param cat Character string indicating which type of prediction error to plot
+#'   for categorical variables, if \code{predict} does not equal \code{FALSE}.
+#'   Options are: \code{"nCC", "CC", "CCmarg"}
+#' @param covNet Logical. Only applies when a covariate is modeled. Allows the
+#'   covariate to be plotted as a separate square "node".
+#' @param plot Logical. If \code{FALSE}, then a \code{qgraph} object will be
+#'   returned rather than plotted.
+#' @param elabs Logical. If \code{TRUE}, the values of the edges will be plotted
+#'   as labels on the edges.
 #' @param elsize numeric
-#' @param rule character
-#' @param binarize logical
-#' @param mlty logical
-#' @param mselect something
+#' @param rule Only applies to GGMs (including between-subjects networks) when a
+#'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
+#'   both corresponding coefficients have p-values below the threshold, while
+#'   the \code{"OR"} rule will preserve an edge so long as one of the two
+#'   coefficients have a p-value below the supplied threshold.
+#' @param binarize Logical. If \code{TRUE}, the network will be plotted as an
+#'   unweighted network. Only applies to GGMs.
+#' @param mlty Logial. If \code{FALSE}, then moderated edges are displayed as
+#'   solid lines. If \code{TRUE}, then moderated edges are shown as dashed
+#'   lines.
+#' @param mselect If the model contains more than one moderator, input the
+#'   character string naming which moderator you would like the plot to reflect.
+#'   Only affects which lines are dashed or solid. Not compatible with the
+#'   \code{mnet} argument.
 #' @param ... Additional arguments.
 #'
-#' @return A plot
+#' @return Displays a network plot, or returns a \code{qgraph} object if
+#'   \code{plot = FALSE}.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- fitNetwork(data)
+#' plot(x)
+#' }
 plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
                     scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
@@ -66,6 +121,8 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
   if(is.character(which.net) & length(which.net) == 1){
     if(startsWith(tolower(which.net), 'coef')){
       return(plotCoefs(x, plot = plot, ...))
+    } else if(startsWith(tolower(which.net), 'int')){
+      return(intsPlot(x, ...))
     }
   }
   if(any(class(x) %in% c('qgraph', 'bootnetResult', 'bootnet'))){
@@ -187,6 +244,7 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
     names <- 1:nrow(x$adjMat)
   }
   names <- names[1:nrow(x$adjMat)]
+  lag <- NULL ### FUNCTION ARGUMENT DEPRECATED
   if(is.null(lag) & "adjMats" %in% names(x)){
     stop("More than one lag modeled; need to specify which to plot")
   } else if(!"adjMats" %in% names(x)){
@@ -328,6 +386,100 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
              pie = pie, pieColor = pieColor, edge.labels = elabs,
              edge.label.cex = elsize, lty = lty, ...)
     }
+  }
+}
+
+#' Plot conditional networks at different levels of the moderator
+#'
+#' An easy wrapper for plotting the same network at different levels of a
+#' moderator. Using the \code{mval} argument of the \code{fitNetwork()}
+#' function, you can create multiple models---conditional networks---wherein the
+#' same model is fit at different values of the moderator.
+#'
+#' Importantly, this function will fix a common layout across all conditional
+#' networks so that the network can be easily compared (visually) at different
+#' levels of the moderator.
+#'
+#' @param nets List of network models fit with \code{fitNetwork()}, where
+#'   \code{mval} has been specified.
+#' @param nodewise See corresponding argument in \code{plotNet()}.
+#' @param elsize Numeric value to indicate the size of the edge labels.
+#' @param vsize Numeric value to indicate the size of the nodes. If \code{NULL},
+#'   then a default value will be determined based on the number of nodes in the
+#'   network.
+#' @param elabs If \code{TRUE}, then edges will be labeled with their numeric
+#'   values.
+#' @param predict See corresponding argument in \code{plotNet()}.
+#' @param layout Can be a character string, corresponding to the options in
+#'   \code{qgraph()}, or can be a matrix that defines the layout (e.g., based on
+#'   the \code{averageLayout()} function). Recommended to leave as \code{NULL},
+#'   so that the layout will be based on the list of networks provided.
+#' @param which.net See corresponding argument in \code{plotNet()}.
+#' @param ... Additional arguments.
+#'
+#' @return Returns a plot where multiple conditional networks are plotted side
+#'   by side.
+#' @export
+#'
+#' @examples
+#' data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
+#'
+#' fit0 <- fitNetwork(data, moderators = 'depressed', mval = 0)
+#' fit1 <- fitNetwork(data, moderators = 'depressed', mval = 1)
+#' fit2 <- fitNetwork(data, moderators = 'depressed', mval = 2)
+#'
+#' fits <- list(fit0, fit1, fit2)
+#' plotMods(fits)
+plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
+                     elabs = TRUE, predict = NULL, layout = NULL,
+                     which.net = "temporal", ...){
+  if(any(c("SURnet", "temporal") %in% unlist(lapply(nets, names)))){
+    if("SURnet" %in% names(nets[[1]])){nets <- lapply(nets, '[[', "SURnet")}
+    which.net <- match.arg(tolower(
+      which.net), c("temporal", "contemporaneous", "pdc"))
+    if(is.null(vsize)){vsize <- 10}
+    nodewise <- FALSE
+    ggm <- FALSE
+  } else {
+    ggm <- TRUE
+  }
+  if(is.null(vsize)){
+    vsize <- (exp(-ncol(nets[[1]]$data)/80) * 8) + 1
+    vsize <- vsize + (exp(-length(nets)/80) * 8)/length(nets)
+  }
+  getLayout <- function(x, which.net = "temporal"){
+    stopifnot(class(x) == "list")
+    averageLayout(lapply(x, function(z){
+      plotNet(z, plot = FALSE, which.net = which.net)}))
+  }
+  getMax <- function(x, n = FALSE, which.net = "temporal"){
+    if(!"ggm" %in% names(attributes(x[[1]]))){
+      which.net <- match.arg(
+        tolower(which.net), c("temporal", "contemporaneous", "pdc"))
+      x <- lapply(x, '[[', ifelse(which.net == "pdc", "temporal", which.net))
+      if(which.net == "pdc"){x <- lapply(x, '[[', "PDC")}
+    }
+    if(n == FALSE){
+      max(unlist(lapply(x, function(z) max(abs(z$adjMat)))))
+    } else {
+      max(unlist(lapply(x, function(z) max(abs(z$nodewise$adjNW)))))
+    }
+  }
+  if(is.null(layout)){layout <- getLayout(nets, which.net)}
+  mx <- getMax(nets, nodewise, which.net)
+  if(ggm){
+    moderator <- capitalize(attr(nets[[1]], "moderator"))
+    vals <- unname(sapply(nets, attr, "mval"))
+  } else {
+    moderator <- capitalize(nets[[1]]$call$moderators)
+    vals <- unname(sapply(lapply(nets, '[[', "call"), '[[', "mval"))
+  }
+  layout(t(1:length(vals)))
+  for(i in 1:length(vals)){
+    plotNet(nets[[i]], predict = predict, layout = layout, elabs = elabs,
+            elsize = elsize, nodewise = nodewise, maximum = mx,
+            title = paste0(moderator, " = ", vals[i]),
+            vsize = vsize, which.net = which.net, ...)
   }
 }
 
@@ -727,110 +879,163 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
   if(pp != FALSE){return(p)} else {return(dat2)}
 }
 
-#' Plot the ECDF of pvalues from resample
+#' Plot the ECDF of p-values from resampling
 #'
-#' Plots pvalues or something
+#' Plots the empirical cumulative distribution function of the p-values related
+#' to iterated resampling via bootstrapping or multi-sample splitting.
 #'
-#' @param obj output from resample
-#' @param outcome numeric
-#' @param predictor numeric
-#' @param alpha numeric
+#' See Meinshausen, Meier, & Buhlmann (2009) for details.
 #'
-#' @return A plot
+#' @param x Output from \code{resample()}, given that \code{sampMethod =
+#'   "bootstrap"} or \code{sampMethod = "split"}.
+#' @param outcome Character string or numeric value (in terms of columns in the
+#'   dataset) to indicate which outcome to plot the p-value distribution for.
+#' @param predictor Character string or numeric value (in terms of columns in
+#'   the dataset) to indicate which predictor to plot the p-value distribution
+#'   for.
+#' @param title If \code{TRUE}, then a default title will be given according to
+#'   the outcome and predictor that are specified. If \code{FALSE}, then no
+#'   title will be plotted. A custom title may also be supplied by the user.
+#' @param alpha The false discovery rate. Defaults to .05
+#'
+#' @return Returns a plot based on the relationship between a particular outcome
+#'   and predictor.
 #' @export
+#' @references
+#' Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
+#' high-dimensional regression. Journal of the American Statistical Association.
+#' 104, 1671-1681.
 #'
 #' @examples
-#' 1 + 1
-plotPvals <- function(obj, outcome = 1, predictor = 1, alpha = .05){
-  stopifnot("adjCIs" %in% names(obj))
-  pvals <- lapply(obj$samples$coefs, '[[', "P")
+#' \dontrun{
+#' x <- resample(data, sampMethod = "bootstrap")
+#' x <- resample(data, sampMethod = "split")
+#' plot(x, what = 'pvals')
+#' }
+plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
+  stopifnot("adjCIs" %in% names(x))
+  pvals <- lapply(x$samples$coefs, '[[', "P")
   if(is.character(outcome)){outcome <- which(names(pvals) == outcome)}
   if(is.character(predictor)){predictor <- which(colnames(pvals[[outcome]]) == predictor)}
+  if(isTRUE(title)){
+    title <- paste(colnames(pvals[[outcome]])[predictor], '-->', names(pvals)[outcome])
+  } else if(identical(title, FALSE)){
+    title <- ''
+  }
   ps <- pvals[[outcome]][, predictor]
   n <- length(ps)
   gammas <- seq(ceiling(alpha * n)/n, 1 - 1/n, by = 1/n)
   h <- hist(ps, breaks = n, plot = FALSE)
   h$density <- h$density/sum(h$density)
   fdr_line <- function(p, gammas, alpha = .05){pmax(.05, (1 - (log(min(gammas)))/alpha) * p)}
-  plot(h, freq = FALSE, main = "", ylim = c(0, 1), xlab = "Adjusted P-values")
+  plot(h, freq = FALSE, main = title, ylim = c(0, 1), xlab = "Adjusted P-values")
   lines(sort(ps), fdr_line(sort(ps), gammas, alpha), lty = 2, lwd = 2)
   lines(sort(ps), seq(.05, 1, length = n), lwd = 2)
 }
 
-#' Plot stability paths for a given variable
+#' Plot stability selection paths for a given outcome
 #'
-#' You heard me
+#' Creates a plot to show the stability path for a particular variable in terms
+#' of how frequently it was chosen in stability selection.
 #'
-#' @param obj output from resample
-#' @param pp numeric
-#' @param s numeric
-#' @param thresh numeric
-#' @param color character
+#' See Meinshausen & Buhlmann (2010) for details on stability selection. Cannot
+#' be used when the criterion for stability selection was set as
+#' cross-validation.
 #'
-#' @return A plot
+#' @param x Output of \code{resample()} where \code{sampMethod = "stability"}.
+#' @param outcome Character string or numeric value (in terms of columns in the
+#'   dataset) to indicate which outcome to plot the stability path for.
+#' @param s Character string or numeric value. This indicates which stability
+#'   path to return a plot for. Either the first sample split \code{"split1"},
+#'   the second sample split \code{"split2"}, or the path for simultaneous
+#'   selection \code{"simult"}, which is the default.
+#' @param thresh The selection threshold, which is represented as a horizontal
+#'   red line on the plot. Defaults to .5
+#' @param typeLegend Logical. If \code{FALSE}, linetype legend is removed.
+#'
+#' @return Plot of the stability path associated with a given outcome.
 #' @export
+#' @references Meinshausen, N., & Buhlmann, P. (2010). Stability selection.
+#'   Journal of the Royal Statistical Society: Series B (Statistical
+#'   Methodology). 72, 417-423
 #'
 #' @examples
-#' 1 + 1
-plotStability <- function(obj, pp = 1, s = 3, thresh = .5, color = "black"){
-  if(obj$call$criterion == "CV"){stop("Not possible when criterion = CV")}
-  objcall <- obj$call
-  obj <- obj$stability
-  node <- names(obj[[s]])[pp]
-  p <- length(obj[[s]]) - ifelse(s == 3, 0, ifelse(!objcall$exogenous, 2, 1))
-  stopifnot(pp <= p + 1)
-  n <- nrow(obj[[s]][[pp]])
-  k <- ncol(obj[[s]][[pp]])
-  plot(0, type = "n", ylim = c(0, 1), xlim = c(1, n + 1), axes = F,
-       main = node, xlab = expression(lambda), ylab = "Selection Probability")
-  axis(1); axis(2)
-  if(any(objcall$moderators == 0)){
-    colors <- rep("black", k)
-    lty <- rep(1, k)
-  } else {
-    colors <- c(rep("black", p), rep("grey50", k - p))
-    lty <- c(rep(1, p), rep(2, k - p))
-  }
-  if(color == "terrain"){colors <- terrain.colors(k)}
+#' \dontrun{
+#' x <- resample(data, sampMethod = "stability")
+#' plot(x, what = "stability")
+#' }
+plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
+                          thresh = .5, typeLegend = TRUE){
+  if(x$call$criterion == "CV"){stop("Not possible when criterion == CV")}
+  objcall <- x$call
+  x <- x$stability
+  if(is.character(s)){s <- switch(match.arg(s), simult = 3, split1 = 1, split2 = 2)}
+  if(is.character(outcome)){outcome <- which(names(x[[s]]) == outcome)}
+  node <- names(x[[s]])[outcome]
+  p <- length(x[[s]]) - ifelse(s == 3, 0, ifelse(!objcall$exogenous, 2, 1))
+  stopifnot(outcome <= p + 1)
+  x <- x[[s]][[outcome]]
+  x <- data.frame(stack(x), lambda = rep(1:nrow(x), ncol(x)),
+                  Type = factor(rep(c('Main Effect', 'Interaction'), c(p, ncol(x) - p) * nrow(x)), levels = c('Main Effect', 'Interaction')))
+  lambda <- x$lambda # removing NOTE
+  values <- x$values # removing NOTE
+  ind <- x$ind # removing NOTE
+  g <- ggplot(x, aes(x = lambda, y = values, color = ind)) +
+    geom_line(aes(linetype = Type)) +
+    xlab(expression(lambda)) + ylab('Selection Probability') + ggtitle(node) +
+    labs(color = 'Predictor') + theme_classic()
   if(!is.null(thresh)){
-    if(thresh != 0){
-      lines(1:n, rep(thresh, n), lwd = 2, lty = ifelse(color == "terrain", 2, 1),
-            col = ifelse(color == "terrain", "black", rgb(1, 0, 0, .2)))
+    if(!identical(as.numeric(thresh), 0)){
+      g <- g + geom_hline(yintercept = thresh, alpha = .3, lty = 4)
     }
   }
-  #if(!is.null(thresh)){if(thresh != 0){abline(h = thresh, col = rgb(1, 0, 0, .2), lwd = 2)}}
-  for(i in 1:k){
-    lines(obj[[s]][[pp]][, i], lwd = 2, col = colors[i], lty = lty[i])
-  }
-  if(color == "terrain"){
-    legend(n + 3, 1.1, xpd = T, legend = colnames(obj[[s]][[pp]]),
-           col = colors, lty = lty, lwd = 2, bty = "n")
-  }
+  if(!isTRUE(typeLegend)){g <- g + guides(linetype = 'none')}
+  return(g)
 }
 
-#' Plot coefficients from 'SURfit' with confidence intervals
+#' Plot model coefficients with confidence intervals
 #'
-#' Plotting. I think this actually goes with resample? Also may not be restricted
-#' to SURfit objects
+#' Return a plot or dataframe showing the point estimates from each model, along
+#' with confidence intervals based on the estimated standard errors.
 #'
-#' @param fit SURfit object
-#' @param true logical
-#' @param alpha numeric
-#' @param plot logical
-#' @param col character
-#' @param flip logical
-#' @param data data
-#' @param select logical
-#' @param size numeric
-#' @param labels logical
-#' @param title character
-#' @param vars character or numeric
+#' This is differentiated from the output of \code{bootNet()} and
+#' \code{plotBoot()} in that the confidence intervals are computed directly from
+#' model parameters rather than estimated from bootstrapping.
 #'
-#' @return A plot
+#' @param fit Output from \code{fitNetwork()}, \code{bootNet()}, or
+#'   \code{resample()}. Can also be the \code{fixedNets} or \code{betweenNet}
+#'   elements of the \code{mlGVAR()} output.
+#' @param true An adjacency matrix containing the true parameter values, if
+#'   known. This can be used in conjunction with a simulated network, in that
+#'   the user can supply the true network and plot those values against the
+#'   estimated values.
+#' @param alpha Alpha level that is used to compute confidence intervals.
+#' @param plot Logical. If \code{FALSE}, a dataframe containing all of the
+#'   confidence interval data will be returned.
+#' @param col Character string. Color of the points associated with the
+#'   \code{true} values.
+#' @param flip Logical. If \code{FALSE}, the facets will be turned 90 degrees.
+#' @param data Supply the original dataset if not already included in the
+#'   \code{fit} object.
+#' @param select Relevant to the \code{resample()} output. Determines whether
+#'   all variables should be plotted, or only those that were selected according
+#'   to the resampling or variable selection procedure.
+#' @param size Numeric. Size of the point estimates.
+#' @param labels If logical, determines whether or not variable labels should be
+#'   included. If a character vector, can be used to customize variable labels.
+#' @param title Custom plot title.
+#' @param vars Defaults to \code{"all"}. Determines which variables should be
+#'   plotted.
+#'
+#' @return Plot displaying estimated model coefficients and confidence
+#'   intervals.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- fitNetwork(data)
+#' plot(x, which.net = 'coef')
+#' }
 plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
                       flip = TRUE, data = NULL, select = TRUE, size = 1,
                       labels = TRUE, title = NULL, vars = 'all'){
@@ -1101,26 +1306,49 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
   pp
 }
 
-#' Plot CI difference for each predictor with interactions against Y
+#' Plot confidence intervals for interaction terms
 #'
-#' This shows something about all the interaction terms
+#' Allows one to plot the confidence intervals associated with interaction
+#' terms. Provides an easy way to look at whether there are any significant
+#' interactions, and if so which interactions are important.
 #'
-#' @param out network
-#' @param y outcome, character
-#' @param moderator something
-#' @param nsims numeric
-#' @param alpha numeric
+#' The default setting \code{y = "all"} shows all interaction terms associated
+#' with the model. But the user can also home-in on specific variables to see
+#' what interactions might be relevant. When \code{y = "all"}, the axis labels
+#' should be explained. These follow the format of \code{predictor:outcome}. The
+#' title reflects the name of the moderator variable. For instance, if a
+#' variable named \code{"M"} moderates the relationship between \code{"X"} and
+#' \code{"Y"}, where \code{"X"} predicts \code{"Y"}, the title of the plot will
+#' list the variable \code{"M"} as the moderator, and the label (shown on the
+#' y-axis), will read \code{"X:Y"}. When \code{y != "all"} (that is, a specifc
+#' value for \code{y} is provided), then the title will still reflect the
+#' moderator, but the labels will simply show which predictor interacts with
+#' that moderator to predict the outcome.
 #'
-#' @return Plot
+#' @param out GGM moderated network output from \code{fitNetwork()}, or output
+#'   from a moderated between-subjects network fit with \code{mlGVAR()} (e.g.,
+#'   when \code{bm = TRUE}).
+#' @param y Character string. The name of the outcome variable for which to
+#'   create the plot. If \code{y = "all"}, then all interaction terms associated
+#'   with all outcomes will be plotted.
+#' @param nsims The number of simulations to estimate the posterior distribution
+#'   of the difference between high and low levels of the confidence interval.
+#' @param alpha Alpha level that is used to compute confidence intervals.
+#'
+#' @return A plot showing the spread of different interactions.
 #' @export
 #'
 #' @examples
-#' 1 + 1
-intsPlot <- function(out, y = 'all', moderator = NULL, nsims = 500, alpha = .05){
-  #require(ggplot2)
+#' \dontrun{
+#' x <- fitNetwork(data, moderators = 'moderator')
+#' plot(x, which.net = 'ints')
+#' }
+intsPlot <- function(out, y = 'all', nsims = 500, alpha = .05){
+  if(is(out, 'SURnet')){stop('Cannot use this function with temporal networks')}
+  if(is(out, 'mlGVAR')){out <- out$betweenNet}
   if("adjMat" %in% names(out)){out <- out$mods0}
-  if("models" %in% names(out)){out <- margCIs(out, modname = moderator, nsims = nsims, alpha = alpha)}
-  if(is.null(moderator)){moderator <- attributes(out)$moderator}
+  if("models" %in% names(out)){out <- margCIs(out, nsims = nsims, alpha = alpha)}
+  moderator <- attributes(out)$moderator
   if(class(y) == "character"){
     if(y == "all"){
       y0 <- as.vector(sapply(seq_along(out), function(z)
@@ -1170,78 +1398,6 @@ intsPlot <- function(out, y = 'all', moderator = NULL, nsims = 500, alpha = .05)
     ggtitle(label = main) + xlab(Y) + ylab(expression(hat(beta))) +
     theme_bw() + coord_flip()
   p
-}
-
-#' Better way to visualize mvals
-#'
-#' Gotta check on this but seems cool
-#'
-#' @param nets list of networks
-#' @param nodewise logical
-#' @param elsize numeric
-#' @param vsize numeric
-#' @param elabs logical
-#' @param predict something
-#' @param layout character
-#' @param which.net character
-#' @param ... Additional arguments.
-#'
-#' @return Plot
-#' @export
-#'
-#' @examples
-#' 1 + 1
-plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
-                     elabs = TRUE, predict = NULL, layout = NULL,
-                     which.net = "temporal", ...){
-  if(any(c("SURnet", "temporal") %in% unlist(lapply(nets, names)))){
-    if("SURnet" %in% names(nets[[1]])){nets <- lapply(nets, '[[', "SURnet")}
-    which.net <- match.arg(tolower(
-      which.net), c("temporal", "contemporaneous", "pdc"))
-    if(is.null(vsize)){vsize <- 10}
-    nodewise <- FALSE
-    ggm <- FALSE
-  } else {
-    ggm <- TRUE
-  }
-  if(is.null(vsize)){
-    vsize <- (exp(-ncol(nets[[1]]$data)/80) * 8) + 1
-    vsize <- vsize + (exp(-length(nets)/80) * 8)/length(nets)
-  }
-  getLayout <- function(x, which.net = "temporal"){
-    stopifnot(class(x) == "list")
-    averageLayout(lapply(x, function(z){
-      plotNet(z, plot = FALSE, which.net = which.net)}))
-  }
-  getMax <- function(x, n = FALSE, which.net = "temporal"){
-    if(!"ggm" %in% names(attributes(x[[1]]))){
-      which.net <- match.arg(
-        tolower(which.net), c("temporal", "contemporaneous", "pdc"))
-      x <- lapply(x, '[[', ifelse(which.net == "pdc", "temporal", which.net))
-      if(which.net == "pdc"){x <- lapply(x, '[[', "PDC")}
-    }
-    if(n == FALSE){
-      max(unlist(lapply(x, function(z) max(abs(z$adjMat)))))
-    } else {
-      max(unlist(lapply(x, function(z) max(abs(z$nodewise$adjNW)))))
-    }
-  }
-  if(is.null(layout)){layout <- getLayout(nets, which.net)}
-  mx <- getMax(nets, nodewise, which.net)
-  if(ggm){
-    moderator <- capitalize(attr(nets[[1]], "moderator"))
-    vals <- unname(sapply(nets, attr, "mval"))
-  } else {
-    moderator <- capitalize(nets[[1]]$call$moderators)
-    vals <- unname(sapply(lapply(nets, '[[', "call"), '[[', "mval"))
-  }
-  layout(t(1:length(vals)))
-  for(i in 1:length(vals)){
-    plotNet(nets[[i]], predict = predict, layout = layout, elabs = elabs,
-            elsize = elsize, nodewise = nodewise, maximum = mx,
-            title = paste0(moderator, " = ", vals[i]),
-            vsize = vsize, which.net = which.net, ...)
-  }
 }
 
 #' Plot results of power simulation
@@ -1389,21 +1545,40 @@ plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
   }
 }
 
-#' Plot the temporal and contemporaneous networks in the same window
+#' Plot temporal and contemporaneous networks in the same window
 #'
-#' Description
+#' Designed for easy-to-use plotting with temporal networks. Essentially just a
+#' wrapper for running \code{plotNet()} twice---once for a temporal network, and
+#' again for a contemporaneous network---and plotting the two networks in the
+#' same window. Good for a quick glance at results from a SUR network. Also
+#' compatible with \code{mlGVAR()} and \code{lmerVAR()} outputs, although can
+#' only plot two networks in the same window. \code{plotNet3()} can be used to
+#' plot 3 networks.
 #'
-#' @param object SUR output
-#' @param whichNets Vector of which networks to plot
-#' @param whichTemp Which version of the temporal network should be plotted
-#' @param titles Titles
+#' @param object Output from \code{fitNetwork()}, specifically with a SUR model.
+#' @param whichNets Vector of length 2 indicating which networks to plot.
+#'   \code{"beta"} and \code{"temporal"} both refer to the unstandardized
+#'   temporal network coefficients, while \code{"PDC"} refers to the
+#'   standardized temporal network. \code{"PCC"} and \code{"contemporaneous"}
+#'   both refer to the standardized residual covariance matrix (the
+#'   contemporaneous network). If the \code{object} is fitted with
+#'   \code{mlGVAR()} or \code{lmerVAR()}, then \code{"between"} is also an
+#'   option for plotting the between-subjects network.
+#' @param whichTemp Which version of the temporal network should be plotted,
+#'   either \code{"temporal"} or \code{"PDC"}. This argument is ignored if
+#'   \code{whichNets} is not \code{NULL}.
+#' @param titles Character vector of length 2 where custom names for the two
+#'   network plots can be supplied.
 #' @param ... Additional arguments.
 #'
-#' @return A plot
+#' @return Returns two network plots side by side.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- fitNetwork(data, lags = TRUE)
+#' plotNet2(x)
+#' }
 plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
                      titles = c("PDC ", "PCC "), ...){
   whichTemp <- match.arg(whichTemp)
@@ -1452,24 +1627,36 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
   }
 }
 
-#' Easy plotting for mlGVAR and lmerVAR output
+#' Plot temporal, contemporaneous, and between-subject networks
 #'
-#' Description
+#' Quick, easy plotting for \code{mlGVAR()} and \code{lmerVAR()} output. Allows
+#' one to plot three networks in the same window: temporal, contemporaneous, and
+#' between-subject.
 #'
-#' @param object mlGVAR or lmerVAR object
+#' @param object Output from \code{mlGVAR()} or \code{lmerVAR()}.
 #' @param ... Additional arguments.
-#' @param nets which networks to plot
-#' @param titles character
-#' @param l numeric
-#' @param label something
-#' @param xpos numeric
-#' @param ypos numeric
+#' @param nets Character vector of length 3 indicating which networks to plot,
+#'   and in what order. Same options as for \code{which.net} in
+#'   \code{plotNet()}.
+#' @param titles If \code{TRUE}, then uses default titles for temporal,
+#'   contemporaneous, and between-subject networks. If \code{FALSE}, then no
+#'   titles will be used. Can also be a character vector to provide custom plot
+#'   titles.
+#' @param l A numeric value to indicate a type of pane layout.
+#' @param label Can include a character string for text annotation.
+#' @param xpos Numeric, x-axis value for where the text annotation should go.
+#'   Between 0 and 1.
+#' @param ypos numeric, y-axis value for where the text annotation should go.
+#'   Between 0 and 1.
 #'
-#' @return Plot
+#' @return Returns 3 network plots.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- mlGVAR(data)
+#' plotNet3(x)
+#' }
 plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'between'),
                      titles = TRUE, l = 3, label = NULL, xpos = 0, ypos = .5){
   args0 <- list(...)
@@ -1497,7 +1684,11 @@ plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'betwe
   mains <- c('Temporal network', 'Partial Contemporaneous Correlations', 'Between-subjects network')
   invisible(lapply(1:3, function(i){
     args <- replace(args0, 'which.net', list(which.net = nets[i]))
-    if(isTRUE(titles)){args$title <- mains[i]}
+    if(isTRUE(titles)){
+      args$title <- mains[i]
+    } else if(is.character(titles)){
+      args$title <- titles[i]
+    }
     do.call(plotNet, args)
   }))
   if(!is.null(label)){
