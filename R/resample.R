@@ -955,6 +955,21 @@ stability <- function(obj){
     })
     names(crits[[i]]) <- names(splits[[i]]) <- vs
   }
+  s1 <- sapply(lapply(splits[[1]], '[[', 'freqs'), nrow)
+  s2 <- sapply(lapply(splits[[2]], '[[', 'freqs'), nrow)
+  if(!all(s1 == s2)){ # WARNING: THIS REMOVES SOME ELEMENTS OF THE PATHS WHEN THEY DO NOT MATCH
+    swhich <- which(s1 != s2)
+    smax <- sapply(swhich, function(z) which.max(c(s1[z], s2[z])))
+    smin <- sapply(swhich, function(z) which.min(c(s1[z], s2[z])))
+    for(i in seq_along(swhich)){
+      n <- nrow(splits[[smin[i]]][[swhich[i]]]$freqs)
+      nn <- ncol(splits[[smin[i]]][[swhich[i]]]$freqs)
+      splits[[smax[i]]][[swhich[i]]]$freqs <- splits[[smax[i]]][[swhich[i]]]$freqs[1:n, ]
+      for(j in 1:nn){
+        splits[[smax[i]]][[swhich[i]]]$signs[[j]] <- splits[[smax[i]]][[swhich[i]]]$signs[[j]][, 1:n]
+      }
+    }
+  }
   simulVars <- lapply(1:p, function(z){
     simul1 <- sapply(1:k[z], function(zz){
       colMeans(splits[[1]][[z]]$signs[[zz]] * splits[[2]][[z]]$signs[[zz]])

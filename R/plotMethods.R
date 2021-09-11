@@ -107,6 +107,10 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 #' \link{plotCoefs}()}} \item{\code{"stability": \link{plotStability}()}}
 #' \item{\code{"pvals": \link{plotPvals}()}} }
 #'
+#' \code{"bootstrap"} and \code{"pvals"} only available for bootstrapped and
+#' multi-sample split resampling. \code{"stability"} only available for
+#' stability selection.
+#'
 #' @param x Output from the \code{resample()} function.
 #' @param what Can be one of three options for all \code{resample()} outputs:
 #'   \code{what = "network"} will plot the final network model selected from

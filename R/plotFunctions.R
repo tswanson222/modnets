@@ -951,7 +951,8 @@ plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
 #'   selection \code{"simult"}, which is the default.
 #' @param thresh The selection threshold, which is represented as a horizontal
 #'   red line on the plot. Defaults to .5
-#' @param typeLegend Logical. If \code{FALSE}, linetype legend is removed.
+#' @param typeLegend Logical. If \code{FALSE}, linetype legend is removed. Only
+#'   applies if there is a moderator in the model.
 #'
 #' @return Plot of the stability path associated with a given outcome.
 #' @export
@@ -968,28 +969,41 @@ plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
                           thresh = .5, typeLegend = TRUE){
   if(x$call$criterion == "CV"){stop("Not possible when criterion == CV")}
   objcall <- x$call
+  mnull <- is.null(objcall$moderators)
   x <- x$stability
+  if(!'simult' %in% names(x)){
+    stop('No stability paths available for object. Try re-running resample with a different seed.')
+  }
   if(is.character(s)){s <- switch(match.arg(s), simult = 3, split1 = 1, split2 = 2)}
   if(is.character(outcome)){outcome <- which(names(x[[s]]) == outcome)}
   node <- names(x[[s]])[outcome]
   p <- length(x[[s]]) - ifelse(s == 3, 0, ifelse(!objcall$exogenous, 2, 1))
   stopifnot(outcome <= p + 1)
   x <- x[[s]][[outcome]]
-  x <- data.frame(stack(x), lambda = rep(1:nrow(x), ncol(x)),
-                  Type = factor(rep(c('Main Effect', 'Interaction'), c(p, ncol(x) - p) * nrow(x)), levels = c('Main Effect', 'Interaction')))
+  k <- ncol(x)
+  n <- nrow(x)
+  x <- data.frame(stack(x), lambda = rep(1:nrow(x), ncol(x)))
   lambda <- x$lambda # removing NOTE
   values <- x$values # removing NOTE
   ind <- x$ind # removing NOTE
+  if(!mnull){
+    x$Type <- factor(rep(c('Main Effect', 'Interaction'), c(p, k - p) * n),
+                     levels = c('Main Effect', 'Interaction'))
+  }
   g <- ggplot(x, aes(x = lambda, y = values, color = ind)) +
-    geom_line(aes(linetype = Type)) +
     xlab(expression(lambda)) + ylab('Selection Probability') + ggtitle(node) +
     labs(color = 'Predictor') + theme_classic()
+  if(!mnull){
+    g <- g + geom_line(aes(linetype = Type))
+    if(!isTRUE(typeLegend)){g <- g + guides(linetype = 'none')}
+  } else {
+    g <- g + geom_line()
+  }
   if(!is.null(thresh)){
     if(!identical(as.numeric(thresh), 0)){
       g <- g + geom_hline(yintercept = thresh, alpha = .3, lty = 4)
     }
   }
-  if(!isTRUE(typeLegend)){g <- g + guides(linetype = 'none')}
   return(g)
 }
 

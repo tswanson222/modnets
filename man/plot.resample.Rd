@@ -37,6 +37,10 @@ following functions: \itemize{ \item{\code{"network": \link{plotNet}()}}
 \item{\code{"bootstrap": \link{plotBoot}()}} \item{\code{"coefs":
 \link{plotCoefs}()}} \item{\code{"stability": \link{plotStability}()}}
 \item{\code{"pvals": \link{plotPvals}()}} }
+
+\code{"bootstrap"} and \code{"pvals"} only available for bootstrapped and
+multi-sample split resampling. \code{"stability"} only available for
+stability selection.
 }
 \examples{
 \dontrun{

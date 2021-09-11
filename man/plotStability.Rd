@@ -26,7 +26,8 @@ selection \code{"simult"}, which is the default.}
 \item{thresh}{The selection threshold, which is represented as a horizontal
 red line on the plot. Defaults to .5}
 
-\item{typeLegend}{Logical. If \code{FALSE}, linetype legend is removed.}
+\item{typeLegend}{Logical. If \code{FALSE}, linetype legend is removed. Only
+applies if there is a moderator in the model.}
 }
 \value{
 Plot of the stability path associated with a given outcome.
