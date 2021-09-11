@@ -1177,38 +1177,56 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
   }
 }
 
-#' Plot conditional effects
+#' Conditional effects plot
 #'
-#' Description
+#' Creates a plot of the relationships between two variables at different levels
+#' of the moderator. Only works for relationships that include an interaction.
 #'
-#' @param out network
-#' @param to y
-#' @param from x
-#' @param swap logical
-#' @param avg logical
-#' @param compare something
-#' @param hist something
-#' @param xlab character
-#' @param mods something
-#' @param nsims numeric
-#' @param xn something
-#' @param getCIs logical
-#' @param discrete logical
-#' @param ylab character
-#' @param main character
-#' @param midline logical
+#' @param out Output from \code{fitNetwork()} or \code{resample()}. Can also
+#'   provide the \code{fixedNets} or \code{betweenNet} element of the
+#'   \code{mlGVAR()} output.
+#' @param to Outcome variable, specified with character string or numeric value.
+#' @param from Predictor variable, specified with character string or numeric
+#'   value.
+#' @param swap Logical. Serves to switch the arguments for \code{to} and
+#'   \code{from}.
+#' @param avg Logical. If \code{TRUE} then the average relationship between the
+#'   two variables is displayed. Only works for GGMs.
+#' @param compare Two values can be supplied to indicate levels of the moderator
+#'   to be compared.
+#' @param hist Logical. Determines whether to show a histogram of the data
+#'   distribution at the bottom of the plot.
+#' @param xlab Character string for labelling the x-axis.
+#' @param mods DEPRECATED!
+#' @param nsims Number of iterations to simulate the posterior distribution.
+#' @param xn Numeric value to indicate how many values of the moderator should
+#'   be evaluated.
+#' @param getCIs Logical. Only applies when \code{avg = TRUE}. If \code{getCIs =
+#'   TRUE}, then the confidence intervals for the average difference between the
+#'   maximum and minimum of the moderator will be returned.
+#' @param discrete Logical. Determines whether to treat the moderator as a
+#'   discrete or continuous variable.
+#' @param ylab Character string for labelling the y-axis.
+#' @param main Character string for labelling the title of the plot.
+#' @param midline Logical. Only applies when \code{discrete = TRUE}. Shows a
+#'   line at the average level of the outcome.
 #'
-#' @return Plot
+#' @return A plot of the conditional effects of one variable on another given
+#'   different levels of the moderator.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- fitNetwork(data, moderators = 'M')
+#' condPlot(x, to = 1, from = 2)
+#' }
 condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
                      hist = FALSE, xlab = NULL, mods = NULL, nsims = 500,
                      xn = NULL, getCIs = FALSE, discrete = FALSE,
                      ylab = NULL, main = NULL, midline = TRUE){
   #suppressMessages(invisible(require(ggplot2)))
   if(isTRUE(discrete)){compare <- 0:1}
+  if(is(out, 'resample')){out <- out$fit0}
   if("adjMat" %in% names(out)){out <- out$mods0}
   if(any(c("models", "SURnet") %in% names(out))){
     out <- condEffects(out, xn = xn, x = compare)}
@@ -1414,24 +1432,44 @@ intsPlot <- function(out, y = 'all', nsims = 500, alpha = .05){
   p
 }
 
-#' Plot results of power simulation
+#' Plot results of power simulations
 #'
-#' Good with mnetPowerSim
+#' Plots the output from the \code{mnetPowerSim()} function.
 #'
-#' @param x mnetPowerSim output
-#' @param by character
-#' @param yvar character ?
-#' @param yadd something
-#' @param hline numeric
-#' @param xlab character
-#' @param title character
+#' The options of what performance metrics to plot include: \itemize{
+#' \item{Sensitivity} \item{Specificity} \item{Correlation} \item{MAE (Mean
+#' Absolute Error)} \item{Precision} \item{Accuracy} \item{FDR (False Discovery
+#' Rate)} }
+#'
+#' @param x \code{mnetPowerSim()} output
+#' @param by In development. Currently only supports \code{"type"} for creating
+#'   different facets for Pairwise and Interaction effects. \code{"network"} for
+#'   creating facets based on different networks (e.g., temporal,
+#'   contemporaneous). \code{"p"} for creating facets based on the number of
+#'   nodes in the network.
+#' @param yvar The performance metrics to plot. Options include:
+#'   \code{"sensitivity", "specificity", "correlation", "precision", "MAE",
+#'   "FDR", "accuracy"}. The option \code{"default"} automatically sets this to
+#'   sensitivity, specificity, and correlation.
+#' @param yadd Specify additional performance metrics to plot. The final
+#'   performance metrics that end up being plotted are simply: \code{c(yvar,
+#'   yadd)}. Thus, this argument is only useful as a shortcut for keeping the
+#'   default values of \code{yvar}, but adding more metrics to plot.
+#' @param hline Numeric value between 0 and 1 for where to plot a horizontal
+#'   line of interest. Can set to \code{FALSE} to remove line.
+#' @param xlab Character string for the x-axis label.
+#' @param title Character string for the title of the plot.
 #' @param ... Additional arguments.
 #'
-#' @return Plot
+#' @return Plots the results of a power simulation according to a variety of
+#'   performance metrics.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- mnetPowerSim(niter = 100, N = c(100, 200))
+#' plot(x)
+#' }
 plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
                       xlab = 'Number of cases', title = NULL, ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
@@ -1482,81 +1520,6 @@ plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
   }
   if(!is.null(title)){g <- g + ggplot2::ggtitle(title)}
   return(g)
-}
-
-#' Plot centrality and clustering values for multiple networks
-#'
-#' Can handle all kinds of (moderated) networks.
-#'
-#' @param Wmats Models
-#' @param which.net character
-#' @param scale logical
-#' @param labels character
-#' @param plot logical
-#' @param centrality character or character vector
-#' @param clustering character or character vector
-#'
-#' @return Plot
-#' @export
-#'
-#' @examples
-#' 1 + 1
-plotCentrality <- function(Wmats, which.net = "temporal", scale = TRUE,
-                           labels = NULL, plot = TRUE, centrality = "all",
-                           clustering = "Zhang"){
-  if(any(c("ggm", "SURnet", "mlGVAR") %in% names(attributes(Wmats)))){Wmats <- list(net1 = Wmats)}
-  if(all(sapply(Wmats, function(z) isTRUE(attr(z, "mlGVAR"))))){
-    Wmats <- lapply(Wmats, function(z) switch(
-      which.net, between = z$betweenNet, z$fixedNets))
-  }
-  if(any(grepl("ggm", lapply(Wmats, function(z) names(attributes(z)))))){which.net <- "contemporaneous"}
-  if(length(unique(lapply(Wmats, checkInclude))) != 1){stop("All networks must be of the same type")}
-  if(is.null(names(Wmats))){names(Wmats) <- paste0("net", seq_along(Wmats))}
-  which.net <- match.arg(tolower(which.net), c("temporal", "contemporaneous", "pdc"))
-  c0 <- c01 <- do.call(rbind, lapply(seq_along(Wmats), function(z){
-    cbind.data.frame(
-      centTable(Wmats[[z]], scale = scale, which.net = which.net,
-                labels = labels), group = names(Wmats)[z])
-  }))
-  if(all(centrality != "all")){
-    include0 <- checkInclude(Wmats[[1]], which.net = which.net)
-    include0 <- include0[!grepl(ifelse(
-      which.net != "contemporaneous", "Degree|^S|^E",
-      "Degree|^Out|^In"), include0)]
-    centrality <- include0[grep(paste(tolower(
-      centrality), collapse = "|"), tolower(include0))]
-    c0 <- c01 <- subset(c0, measure %in% centrality)
-  }
-  if(which.net == "contemporaneous" & clustering != FALSE){
-    c1 <- do.call(rbind, lapply(seq_along(Wmats), function(z){
-      z1 <- clustTable(Wmats[[z]], scale = scale, labels = labels)
-      z1 <- z1[z1$measure == ifelse(is.logical(clustering), "Zhang", clustering), ]
-      z1$measure <- "Clust. coef."
-      z1$node <- as.character(z1$node)
-      rownames(z1) <- 1:nrow(z1)
-      return(cbind.data.frame(z1, group = names(Wmats)[z]))
-    }))
-    c01 <- rbind(c0, c1)
-  }
-  c01 <- c01[order(c01$node), ]
-  c01 <- c01[order(c01$group), ]
-  rownames(c01) <- 1:nrow(c01)
-  #c01$node <- stringr::str_sub(c01$node, 1, 6)
-  c01$node <- substr(c01$node, 1, 6)
-  if(!plot){
-    list2env(list(c0 = c0, c1 = c1, c01 = c01), .GlobalEnv)
-  } else {
-    #invisible(suppressMessages(require(ggplot2)))
-    g1 <- ggplot(c01, aes(x = value, y = node, group = group, color = group, shape = group)) +
-      geom_path(alpha = 1, size = 1) + geom_point(size = 2) + xlab("") + ylab("") + theme_bw() +
-      facet_grid(. ~ measure, scales = "free") + scale_x_continuous(breaks = c(-1, 0, 1)) +
-      theme(axis.line.x = element_line(colour = "black"),
-            axis.ticks.x = element_line(colour = "black"),
-            axis.ticks.y = element_line(colour = "white", size = 0),
-            axis.text.y = element_text(colour = "black"),
-            axis.text.x = element_text(angle = 45, colour = "black"))
-    g1
-  }
 }
 
 #' Plot temporal and contemporaneous networks in the same window

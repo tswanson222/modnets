@@ -3,7 +3,7 @@
 \name{plotPower}
 \alias{plotPower}
 \alias{plot.mnetPower}
-\title{Plot results of power simulation}
+\title{Plot results of power simulations}
 \usage{
 plotPower(
   x,
@@ -28,28 +28,49 @@ plotPower(
 )
 }
 \arguments{
-\item{x}{mnetPowerSim output}
+\item{x}{\code{mnetPowerSim()} output}
 
-\item{by}{character}
+\item{by}{In development. Currently only supports \code{"type"} for creating
+different facets for Pairwise and Interaction effects. \code{"network"} for
+creating facets based on different networks (e.g., temporal,
+contemporaneous). \code{"p"} for creating facets based on the number of
+nodes in the network.}
 
-\item{yvar}{character ?}
+\item{yvar}{The performance metrics to plot. Options include:
+\code{"sensitivity", "specificity", "correlation", "precision", "MAE",
+  "FDR", "accuracy"}. The option \code{"default"} automatically sets this to
+sensitivity, specificity, and correlation.}
 
-\item{yadd}{something}
+\item{yadd}{Specify additional performance metrics to plot. The final
+performance metrics that end up being plotted are simply: \code{c(yvar,
+  yadd)}. Thus, this argument is only useful as a shortcut for keeping the
+default values of \code{yvar}, but adding more metrics to plot.}
 
-\item{hline}{numeric}
+\item{hline}{Numeric value between 0 and 1 for where to plot a horizontal
+line of interest. Can set to \code{FALSE} to remove line.}
 
-\item{xlab}{character}
+\item{xlab}{Character string for the x-axis label.}
 
-\item{title}{character}
+\item{title}{Character string for the title of the plot.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-Plot
+Plots the results of a power simulation according to a variety of
+performance metrics.
 }
 \description{
-Good with mnetPowerSim
+Plots the output from the \code{mnetPowerSim()} function.
+}
+\details{
+The options of what performance metrics to plot include: \itemize{
+\item{Sensitivity} \item{Specificity} \item{Correlation} \item{MAE (Mean
+Absolute Error)} \item{Precision} \item{Accuracy} \item{FDR (False Discovery
+Rate)} }
 }
 \examples{
-1 + 1
+\dontrun{
+x <- mnetPowerSim(niter = 100, N = c(100, 200))
+plot(x)
+}
 }

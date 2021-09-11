@@ -67,6 +67,10 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
       data <- getConsec(data = data, beepno = beepno, dayno = dayno)
     }
   }
+  if(any(is.na(data))){
+    ww <- which(apply(data, 1, function(z) any(is.na(z))))
+    stop(paste0(length(ww), ' rows contain missing values'))
+  }
   consec <- switch(2 - (!is.null(lags) & 'samp_ind' %in% names(attributes(data))),
                    attr(data, 'samp_ind'), NULL)
   N <- ifelse(is.null(consec), nrow(data) - ifelse(is.null(lags), 0, lags), length(consec))

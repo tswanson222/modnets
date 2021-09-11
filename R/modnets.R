@@ -1,10 +1,7 @@
 #' modnets: A package for fitting moderated network models
 #'
 #' The modnets package is all about fitting and analyzing moderated network
-#' models --- whoda thunk! Here is a list of functions.
-#'
-#' @section modnets functions:
-#' The modnets functions...
+#' models. Currently in development -- more updates and details to come.
 #'
 #' @docType package
 #' @name modnets

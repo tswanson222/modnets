@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotFunctions.R
 \name{condPlot}
 \alias{condPlot}
-\title{Plot conditional effects}
+\title{Conditional effects plot}
 \usage{
 condPlot(
   out,
@@ -24,44 +24,61 @@ condPlot(
 )
 }
 \arguments{
-\item{out}{network}
+\item{out}{Output from \code{fitNetwork()} or \code{resample()}. Can also
+provide the \code{fixedNets} or \code{betweenNet} element of the
+\code{mlGVAR()} output.}
 
-\item{to}{y}
+\item{to}{Outcome variable, specified with character string or numeric value.}
 
-\item{from}{x}
+\item{from}{Predictor variable, specified with character string or numeric
+value.}
 
-\item{swap}{logical}
+\item{swap}{Logical. Serves to switch the arguments for \code{to} and
+\code{from}.}
 
-\item{avg}{logical}
+\item{avg}{Logical. If \code{TRUE} then the average relationship between the
+two variables is displayed. Only works for GGMs.}
 
-\item{compare}{something}
+\item{compare}{Two values can be supplied to indicate levels of the moderator
+to be compared.}
 
-\item{hist}{something}
+\item{hist}{Logical. Determines whether to show a histogram of the data
+distribution at the bottom of the plot.}
 
-\item{xlab}{character}
+\item{xlab}{Character string for labelling the x-axis.}
 
-\item{mods}{something}
+\item{mods}{DEPRECATED!}
 
-\item{nsims}{numeric}
+\item{nsims}{Number of iterations to simulate the posterior distribution.}
 
-\item{xn}{something}
+\item{xn}{Numeric value to indicate how many values of the moderator should
+be evaluated.}
 
-\item{getCIs}{logical}
+\item{getCIs}{Logical. Only applies when \code{avg = TRUE}. If \code{getCIs =
+  TRUE}, then the confidence intervals for the average difference between the
+maximum and minimum of the moderator will be returned.}
 
-\item{discrete}{logical}
+\item{discrete}{Logical. Determines whether to treat the moderator as a
+discrete or continuous variable.}
 
-\item{ylab}{character}
+\item{ylab}{Character string for labelling the y-axis.}
 
-\item{main}{character}
+\item{main}{Character string for labelling the title of the plot.}
 
-\item{midline}{logical}
+\item{midline}{Logical. Only applies when \code{discrete = TRUE}. Shows a
+line at the average level of the outcome.}
 }
 \value{
-Plot
+A plot of the conditional effects of one variable on another given
+different levels of the moderator.
 }
 \description{
-Description
+Creates a plot of the relationships between two variables at different levels
+of the moderator. Only works for relationships that include an interaction.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- fitNetwork(data, moderators = 'M')
+condPlot(x, to = 1, from = 2)
+}
 }

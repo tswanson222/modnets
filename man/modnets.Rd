@@ -6,10 +6,5 @@
 \title{modnets: A package for fitting moderated network models}
 \description{
 The modnets package is all about fitting and analyzing moderated network
-models --- whoda thunk! Here is a list of functions.
+models. Currently in development -- more updates and details to come.
 }
-\section{modnets functions}{
-
-The modnets functions...
-}
-
