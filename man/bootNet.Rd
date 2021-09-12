@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootNet.R
 \name{bootNet}
 \alias{bootNet}
-\title{Essentially "bootnet", but with fitNetwork for all estimation}
+\title{Bootstrapping network estimation for moderated networks}
 \usage{
 bootNet(
   data,
@@ -33,62 +33,136 @@ bootNet(
 )
 }
 \arguments{
-\item{data}{data.frame}
+\item{data}{Dataframe or matrix.}
 
-\item{m}{numeric}
+\item{m}{Numeric or character string. Indicates which variable should be
+treated as a moderator (if any).}
 
-\item{nboots}{numeric}
+\item{nboots}{Number of bootstrapped samples.}
 
-\item{lags}{numeric or logical}
+\item{lags}{Numeric or logical, to indicate whether or not a temporal network
+is being estimated. Maximum of 1 lag -- meaningful values are either 1 or
+\code{TRUE}.}
 
-\item{caseDrop}{logical}
+\item{caseDrop}{Logical. Determines whether to do a caseDrop bootstrap
+procedure or not.}
 
-\item{rule}{character}
+\item{rule}{Only applies to GGMs (including between-subjects networks) when a
+threshold is supplied. The \code{"AND"} rule will only preserve edges when
+both corresponding coefficients have p-values below the threshold, while
+the \code{"OR"} rule will preserve an edge so long as one of the two
+coefficients have a p-value below the supplied threshold.}
 
-\item{ci}{numeric}
+\item{ci}{Numeric, between 0 and 1. The level of the confidence intervals
+estimated. Defaults at .95}
 
-\item{caseMin}{numeric}
+\item{caseMin}{Numeric. The minimum proportion of the sample that should be
+taken when \code{caseDrop = TRUE}. Provide a value between 0 and 1. The
+value indicates the smallest proportion of the total sample size to test in
+the case-dropping procedure,}
 
-\item{caseMax}{numeric}
+\item{caseMax}{Numeric. The maximum proportion of the sample that should be
+taken when \code{caseDrop = TRUE}. Provide a value between 0 and 1. The
+value indicates the largest proportion of the total sample size to test in
+the case-dropping procedure,}
 
-\item{caseN}{numeric}
+\item{caseN}{Numeric. The number of samples to draw at each sample size
+tested when \code{caseDrop = TRUE}.}
 
-\item{threshold}{logical or numeric}
+\item{threshold}{Logical or numeric. If \code{TRUE}, then a default value of
+.05 will be set. Indicates whether a threshold should be placed on the
+bootstrapped samples. A significant choice by the researcher. Only applies
+when a variable selection procedure is applied, or whether a
+\code{resample()} object is used as input.}
 
-\item{fits}{logical?}
+\item{fits}{A list of all fitted models, if available. Not likely to be used.}
 
-\item{type}{character}
+\item{type}{See \code{type} argument in \code{fitNetwork()} function.}
 
-\item{saveMods}{logical}
+\item{saveMods}{Logical. Determines whether or not to return all of the
+fitted models -- that is, all the models fit to each bootstrapped sample.
+Defaults to \code{TRUE}, but if \code{FALSE} then models will not be
+returned which can save memory.}
 
-\item{verbose}{logical}
+\item{verbose}{Logical. Determines whether a progress bar should be shown, as
+well as whether messages should be shown.}
 
-\item{fitCoefs}{logical}
+\item{fitCoefs}{DEPRECATED}
 
-\item{size}{numeric?}
+\item{size}{Numeric. Size of sample to use for bootstrapping. Not
+recommended.}
 
-\item{nCores}{numeric}
+\item{nCores}{If a logical or numeric value is provided, then the
+bootstrapping procedure will be parallelized across multiple CPUs. If
+numeric, this will specify the number of cores to use for the procedure. If
+\code{TRUE}, then the \code{detectCores()} function of the \code{parallel}
+package will be run to maximize the number of cores available. Defaults to
+1, which does not run any parallelization functions.}
 
-\item{cluster}{character}
+\item{cluster}{Character string to indicate which type of parallelization
+function to use, if \code{nCores > 1}. Options are \code{"mclapply"} or
+\code{"SOCK"}.}
 
-\item{block}{logical}
+\item{block}{Logical or numeric. If specified, then this indicates that
+\code{lags != 0} or \code{lags != NULL}. If numeric, then this indicates
+that block bootstrapping will be used, and the value specifies the block
+size. If \code{TRUE} then an appropriate block size will be estimated
+automatically.}
 
-\item{maxiter}{numeric}
+\item{maxiter}{The maximum number of iterations for the algorithm to go
+through before stopping. In some circumstances, iterated versions of the
+model based on subsamples of the data may not be possible to fit. In these
+cases, \code{maxiter} specifies the number of attempts that are made with
+different versions of the sample before stopping the algorithm.}
 
 \item{directedDiag}{logical}
 
-\item{beepno}{something}
+\item{beepno}{Character string or numeric value to indicate which variable
+(if any) encodes the survey number within a single day. Must be used in
+conjunction with \code{dayno} argument.}
 
-\item{dayno}{something}
+\item{dayno}{Character string or numeric value to indiciate which variable
+(if any) encodes the survey number within a single day. Must be used in
+conjunction with \code{beepno} argument.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A bootNet object
+A \code{bootNet} object
 }
 \description{
-Just expanding tha bootnet
+Follows closely to the methods of bootstrapping found in the \code{bootnet()}
+function of the \code{bootnet} package. An essential goal behind this
+function to expand \code{bootnet()} to encompass moderated networks.
 }
+\details{
+Can be used to perform bootstrapped network estimation, as well as to perform
+a case-drop bootstrap. Details on these two methods can be found in the help
+page for the \code{bootnet()} function within the \code{bootnet} package.
+
+In addition to expanding \code{bootnet()} to moderated networks, there are
+also some additional features such as the capacity to perform the block
+bootstrap for temporal networks via the \code{block} argument. The block
+bootstrap is \strong{highly} recommended for resampling temporal networks.
+
+Another feature of this function is that it can be used on outputs from the
+\code{resample()} function. This can be used as a way to evaluate the
+iterations of \code{resample()} beyond just using it for variable selection.
+}
+\section{Warning}{
+
+
+Importantly, if output from the \code{resample()} function is used as input
+for the \code{bootNet()} function, and the user wishes to use the model
+selected by the \code{resample()} function as the comparison to the
+bootstrapped results, you must add the \code{fit0} argument to this
+function. Use the fitted object in the \code{resample()} output as the
+input for the undocumented \code{fit0} argument for the \code{bootNet()}
+function.
+}
+
 \examples{
-1 + 1
+\dontrun{
+x <- bootNet(data)
+}
 }

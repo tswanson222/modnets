@@ -8,6 +8,9 @@
 #' outcomes and rows will represent predictors. For temporal networks, columns
 #' represent predictors and rows represent outcomes.
 #'
+#' Can also be used with output from the \code{resample()} and \code{bootNet()}
+#' functions.
+#'
 #' @param fit A fitted network model. Can be the output from
 #'   \code{fitNetwork()}, \code{mlGVAR()}, \code{lmerVAR()}, \code{bootNet()},
 #'   \code{resample()}, \code{simNet()}, or \code{mlGVARsim()}.

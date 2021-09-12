@@ -1,38 +1,109 @@
-#' Essentially "bootnet", but with fitNetwork for all estimation
+#' Bootstrapping network estimation for moderated networks
 #'
-#' Just expanding tha bootnet
+#' Follows closely to the methods of bootstrapping found in the \code{bootnet()}
+#' function of the \code{bootnet} package. An essential goal behind this
+#' function to expand \code{bootnet()} to encompass moderated networks.
 #'
-#' @param data data.frame
-#' @param m numeric
-#' @param nboots numeric
-#' @param lags numeric or logical
-#' @param caseDrop logical
-#' @param rule character
-#' @param ci numeric
-#' @param caseMin numeric
-#' @param caseMax numeric
-#' @param caseN numeric
-#' @param threshold logical or numeric
-#' @param fits logical?
-#' @param type character
-#' @param saveMods logical
-#' @param verbose logical
-#' @param fitCoefs logical
-#' @param size numeric?
-#' @param nCores numeric
-#' @param cluster character
-#' @param block logical
-#' @param maxiter numeric
+#' Can be used to perform bootstrapped network estimation, as well as to perform
+#' a case-drop bootstrap. Details on these two methods can be found in the help
+#' page for the \code{bootnet()} function within the \code{bootnet} package.
+#'
+#' In addition to expanding \code{bootnet()} to moderated networks, there are
+#' also some additional features such as the capacity to perform the block
+#' bootstrap for temporal networks via the \code{block} argument. The block
+#' bootstrap is \strong{highly} recommended for resampling temporal networks.
+#'
+#' Another feature of this function is that it can be used on outputs from the
+#' \code{resample()} function. This can be used as a way to evaluate the
+#' iterations of \code{resample()} beyond just using it for variable selection.
+#'
+#' @section Warning:
+#'
+#'   Importantly, if output from the \code{resample()} function is used as input
+#'   for the \code{bootNet()} function, and the user wishes to use the model
+#'   selected by the \code{resample()} function as the comparison to the
+#'   bootstrapped results, you must add the \code{fit0} argument to this
+#'   function. Use the fitted object in the \code{resample()} output as the
+#'   input for the undocumented \code{fit0} argument for the \code{bootNet()}
+#'   function.
+#'
+#' @param data Dataframe or matrix.
+#' @param m Numeric or character string. Indicates which variable should be
+#'   treated as a moderator (if any).
+#' @param nboots Number of bootstrapped samples.
+#' @param lags Numeric or logical, to indicate whether or not a temporal network
+#'   is being estimated. Maximum of 1 lag -- meaningful values are either 1 or
+#'   \code{TRUE}.
+#' @param caseDrop Logical. Determines whether to do a caseDrop bootstrap
+#'   procedure or not.
+#' @param rule Only applies to GGMs (including between-subjects networks) when a
+#'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
+#'   both corresponding coefficients have p-values below the threshold, while
+#'   the \code{"OR"} rule will preserve an edge so long as one of the two
+#'   coefficients have a p-value below the supplied threshold.
+#' @param ci Numeric, between 0 and 1. The level of the confidence intervals
+#'   estimated. Defaults at .95
+#' @param caseMin Numeric. The minimum proportion of the sample that should be
+#'   taken when \code{caseDrop = TRUE}. Provide a value between 0 and 1. The
+#'   value indicates the smallest proportion of the total sample size to test in
+#'   the case-dropping procedure,
+#' @param caseMax Numeric. The maximum proportion of the sample that should be
+#'   taken when \code{caseDrop = TRUE}. Provide a value between 0 and 1. The
+#'   value indicates the largest proportion of the total sample size to test in
+#'   the case-dropping procedure,
+#' @param caseN Numeric. The number of samples to draw at each sample size
+#'   tested when \code{caseDrop = TRUE}.
+#' @param threshold Logical or numeric. If \code{TRUE}, then a default value of
+#'   .05 will be set. Indicates whether a threshold should be placed on the
+#'   bootstrapped samples. A significant choice by the researcher. Only applies
+#'   when a variable selection procedure is applied, or whether a
+#'   \code{resample()} object is used as input.
+#' @param fits A list of all fitted models, if available. Not likely to be used.
+#' @param type See \code{type} argument in \code{fitNetwork()} function.
+#' @param saveMods Logical. Determines whether or not to return all of the
+#'   fitted models -- that is, all the models fit to each bootstrapped sample.
+#'   Defaults to \code{TRUE}, but if \code{FALSE} then models will not be
+#'   returned which can save memory.
+#' @param verbose Logical. Determines whether a progress bar should be shown, as
+#'   well as whether messages should be shown.
+#' @param fitCoefs DEPRECATED
+#' @param size Numeric. Size of sample to use for bootstrapping. Not
+#'   recommended.
+#' @param nCores If a logical or numeric value is provided, then the
+#'   bootstrapping procedure will be parallelized across multiple CPUs. If
+#'   numeric, this will specify the number of cores to use for the procedure. If
+#'   \code{TRUE}, then the \code{detectCores()} function of the \code{parallel}
+#'   package will be run to maximize the number of cores available. Defaults to
+#'   1, which does not run any parallelization functions.
+#' @param cluster Character string to indicate which type of parallelization
+#'   function to use, if \code{nCores > 1}. Options are \code{"mclapply"} or
+#'   \code{"SOCK"}.
+#' @param block Logical or numeric. If specified, then this indicates that
+#'   \code{lags != 0} or \code{lags != NULL}. If numeric, then this indicates
+#'   that block bootstrapping will be used, and the value specifies the block
+#'   size. If \code{TRUE} then an appropriate block size will be estimated
+#'   automatically.
+#' @param maxiter The maximum number of iterations for the algorithm to go
+#'   through before stopping. In some circumstances, iterated versions of the
+#'   model based on subsamples of the data may not be possible to fit. In these
+#'   cases, \code{maxiter} specifies the number of attempts that are made with
+#'   different versions of the sample before stopping the algorithm.
 #' @param directedDiag logical
-#' @param beepno something
-#' @param dayno something
+#' @param beepno Character string or numeric value to indicate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{dayno} argument.
+#' @param dayno Character string or numeric value to indiciate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{beepno} argument.
 #' @param ... Additional arguments.
 #'
-#' @return A bootNet object
+#' @return A \code{bootNet} object
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- bootNet(data)
+#' }
 bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, rule = 'OR',
                     ci = .95, caseMin = .05, caseMax = .75, caseN = 10, threshold = FALSE,
                     fits = NULL, type = 'g', saveMods = TRUE, verbose = TRUE, fitCoefs = FALSE,
@@ -679,19 +750,23 @@ cscoef <- function(obj, cor = .7, ci = .95, first = TRUE, verbose = TRUE){
   return(out)
 }
 
-#' Descriptive statistics for bootNet
+#' Descriptive statistics for \code{bootNet} objects
 #'
-#' Description
+#' Currently only works for unmoderated GGMs.
 #'
-#' @param object bootNet object
-#' @param centrality logical
+#' @param object \code{bootNet} object
+#' @param centrality Logical. Determines whether or not strength centrality and
+#'   expected influence should be computed for output.
 #' @param ... Additional arguments.
 #'
-#' @return A table of descriptives
+#' @return A table of descriptives for bootNet objects.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- bootNet(data)
+#' summary(x)
+#' }
 summary.bootNet <- function(object, centrality = TRUE, ...){
   inds1 <- c('edges', 'strength', 'EI')
   inds2 <- paste0('boot_', inds1)

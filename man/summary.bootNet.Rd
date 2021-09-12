@@ -2,23 +2,27 @@
 % Please edit documentation in R/bootNet.R
 \name{summary.bootNet}
 \alias{summary.bootNet}
-\title{Descriptive statistics for bootNet}
+\title{Descriptive statistics for \code{bootNet} objects}
 \usage{
 \method{summary}{bootNet}(object, centrality = TRUE, ...)
 }
 \arguments{
-\item{object}{bootNet object}
+\item{object}{\code{bootNet} object}
 
-\item{centrality}{logical}
+\item{centrality}{Logical. Determines whether or not strength centrality and
+expected influence should be computed for output.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A table of descriptives
+A table of descriptives for bootNet objects.
 }
 \description{
-Description
+Currently only works for unmoderated GGMs.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- bootNet(data)
+summary(x)
+}
 }

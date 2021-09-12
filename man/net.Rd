@@ -95,6 +95,9 @@ interaction terms associated with a moderated network.
 For GGMs when a non-symmetric matrix is requested, columns will represent
 outcomes and rows will represent predictors. For temporal networks, columns
 represent predictors and rows represent outcomes.
+
+Can also be used with output from the \code{resample()} and \code{bootNet()}
+functions.
 }
 \examples{
 \dontrun{
