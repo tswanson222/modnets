@@ -87,7 +87,8 @@ returned which can save memory.}
 \item{verbose}{Logical. Determines whether a progress bar should be shown, as
 well as whether messages should be shown.}
 
-\item{fitCoefs}{DEPRECATED}
+\item{fitCoefs}{Logical, refers to the argument in the \code{fitNetwork()}
+function. Most likely this should always be \code{FALSE}.}
 
 \item{size}{Numeric. Size of sample to use for bootstrapping. Not
 recommended.}

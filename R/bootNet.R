@@ -66,7 +66,8 @@
 #'   returned which can save memory.
 #' @param verbose Logical. Determines whether a progress bar should be shown, as
 #'   well as whether messages should be shown.
-#' @param fitCoefs DEPRECATED
+#' @param fitCoefs Logical, refers to the argument in the \code{fitNetwork()}
+#'   function. Most likely this should always be \code{FALSE}.
 #' @param size Numeric. Size of sample to use for bootstrapping. Not
 #'   recommended.
 #' @param nCores If a logical or numeric value is provided, then the
@@ -675,106 +676,57 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
   return(out)
 }
 
-#' Return correlation stability coefficients from caseDrop procedure
-#'
-#' @param obj bootNet object
-#' @param cor numeric
-#' @param ci numeric
-#' @param first logical
-#' @param verbose logical
-#'
-#' @return CS coefficients
-#' @export
-#'
-#' @examples
-#' 1 + 1
-cscoef <- function(obj, cor = .7, ci = .95, first = TRUE, verbose = TRUE){
-  stopifnot(isTRUE(attr(obj, 'caseDrop')))
-  ci0 <- ci * 100
-  ci <- paste0("q", c((1 - ci)/2, 1 - (1 - ci)/2) * 100)[1]
-  lags <- any(c('temporal', 'contemporaneous') %in% names(obj))
-  inds <- c('edges', switch(2 - !lags, c('strength', 'EI'), c('outStrength', 'inStrength', 'outEI', 'inEI')))
-  if(lags){
-    obj0 <- obj
-    obj <- obj$temporal
-  }
-  if('interactions' %in% names(obj)){
-    inds2 <- c('pairwise', 'interactions')
-    out <- do.call(rbind, setNames(lapply(inds2, function(z){
-      obj2 <- obj[[z]]
-      setNames(sapply(inds, function(i){
-        if(grepl('^out|^in', i)){
-          ii <- tolower(gsub('^out|^in', '', i))
-          if(ii == 'ei'){ii <- 'EI'}
-          dat <- obj2[[ii]][[i]]
-          dat <- dat[order(dat$subN), ]
-        } else {
-          dat <- obj2[[i]][order(obj2[[i]]$subN), ]
-        }
-        if(!first){
-          css <- dat[dat[, ci] > cor, 'drop']
-          css <- ifelse(length(css) == 0, 0, max(css))
-        } else {
-          css <- which(!dat[, ci] > cor)
-          css <- dat[ifelse(length(css) == 0, 1, max(css) + 1), 'drop']
-        }
-        return(css)
-      }), inds)
-    }), inds2))
-  } else {
-    out <- setNames(sapply(inds, function(i){
-      if(grepl('^out|^in', i)){
-        ii <- tolower(gsub('^out|^in', '', i))
-        if(ii == 'ei'){ii <- 'EI'}
-        dat <- obj[[ii]][[i]]
-        dat <- dat[order(dat$subN), ]
-      } else {
-        dat <- obj[[i]][order(obj[[i]]$subN), ]
-      }
-      if(!first){
-        css <- dat[dat[, ci] > cor, 'drop']
-        css <- ifelse(length(css) == 0, 0, max(css))
-      } else {
-        css <- which(!dat[, ci] > cor)
-        css <- dat[ifelse(length(css) == 0, 1, max(css) + 1), 'drop']
-      }
-      return(css)
-    }), inds)
-  }
-  if(lags){
-    call <- replace(as.list(match.call())[-1], c('obj', 'verbose'),
-                    list(obj = obj0$contemporaneous, verbose = FALSE))
-    out <- list(temporal = out, contemporaneous = do.call(cscoef, call))
-  }
-  if(verbose){cat(paste0('CS = ', cor, '(', ci0, '%)'), '\n')}
-  return(out)
-}
+
 
 #' Descriptive statistics for \code{bootNet} objects
 #'
-#' Currently only works for unmoderated GGMs.
+#' Currently only works for GGMs, including the between-subjects network
+#' returned in the \code{mlGVAR()} output.
+#'
+#' Outputs correlation-stability (CS) coefficients for the case-drop bootstrap.
 #'
 #' @param object \code{bootNet} object
 #' @param centrality Logical. Determines whether or not strength centrality and
 #'   expected influence should be computed for output.
+#' @param cor Numeric value to indicate the correlation stability value to be
+#'   computed.
+#' @param ci Numeric. Confidence interval level for CS coefficient.
+#' @param first Logical. Whether or not to count the first instance that a CS
+#'   statistic dips below the requisite threshold. Often times the value of this
+#'   will not affect the results. When it does, if \code{first = TRUE} then the
+#'   calculation will be more conservative.
+#' @param verbose Logical. Whether to write out the full statement of the CS
+#'   coefficient in output. Set to \code{FALSE} if you want the details about
+#'   the CS coefficient saved as attributes on the output.
 #' @param ... Additional arguments.
 #'
-#' @return A table of descriptives for bootNet objects.
+#' @return A table of descriptives for bootNet objects, or correlation-stability
+#'   coefficients for the case-drop bootstrap.
 #' @export
+#' @name bootNetDescriptives
 #'
 #' @examples
 #' \dontrun{
 #' x <- bootNet(data)
 #' summary(x)
+#'
+#' x <- bootNet(data, m = 5)
+#' summary(x, cor = .7)
 #' }
 summary.bootNet <- function(object, centrality = TRUE, ...){
+  if(isTRUE(attr(object, 'caseDrop'))){return(cscoef(object, ...))}
   inds1 <- c('edges', 'strength', 'EI')
   inds2 <- paste0('boot_', inds1)
   inds2[2:3] <- paste0(inds2[2:3], 's')
-  if('interactions' %in% names(object)){
-    cat('BLANK')
-  } else {
-    samps <- lapply(inds1, function(z) object[[z]]$sample)
+  inds <- c('pairwise', 'interactions')
+  out <- vector('list', 2)
+  for(i in 1:ifelse('interactions' %in% names(object), 2, 1)){
+    if('interactions' %in% names(object)){
+      samps <- lapply(inds1, function(z) object[[inds[i]]][[z]]$sample)
+      if(i == 2){inds2 <- setdiff(names(object$boots), c(inds2, 'boot_inds'))}
+    } else {
+      samps <- lapply(inds1, function(z) object[[z]]$sample)
+    }
     cors <- lapply(1:3, function(i){
       boots <- object$boots[[inds2[i]]]
       if(!grepl('edge', inds1[i])){boots <- t(boots)}
@@ -804,14 +756,84 @@ summary.bootNet <- function(object, centrality = TRUE, ...){
     if(any(is.na(spec))){spec[is.na(spec)] <- 0}
     if(any(is.na(prec))){prec[is.na(prec)] <- 0}
     if(any(is.na(accu))){accu[is.na(accu)] <- 0}
-    out <- cbind.data.frame(cor = cors[[1]], mae = mae[[1]], sensitivity = sens,
-                            specificity = spec, precision = prec, accuracy = accu,
-                            N = attr(object, 'n'), p = length(samps[[2]]),
-                            sparsity = sum(samps[[1]] == 0)/length(samps[[1]]),
-                            index = 1, iter = 1:ncol(boots), type = 'Pairwise',
-                            network = 'Between')
-    if(centrality){out <- cbind.data.frame(out, strength = cors[[2]], EI = cors[[3]])}
-    class(out) <- c('data.frame', 'mnetPower')
+    out[[i]] <- cbind.data.frame(cor = cors[[1]], mae = mae[[1]], sensitivity = sens,
+                                 specificity = spec, precision = prec, accuracy = accu,
+                                 N = attr(object, 'n'), p = length(samps[[2]]),
+                                 sparsity = sum(samps[[1]] == 0)/length(samps[[1]]),
+                                 index = 1, iter = 1:ncol(boots), type = capitalize(inds[i]),
+                                 network = 'Between')
+    if(centrality){out[[i]] <- cbind.data.frame(out[[i]], strength = cors[[2]], EI = cors[[3]])}
+    class(out[[i]]) <- c('data.frame', 'mnetPowerSim')
   }
+  out <- do.call(rbind, out)
   return(out)
+}
+
+#' @rdname bootNetDescriptives
+#' @export
+cscoef <- function(object, cor = .7, ci = .95, first = TRUE, verbose = TRUE){
+  stopifnot(isTRUE(attr(object, 'caseDrop')))
+  ci0 <- ci * 100
+  ci <- paste0("q", c((1 - ci)/2, 1 - (1 - ci)/2) * 100)[1]
+  lags <- any(c('temporal', 'contemporaneous') %in% names(object))
+  inds <- c('edges', switch(2 - !lags, c('strength', 'EI'), c('outStrength', 'inStrength', 'outEI', 'inEI')))
+  if(lags){
+    obj0 <- object
+    object <- object$temporal
+  }
+  if('interactions' %in% names(object)){
+    inds2 <- c('pairwise', 'interactions')
+    out <- do.call(rbind, setNames(lapply(inds2, function(z){
+      obj2 <- object[[z]]
+      setNames(sapply(inds, function(i){
+        if(grepl('^out|^in', i)){
+          ii <- tolower(gsub('^out|^in', '', i))
+          if(ii == 'ei'){ii <- 'EI'}
+          dat <- obj2[[ii]][[i]]
+          dat <- dat[order(dat$subN), ]
+        } else {
+          dat <- obj2[[i]][order(obj2[[i]]$subN), ]
+        }
+        if(!first){
+          css <- dat[dat[, ci] > cor, 'drop']
+          css <- ifelse(length(css) == 0, 0, max(css))
+        } else {
+          css <- which(!dat[, ci] > cor)
+          css <- dat[ifelse(length(css) == 0, 1, max(css) + 1), 'drop']
+        }
+        return(css)
+      }), inds)
+    }), inds2))
+  } else {
+    out <- setNames(sapply(inds, function(i){
+      if(grepl('^out|^in', i)){
+        ii <- tolower(gsub('^out|^in', '', i))
+        if(ii == 'ei'){ii <- 'EI'}
+        dat <- object[[ii]][[i]]
+        dat <- dat[order(dat$subN), ]
+      } else {
+        dat <- object[[i]][order(object[[i]]$subN), ]
+      }
+      if(!first){
+        css <- dat[dat[, ci] > cor, 'drop']
+        css <- ifelse(length(css) == 0, 0, max(css))
+      } else {
+        css <- which(!dat[, ci] > cor)
+        css <- dat[ifelse(length(css) == 0, 1, max(css) + 1), 'drop']
+      }
+      return(css)
+    }), inds)
+  }
+  if(lags){
+    call <- replace(as.list(match.call())[-1], c('object', 'verbose'),
+                    list(object = obj0$contemporaneous, verbose = FALSE))
+    out <- list(temporal = out, contemporaneous = do.call(cscoef, call))
+  }
+  if(verbose){
+    cat(paste0('CS = ', cor, '(', ci0, '%)'), '\n')
+    print(out)
+  } else {
+    attr(out, c('cor', 'ci', 'first')) <- c(cor, ci0/100, first)
+    return(out)
+  }
 }

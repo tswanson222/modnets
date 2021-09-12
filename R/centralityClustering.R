@@ -424,6 +424,7 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
 #'
 #' centPlot(x)
 #' clustPlot(x)
+#' plotCentrality(x)
 #' }
 centPlot <- function(Wmats, scale = c("z-scores", "raw", "raw0", "relative"),
                      which.net = "temporal", include = "all", labels = NULL,

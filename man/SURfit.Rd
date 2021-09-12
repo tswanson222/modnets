@@ -2,7 +2,7 @@
 % Please edit documentation in R/SURfunctions.R
 \name{SURfit}
 \alias{SURfit}
-\title{Fit SUR model with or without constraints}
+\title{Fit SUR models with or without constraints}
 \usage{
 SURfit(
   data,
@@ -21,38 +21,75 @@ SURfit(
 )
 }
 \arguments{
-\item{data}{dataset}
+\item{data}{Dataframe or matrix containing idiographic temporal data.}
 
-\item{varMods}{output of varSelect}
+\item{varMods}{Output of \code{varSelect()} or \code{modSelect()}. The latter
+must be applied to \code{resample()} results in order for it to work as
+input for this argument.}
 
-\item{mod}{character}
+\item{mod}{Character string. Only applies if output from \code{varSelect()}
+or \code{modSelect()} is used to constrain the model, and cross-validation
+\code{"CV"} was set as the criterion for model/variable selection. Options
+include \code{"min"}, which uses the lambda value that minimizes the
+objective function, or \code{"1se"} which uses the lambda value at 1
+standard error above the value that minimizes the objective function.}
 
-\item{maxiter}{numeric}
+\item{maxiter}{Numeric. The maximum number of iterations to attempt before
+stopping the function.}
 
-\item{m}{moderator}
+\item{m}{Character string or numeric value to specify the moderator (if any).}
 
-\item{type}{character}
+\item{type}{Indicates the type of model to use, either \code{"g"} for
+gaussian, or \code{"c"} for categorical (i.e., binary, at present). This
+argument should not be edited by the user, as the appropriate input will
+automatically be detected.}
 
-\item{center}{logical}
+\item{center}{Logical. Determines whether to mean-center the variables.}
 
-\item{scale}{logical}
+\item{scale}{Logical. Determines whether to standardize the variables.}
 
-\item{exogenous}{logical}
+\item{exogenous}{Logical. See \code{fitNetwork()} function for details.}
 
 \item{covs}{something}
 
-\item{sur}{logical}
+\item{sur}{Logical. Provides input to the \code{method} argument of the
+\code{systemfit()} function. If \code{TRUE}, then the \code{method} will be
+\code{"SUR"}. If \code{"FALSE"}, then the \code{method} will be
+\code{"OLS"}. These two methods only differ when constraints are applied.
+When a saturated model is fit, both methods produce the same results.}
 
-\item{consec}{something}
+\item{consec}{A logical vector that identifies which values to include in
+accordance with the \code{beepno} and \code{dayno} arguments in the
+\code{fitNetwork()} function.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-Models
+A SUR model, as fit with the \code{systemfit()} function.
 }
 \description{
-Actually not sure if this is a top-level function.
+A wrapper for the \code{systemfit()} function of the \code{systemfit} package
+that will construct formulas for all equations based on specified moderators.
+This function was NOT designed for user-level functionality, but rather
+exists to be embedded within \code{fitNetwork()}. The purpose for making it
+available to the user is for allowing the exact fitted model to be highly
+customizable.
+}
+\details{
+See the \code{systemfit} package for details on customizing \code{systemfit}
+objects. Constraints can be applied via the \code{varMods} argument, which is
+intended to facilitate the output of the \code{varSelect()} and
+\code{resample()} functions. These objects can be further edited to apply
+constraints not specified by these automated functions. Moreover, there are a
+variety of additional arguments that can be supplied to the
+\code{systemfit()} function if desired.
+
+If the variable selection results from \code{resample()} are intended to be
+used as input for the \code{varMods} argument, then these results must be fed
+into the \code{modSelect()} function.
 }
 \examples{
-1 + 1
+\dontrun{
+SURfit(data)
+}
 }

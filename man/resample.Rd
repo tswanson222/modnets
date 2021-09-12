@@ -120,6 +120,8 @@ Multiple resampling procedures for selecting variables for a final network model
 1 + 1
 }
 \seealso{
+\code{\link{plot.resample}}
+
 Other some family: 
 \code{\link{fitNetwork}()}
 }

@@ -107,5 +107,6 @@ x <- fitNetwork(data)
 
 centPlot(x)
 clustPlot(x)
+plotCentrality(x)
 }
 }

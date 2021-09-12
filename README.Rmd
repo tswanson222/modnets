@@ -1,0 +1,43 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# modnets
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of modnets is to ...
+
+## Installation
+
+You can install the released version of modnets from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("modnets")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(modnets)
+
+data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
+
+fit <- fitNetwork(data, moderators = 'depressed')
+
+plot(fit, threshold = TRUE)
+```

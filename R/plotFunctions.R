@@ -244,6 +244,7 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
     names <- 1:nrow(x$adjMat)
   }
   names <- names[1:nrow(x$adjMat)]
+  if(!is.null(lag)){warning('Argument lag is deprecated. Lagged networks are automatically detected.')}
   lag <- NULL ### FUNCTION ARGUMENT DEPRECATED
   if(is.null(lag) & "adjMats" %in% names(x)){
     stop("More than one lag modeled; need to specify which to plot")
@@ -389,6 +390,84 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
   }
 }
 
+# @describeIn plotNet For ggms!
+#' @rdname plotNet
+#' @export
+plot.ggm <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                     scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                     plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                     binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
+#' @rdname plotNet
+#' @export
+plot.SURnet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                        predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                        plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                        binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
+#' @rdname plotNet
+#' @export
+plot.mlGVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                        predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                        plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                        binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
+#' @rdname plotNet
+#' @export
+plot.lmerVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                         predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                         scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                         plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                         binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
+#' @rdname plotNet
+#' @export
+plot.mgmSim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                        predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                        scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                        plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                        binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
+#' @rdname plotNet
+#' @export
+plot.mlVARsim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                          predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                          scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                          plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                          binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
+#' @rdname plotNet
+#' @export
+plot.simMLgvar <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                           predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                           scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                           plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                           binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotNet, args)
+}
+
 #' Plot conditional networks at different levels of the moderator
 #'
 #' An easy wrapper for plotting the same network at different levels of a
@@ -483,39 +562,124 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
   }
 }
 
-#' Plot results of bootNet
+#' Plot \code{bootNet} outputs
 #'
-#' Currently only available for caseDrop
+#' Creates various types of plot to visualize \code{bootNet} objects.
 #'
-#' @param x network
-#' @param type character
-#' @param net character
-#' @param plot character
-#' @param cor numeric
-#' @param order character
-#' @param ci numeric
-#' @param pairwise logical
-#' @param interactions logical
-#' @param labels character vector
-#' @param title character
-#' @param cis character
-#' @param true logical
-#' @param errbars logical
-#' @param vline numeric or logical
-#' @param threshold numeric or logical
-#' @param difference logical
-#' @param color logical
-#' @param text logical
-#' @param textPos character
-#' @param multi logical
-#' @param directedDiag logical
+#' @param x Output from \code{bootNet()}. Also some compatiblity with
+#'   \code{resample} objects (when sampMethod != 'stability').
+#' @param type The outcome measure to plot. Options include: \code{"edges",
+#'   "strength", "ei", "outstrength", "instrength", "outei", "inei"}. The "out-"
+#'   and "in-" options are only available for temporal networks. Moreover, both
+#'   related options can be used together in temporal networks, by setting
+#'   either \code{type = c("outstrength", "instrength")} or \code{type =
+#'   c("outei", "inei")}.
+#' @param net Determines which network to plot coefficients for. Options
+#'   include: \code{"ggm", "temporal", "contemporaneous", "between"}. Only
+#'   relevant to SUR networks or \code{mlGVAR} objects.
+#' @param plot Primary use is to set as \code{"none"} or \code{FALSE} in order
+#'   to return a table containing the constituents of the plot rather than
+#'   create the plot itself. The options \code{"all"} and \code{"both"} each
+#'   essentially indicate that both pairwise and interaction terms are plotted.
+#'   Can also specify \code{"pairwise"} to only plot the pairwise terms, or
+#'   \code{"interactions"} to only plot the interaction terms.
+#' @param cor Numeric value to indicate the correlation stability value to be
+#'   plotted. Only applies to the case-drop bootstrapping output.
+#' @param order Determines how to arrange the predictors displayed in the plot.
+#'   If \code{TRUE}, then defaults to \code{"mean"}. If \code{FALSE} then
+#'   defaults to \code{"id"}. The \code{"mean"} option will arrange the values
+#'   by the bootstrapped sample means. The \code{"sample"} option will arrange
+#'   the values according to the statistics from the model fitted to the full
+#'   sample. The \code{"id"} option will keep the variables in the same order
+#'   that they appear in the dataframe. Not relevant to the case-drop bootstrap.
+#' @param ci Numeric value between 0 and 1 to specify the confidence level.
+#' @param pairwise Logical. Whether to plot pairwise relationships. Defaults to
+#'   \code{TRUE}. If \code{FALSE}, this will override the \code{"all"} option of
+#'   the \code{plot} argument.
+#' @param interactions Logical. Whether to plot interactions. Defaults to
+#'   \code{TRUE}. If \code{FALSE}, this will override the \code{"all"} option of
+#'   the \code{plot} argument. Only relevant to moderated networks.
+#' @param labels Logical. Determines whether to plot names of the predictors.
+#' @param title Character vector the title label.
+#' @param cis Either \code{"quantile"} or \code{"se"}. If \code{"quantile"},
+#'   then confidence bands will be computed based on quantiles (specified by the
+#'   \code{ci} argument) of the bootstrapped resamples. If \code{"se"}, then the
+#'   confidence bands will be computed based on the standard errors associated
+#'   with the sample statistics. Thus, the \code{"se"} argument will always
+#'   produce a symmetric confidence band, whereas for \code{"quantile"} argument
+#'   this is not necessary. Not relevant to outputs for the case-drop bootstrap.
+#' @param true Defaults to \code{NULL}, not relevant for the case-drop
+#'   bootstrap. Can supply another output from \code{fitNetwork()}, or an
+#'   adjacency matrix, to serve as the true network in the plot. If there are
+#'   interactions in the model, then a \code{fitNetwork()} object is
+#'   recommended. Alternatively, this argument can be extremely useful for
+#'   simulated data -- especially anything created with \code{simNet()}. For
+#'   whatever outcome (e.g., \code{edges, strength, EI}) is plotted, supplying
+#'   another object to \code{true} will plot the values related to the true
+#'   network, i.e., the data-generating model.
+#' @param errbars Logical. Not relevant to the case-drop bootstrap. If
+#'   \code{TRUE}, then error bars are used rather than confidence bands. Can be
+#'   useful to home in on specific variables and see their confidence interval.
+#' @param vline Logical or numeric. Not relevant to the case-drop bootstrap. If
+#'   \code{TRUE}, then a dashed vertical line will be plotted at 0. If numeric,
+#'   then the line will be plotted at the supplied intercept on the x-axis.
+#' @param threshold Numeric or logical. Not relevant to the case-drop bootstrap.
+#'   Has a significant effect on the bootstrapped coefficient distributions. If
+#'   \code{TRUE}, then the default p-value threshold is set to .05. A numeric
+#'   value can specify a different threshold. Causes the \code{bootNet()}
+#'   function to run the object again, only to re-compute the bootstrapped
+#'   distributions after applying a p-value threshold to the results of each
+#'   model iteration. If \code{NULL}, all coefficient estimates are used in
+#'   estimating the posterior distribution of each parameter.
+#' @param difference Logical. Not relevant to the case-drop bootstrap. If
+#'   \code{TRUE}, then a difference plot is provided rather than a coefficient
+#'   plot. In the difference plot, the diagonal squares reflect the fitted
+#'   network coefficients for the the original sample. Black boxes indicate that
+#'   the difference between the two edges, coefficients, or centrality values
+#'   being compared is significantly different from 0. The significance level
+#'   will have already been determined by the parameters used to fit the
+#'   \code{bootNet} object. Gray boxes indicate the difference is not
+#'   significantly different from 0.
+#' @param color Logical. Only applies when \code{difference = TRUE}. Determines
+#'   whether to add colors that reflect the sign of the sample values. Reflected
+#'   in the diagonal of the difference plot.
+#' @param text Logical. For difference plots, if \code{TRUE} then the statistics
+#'   based on the full sample will be labeled in the diagonal boxes. For
+#'   coefficient plots, setting this to \code{TRUE} will plot a label for each
+#'   variable to reflect the proportion of times that it was selected across all
+#'   bootstrapped iterations. Only relevant if a threshold was set for the
+#'   fitted bootstrap models, either specified in the current function or was
+#'   specified in creating the \code{bootNet} object. If a numeric value is
+#'   provided, this will determine the size of the text label. Defaults to 1.2
+#'   when \code{text = TRUE}.
+#' @param textPos Supports the \code{text} argument for coefficient plots.
+#'   Indicates the x-axis position of where to plot the coefficient labels.
+#'   Generally will be numeric, but defaults to \code{"value"}, which means that
+#'   the text will be labeled on top each point on the plot.
+#' @param multi Useful when there are interactions in a model. If \code{TRUE},
+#'   the single plot with a facet for both pairwise and interaction terms is
+#'   split into two separate plots. Allows for a more elegant side-by-side plot,
+#'   and allows arguments that are restricted for plots of either pairwise or
+#'   interactions (such as \code{text}) are plotted. This argument will
+#'   eventually be expanded to allow one to plot combinations of edge and
+#'   centrality plots.
+#' @param directedDiag See corresponding argument in the \code{bootNet()}.
+#'   function.
 #' @param ... Additional arguments.
 #'
-#' @return A plot
+#' @return A coefficient plot, difference plot, or correlation-stability plot.
+#'   When \code{plot %in% c('none', FALSE)}, the table used to construct the
+#'   relevant plot will be returned as output instead.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- bootNet(data)
+#'
+#' plot(x)
+#'
+#' plot(x, difference = TRUE)
+#' }
 plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7,
                      order = 'mean', ci = .95, pairwise = TRUE, interactions = TRUE,
                      labels = NULL, title = NULL, cis = 'quantile', true = NULL,
@@ -534,7 +698,8 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
     return(gridExtra::grid.arrange(legend, gridExtra::arrangeGrob(
       p1 + theme(legend.position = 'none'),
       p2 + theme(legend.position = 'none'), nrow = 1),
-      nrow = 2, heights = c(1, 10)))
+      nrow = 2, heights = c(1, 10))
+    )
   }
   args <- tryCatch({list(...)}, error = function(e){list()})
   fit0 <- switch(2 - ('fit0' %in% names(x)), x$fit0, list())
@@ -544,14 +709,14 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
       fit0 <- switch(2 - ('fit0' %in% names(args)), args$fit0, TRUE)
     }
     x <- do.call(bootNet, append(list(data = x, fit0 = fit0, directedDiag = directedDiag),
-                                   replace(args, 'fit0', NULL)))
+                                 replace(args, 'fit0', NULL)))
   }
   if(!identical(threshold, FALSE) & 'bootFits' %in% names(x)){
     dat <- paste0('x$fit0$', ifelse('temporal' %in% names(x), 'SURnet$data', 'data'))
     if(isTRUE(attr(x$bootFits, 'resample'))){attributes(x$bootFits)$resample <- NULL}
     x <- bootNet(data = eval(parse(text = dat)), fits = x$bootFits,
-                   threshold = threshold, fit0 = x$fit0,
-                   directedDiag = directedDiag)
+                 threshold = threshold, fit0 = x$fit0,
+                 directedDiag = directedDiag)
   }
   runonce <- TRUE
   plots <- c('none', 'pairwise', 'interactions', 'all', 'both')
@@ -711,7 +876,8 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
     dat$id1 <- factor(dat$id1, levels = dat0[[id0]][order(dat0[[order]])])
     dat$id2 <- factor(dat$id2, levels = dat0[[id0]][order(dat0[[order]])])
     dat$type <- factor(paste0(ifelse(pp == 'pairwise', 'Pairwise (', 'Interactions ('), capitalize(type), ')'))
-    if(color & type == 'edges'){
+    if(color & type %in% c('edges', 'pairwise', 'interactions')){
+      # Adding threshold = TRUE has some issues when type = 'interactions'
       if(net == 'ggm'){net <- 'temporal'}
       nn <- switch(2 - pairwise, net(fit0, n = net), netInts(fit0))
       if(lags2 & !pairwise){nn <- t(nn)}
@@ -860,11 +1026,12 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
     p <- p + guides(colour = guide_legend(title = title), fill = 'none') + theme(legend.position = "top")
     p <- p + scale_size_manual(values = scaleSize) + scale_alpha_manual(values = scaleAlpha)
     p <- p + scale_color_manual('', values = legCols, labels = legLabs)
-    if(!labels){p <- p + theme(axis.text.y = element_blank())}
+    if(!isTRUE(labels)){p <- p + theme(axis.text.y = element_blank())}
     if(!identical(vline, FALSE)){
       p <- p + geom_hline(yintercept = ifelse(!is.numeric(vline), 0, vline), linetype = 2, alpha = .35)
     }
     if(!identical(text, FALSE) & type == 'edges'){
+      # Would be cool to make a warning if no thresholds are used
       if(isTRUE(text)){text <- 1.2}
       rnames <- rownames(boots)
       dat2$prop0 <- rep(NA, nrow(dat2))
@@ -877,6 +1044,18 @@ plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7
     }
   }
   if(pp != FALSE){return(p)} else {return(dat2)}
+}
+
+#' @rdname plotBoot
+#' @export
+plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7,
+                         order = 'mean', ci = .95, pairwise = TRUE, interactions = TRUE,
+                         labels = NULL, title = NULL, cis = 'quantile', true = NULL,
+                         errbars = FALSE, vline = FALSE, threshold = FALSE,
+                         difference = FALSE, color = FALSE, text = FALSE,
+                         textPos = 'value', multi = NULL, directedDiag = FALSE, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotBoot, args)
 }
 
 #' Plot the ECDF of p-values from resampling
@@ -1520,6 +1699,14 @@ plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
   }
   if(!is.null(title)){g <- g + ggplot2::ggtitle(title)}
   return(g)
+}
+
+#' @rdname plotPower
+#' @export
+plot.mnetPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
+                           xlab = 'Number of cases', title = NULL, ...){
+  args <- as.list(match.call())[-1]
+  do.call(plotPower, args)
 }
 
 #' Plot temporal and contemporaneous networks in the same window

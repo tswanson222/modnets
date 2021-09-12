@@ -1,26 +1,62 @@
-#' Fit SUR model with or without constraints
+#' Fit SUR models with or without constraints
 #'
-#' Actually not sure if this is a top-level function.
+#' A wrapper for the \code{systemfit()} function of the \code{systemfit} package
+#' that will construct formulas for all equations based on specified moderators.
+#' This function was NOT designed for user-level functionality, but rather
+#' exists to be embedded within \code{fitNetwork()}. The purpose for making it
+#' available to the user is for allowing the exact fitted model to be highly
+#' customizable.
 #'
-#' @param data dataset
-#' @param varMods output of varSelect
-#' @param mod character
-#' @param maxiter numeric
-#' @param m moderator
-#' @param type character
-#' @param center logical
-#' @param scale logical
-#' @param exogenous logical
+#' See the \code{systemfit} package for details on customizing \code{systemfit}
+#' objects. Constraints can be applied via the \code{varMods} argument, which is
+#' intended to facilitate the output of the \code{varSelect()} and
+#' \code{resample()} functions. These objects can be further edited to apply
+#' constraints not specified by these automated functions. Moreover, there are a
+#' variety of additional arguments that can be supplied to the
+#' \code{systemfit()} function if desired.
+#'
+#' If the variable selection results from \code{resample()} are intended to be
+#' used as input for the \code{varMods} argument, then these results must be fed
+#' into the \code{modSelect()} function.
+#'
+#' @param data Dataframe or matrix containing idiographic temporal data.
+#' @param varMods Output of \code{varSelect()} or \code{modSelect()}. The latter
+#'   must be applied to \code{resample()} results in order for it to work as
+#'   input for this argument.
+#' @param mod Character string. Only applies if output from \code{varSelect()}
+#'   or \code{modSelect()} is used to constrain the model, and cross-validation
+#'   \code{"CV"} was set as the criterion for model/variable selection. Options
+#'   include \code{"min"}, which uses the lambda value that minimizes the
+#'   objective function, or \code{"1se"} which uses the lambda value at 1
+#'   standard error above the value that minimizes the objective function.
+#' @param maxiter Numeric. The maximum number of iterations to attempt before
+#'   stopping the function.
+#' @param m Character string or numeric value to specify the moderator (if any).
+#' @param type Indicates the type of model to use, either \code{"g"} for
+#'   gaussian, or \code{"c"} for categorical (i.e., binary, at present). This
+#'   argument should not be edited by the user, as the appropriate input will
+#'   automatically be detected.
+#' @param center Logical. Determines whether to mean-center the variables.
+#' @param scale Logical. Determines whether to standardize the variables.
+#' @param exogenous Logical. See \code{fitNetwork()} function for details.
 #' @param covs something
-#' @param sur logical
-#' @param consec something
+#' @param sur Logical. Provides input to the \code{method} argument of the
+#'   \code{systemfit()} function. If \code{TRUE}, then the \code{method} will be
+#'   \code{"SUR"}. If \code{"FALSE"}, then the \code{method} will be
+#'   \code{"OLS"}. These two methods only differ when constraints are applied.
+#'   When a saturated model is fit, both methods produce the same results.
+#' @param consec A logical vector that identifies which values to include in
+#'   accordance with the \code{beepno} and \code{dayno} arguments in the
+#'   \code{fitNetwork()} function.
 #' @param ... Additional arguments.
 #'
-#' @return Models
+#' @return A SUR model, as fit with the \code{systemfit()} function.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' SURfit(data)
+#' }
 SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL,
                    type = "g", center = TRUE, scale = FALSE, exogenous = TRUE,
                    covs = NULL, sur = TRUE, consec = NULL, ...){
@@ -42,326 +78,42 @@ SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL,
   fit
 }
 
-#' Log-likelihood of SUR model with LRT to compare models
-#'
-#' Similar to modLL
-#'
-#' @param net0 network
-#' @param net1 network
-#' @param nodes logical
-#' @param lrt logical
-#' @param all logical
-#' @param d numeric
-#' @param alpha numeric
-#' @param s character
-#' @param orderBy character
-#' @param decreasing logical
-#' @param sysfits logical
-#'
-#' @return Results about SUR network
-#' @export
-#'
-#' @examples
-#' 1 + 1
-SURll <- function(net0, net1 = NULL, nodes = FALSE, lrt = NULL, all = FALSE,
-                  d = 4, alpha = .05, s = "res", orderBy = NULL,
-                  decreasing = TRUE, sysfits = FALSE){
-  sll <- function(fit, s = "res"){
-    if("SURfit" %in% names(fit)){fit <- fit$SURfit}
-    s <- match.arg(tolower(s), choices = c("res", "dfres", "sigma"))
-    resid <- residuals(fit)
-    residCov <- getCoefs(fit = fit, mat = s)
-    residCovInv <- solve(residCov)
-    resid <- as.matrix(resid)
-    nEq <- ncol(resid)
-    ll <- 0
-    for(i in 1:nrow(resid)){
-      ll <- ll - (nEq/2) * log(2 * pi) - .5 * log(det(residCov)) - .5 * resid[i, , drop = FALSE] %*% residCovInv %*% t(resid[i, , drop = FALSE])
-    }
-    df <- fit$rank + (nEq * (nEq + 1))/2
-    out <- c(LL = as.numeric(ll), df = df)
-    out
-  }
-  uni_sll <- function(fit){
-    if("SURnet" %in% names(fit)){fit <- append(fit$SURnet, list(fitobj = fit$SURfit$eq))}
-    getInd <- function(ind, x){
-      ind <- c("deviance", "LL_model", "df.residual", "AIC", "BIC")[ind]
-      X <- ifelse(ind == "df.residual", list(x$fitobj), list(x$mods))[[1]]
-      return(unname(sapply(X, '[[', ind)))
-    }
-    out <- do.call(cbind.data.frame, lapply(1:5, getInd, x = fit))
-    colnames(out) <- c("RSS", "LL", "df", "AIC", "BIC")
-    rownames(out) <- names(fit$mods)
-    out
-  }
-  omni_sll <- function(fit, s = "res"){
-    k <- length(fit$SURnet$mods)
-    n <- nrow(fit$SURnet$data$X) * k
-    ll <- sll(fit = fit, s = s)
-    aic <- (2 * ll[2]) - (2 * ll[1])
-    bic <- (ll[2] * log(n)) - (2 * ll[1])
-    out <- c(ll, AIC = unname(aic), BIC = unname(bic))
-    out
-  }
-  sur_lrt <- function(object, d = 4, alpha = .05, N = NULL){
-    if(is.list(object)){
-      if(length(object) > 2){object <- object[1:2]}
-      nn <- names(object)
-      ll0 <- object[[1]]$LL; df0 <- object[[1]]$df
-      ll1 <- object[[2]]$LL; df1 <- object[[2]]$df
-      omnibus <- FALSE
-    } else {
-      if(nrow(object) > 2){object <- object[1:2, ]}
-      nn <- rownames(object)
-      ll0 <- object[1, 1]; df0 <- object[1, 2]
-      ll1 <- object[2, 1]; df1 <- object[2, 2]
-      omnibus <- TRUE
-    }
-    lldiff <- abs(ll0 - ll1) * 2
-    dfdiff <- abs(df0 - df1)
-    ps <- pchisq(q = lldiff, df = dfdiff, lower.tail = FALSE)
-    decision <- c()
-    for(i in seq_along(ps)){
-      if(ps[i] <= alpha){
-        decision[i] <- ifelse(ll0[i] > ll1[i], nn[1], nn[2])
-      } else if(ps[i] == 1){
-        decision[i] <- "- "
-      } else if(ps[i] > alpha){
-        if(omnibus){
-          decision[i] <- ifelse(df0 < df1, nn[1], nn[2])
-        } else {
-          decision[i] <- ifelse(df0[i] > df1[i], nn[1], nn[2])
-        }
-      }
-    }
-    if(!omnibus){
-      if(!is.null(d)){ps <- round(ps, d)}
-      out <- data.frame(LL_diff2 = lldiff, Df_diff = dfdiff, pval = ps, decision = decision)
-      rownames(out) <- rownames(object[[1]])
-    } else {
-      RMSEA <- function(X2, df, N){
-        rmsea <- sqrt(max(c(((X2/N)/df) - (1/N), 0)))
-        lower.l <- function(lambda){(pchisq(q = X2, df = df, ncp = lambda) - .95)}
-        lambda.l <- tryCatch({uniroot(f = lower.l, lower = 0, upper = X2)$root}, error = function(e){0})
-        rmsea.lower <- sqrt(lambda.l/(N * df))
-        upper.l <- function(lambda){(pchisq(q = X2, df = df, ncp = lambda) - .05)}
-        lambda.u <- tryCatch({uniroot(f = upper.l, lower = 0, upper = max(N, X2 * 4))$root}, error = function(e){1})
-        rmsea.upper <- sqrt(lambda.u/(N * df))
-        rmsea.pvalue <- 1 - pchisq(q = X2, df = df, ncp = (N * df * (.05^2)))
-        return(c(lower = rmsea.lower, RMSEA = rmsea, upper = rmsea.upper, p.value = rmsea.pvalue))
-      }
-      rmsea <- RMSEA(lldiff, dfdiff, N)
-      if(!is.null(d)){
-        ps <- round(ps, d)
-        lldiff <- round(lldiff, d)
-        rmsea <- round(rmsea, d)
-      }
-      if(object[2, 2] < object[1, 2]){object <- object[order(object[, 2]), ]}
-      out0 <- data.frame(LL_diff2 = c("", lldiff), Df_diff = c("", dfdiff),
-                         pval = c("", ps), decision = c("", decision))
-      out <- data.frame(object[, 1:2], out0, object[, 3:4])
-      attr(out, "RMSEA") <- rmsea
-    }
-    return(out)
-  }
-  nn <- paste0("net", 0:1)
-  if(length(net0) == 2 & ifelse(
-    is.null(net1), TRUE, ifelse(is.logical(net1), net1, FALSE))){
-    if(isTRUE(net1)){nodes <- net1}
-    nn <- ifelse(!is.null(names(net0)), list(names(net0)), list(nn))[[1]]
-    net1 <- net0[[2]]; net0 <- net0[[1]]
-  }
-  if(isTRUE(attr(net0, "mlGVAR"))){net0 <- net0$fixedNets}
-  if("SURnet" %in% names(net0)){
-    yLL <- isTRUE('SURll' %in% names(net0))
-    omni0 <- switch(2 - yLL, net0$SURll$omnibus, omni_sll(fit = net0, s = s))
-    uni0 <- switch(2 - yLL, net0$SURll$nodes, uni_sll(fit = net0))
-    if(is.logical(net1)){nodes <- net1; net1 <- NULL}
-    if(!is.null(net1)){
-      if(isTRUE(attr(net1, "mlGVAR"))){net1 <- net1$fixedNets}
-      if(is.null(lrt)){lrt <- TRUE}
-      yLL <- isTRUE('SURll' %in% names(net1))
-      omni1 <- switch(2 - yLL, net1$SURll$omnibus, omni_sll(fit = net1, s = s))
-      uni1 <- switch(2 - yLL, net1$SURll$nodes, uni_sll(fit = net1))
-      omni0 <- rbind(omni0, omni1)
-      uni0 <- list(uni0, uni1)
-      rownames(omni0) <- names(uni0) <- nn
-    }
-  } else {
-    if(all(sapply(net0, function(z) isTRUE(attr(z, "mlGVAR"))))){
-      net0 <- lapply(net0, '[[', "fixedNets")
-    }
-    stopifnot(all(sapply(net0, function(z) "SURnet" %in% names(z))))
-    yLL <- all(sapply(net0, function(z) 'SURll' %in% names(z)))
-    if(is.null(lrt)){lrt <- FALSE}
-    if(is.logical(net1) & !sysfits){nodes <- net1}
-    omni0 <- t(switch(2 - yLL, sapply(lapply(net0, '[[', 'SURll'), '[[', 'omnibus'), sapply(net0, omni_sll)))
-    if(!is.null(orderBy)){
-      orderBy <- switch(match.arg(tolower(as.character(
-        orderBy)), c("true", "ll", "loglik", "aic", "bic", "df", "rank")),
-        ll =, loglik = logLik, aic = AIC, bic = BIC, TRUE)
-      if(is.function(orderBy)){
-        orderBy <- c('LL', 'AIC', 'BIC')[which(sapply(
-          list(logLik, AIC, BIC), function(z) identical(z, orderBy)))]
-      }
-      net0 <- net0[order(sapply(net0, function(z){
-        if(isTRUE(orderBy)){
-          return(sum(sapply(lapply(z$SURnet$mods, '[[', 'model'), nrow)))
-        } else {
-          return(omni0[, orderBy])
-        }
-      }), decreasing = decreasing)]
-    }
-    nn <- ifelse(!is.null(names(net0)), list(names(net0)),
-                 list(paste0("net", 0:(length(net0) - 1))))[[1]]
-    uni0 <- switch(2 - yLL, lapply(lapply(net0, '[[', 'SURll'), '[[', 'nodes'),
-                   lapply(net0, uni_sll))
-    rownames(omni0) <- names(uni0) <- nn
-    sysgo <- all(sapply(net0, function(z) 'SURfit' %in% names(z)))
-    if(sysfits & sysgo){
-      net00 <- lapply(lapply(net0, '[[', "SURfit"), summary)
-      ssr <- colSums(sapply(uni0, '[[', "RSS"))
-      detrc <- sapply(net00, '[[', "detResidCov")
-      olsr2 <- sapply(net00, '[[', "ols.r.squared")
-      mcelroy <- sapply(net00, '[[', "mcelroy.r.squared")
-      omni0 <- cbind(omni0, SSR = ssr, detSigma = detrc,
-                     OLS.R2 = olsr2, McElroy.R2 = mcelroy)
-      if(!is.null(d)){omni0 <- round(omni0, d)}
-      return(omni0)
-    }
-  }
-  out <- ifelse(all, list(list(nodes = uni0, omnibus = omni0)),
-                ifelse(nodes, list(uni0), list(omni0)))[[1]]
-  if(ifelse(!is.null(net1), lrt, FALSE)){
-    lrt0 <- sur_lrt(object = omni0, d = d, alpha = alpha,
-                    N = prod(dim(net1$SURnet$data$Y)))
-    lrt1 <- sur_lrt(object = uni0, d = d, alpha = alpha)
-    out <- list(nodes = uni0, LRT = lrt1, omnibus = lrt0)
-    if(!all){out <- ifelse(nodes, list(lrt1), list(lrt0))[[1]]}
-  }
-  return(out)
-}
-
-##### SURtable: obtain all possible LRTs (with RMSEAs) comparing a list of models
-#' Obtain all possible LRTs comparing a list of SUR models
-#'
-#' Includes RMSEAs
-#'
-#' @param fits list of networks
-#' @param nodes logical
-#' @param orderBy logical or character?
-#' @param d numeric
-#' @param alpha numeric
-#' @param decreasing logical
-#' @param names logical or character?
-#' @param rmsea logical
-#' @param s character
-#'
-#' @return Table of LRTs
-#' @export
-#'
-#' @examples
-#' 1 + 1
-SURtable <- function(fits, nodes = FALSE, orderBy = TRUE, d = 4, alpha = .05,
-                     decreasing = TRUE, names = NULL, rmsea = FALSE, s = "res"){
-  n <- length(fits)
-  stopifnot(is.list(fits) & n > 2)
-  if(!is.null(names)){names(fits) <- names}
-  if(is.null(names(fits))){names(fits) <- paste0("fit", 1:n)}
-  if(all(sapply(fits, function(z) isTRUE(attr(z, "mlGVAR"))))){
-    fits <- lapply(fits, '[[', "fixedNets")
-  }
-  stopifnot(all(sapply(fits, function(z) "SURnet" %in% names(z))))
-  if(!is.null(orderBy)){
-    oms <- SURll(fits)
-    orderBy <- switch(match.arg(tolower(as.character(
-      orderBy)), c("true", "ll", "loglik", "aic", "bic", "df", "rank")),
-      ll =, loglik = logLik, aic = AIC, bic = BIC, TRUE)
-    if(is.function(orderBy)){
-      orderBy <- c('LL', 'AIC', 'BIC')[which(sapply(
-        list(logLik, AIC, BIC), function(z) identical(z, orderBy)))]
-    }
-    fits <- fits[order(sapply(fits, function(z){
-      if(isTRUE(orderBy)){
-        return(sum(sapply(lapply(z$SURnet$mods, '[[', 'model'), nrow)))
-      } else {
-        return(oms[, orderBy])
-      }
-    }), decreasing = decreasing)]
-  }
-  tt <- combn(n, 2)
-  lls0 <- SURll(fits, s = s)
-  lrts0 <- lapply(seq_len(ncol(tt)), function(i){
-    SURll(fits[tt[, i]], d = d, alpha = alpha, s = s)})
-  out1 <- t(sapply(lrts0, rownames))
-  out2 <- t(sapply(lrts0, function(z) as.numeric(z[2, 3:5])))
-  out3 <- sapply(lrts0, function(z) z[2, 6])
-  out4 <- cbind.data.frame(out1, out2, out3)
-  colnames(out4) <- c("net0", "net1", "Chisq", "Df", "pval", "decision")
-  rmsea0 <- data.frame(out4[, 1:2], do.call(rbind, lapply(lrts0, attr, "RMSEA")))
-  select <- table(out4$decision)
-  if(any(names(select) == "- ")){select <- select[names(select) != "- "]}
-  lls0 <- cbind(lls0, LRT = numeric(nrow(lls0)))
-  lls0[match(names(select), rownames(lls0)), "LRT"] <- unname(select)
-  out <- list(LRT = out4, omnibus = lls0, RMSEA = rmsea0)
-  if(!rmsea){out$RMSEA <- NULL}
-  if(nodes != FALSE){
-    lls1 <- SURll(fits, nodes = TRUE, s = s)
-    stopifnot(length(unique(lapply(lls1, rownames))) == 1)
-    nodenames <- unique(lapply(lls1, rownames))[[1]]
-    lls2 <- lapply(nodenames, function(fit){
-      nodemod <- matrix(unlist(sapply(lls1, function(node){
-        node[fit, -1]})), nrow = length(lls1), ncol = 4, byrow = TRUE)
-      dimnames(nodemod) <- list(names(fits), c("LL", "df", "AIC", "BIC"))
-      return(nodemod)
-    })
-    names(lls2) <- nodenames
-    lrts1 <- lapply(seq_len(ncol(tt)), function(i){
-      SURll(fits[tt[, i]], nodes = TRUE, d = d, alpha = alpha, s = s)})
-    netLRTs <- lapply(colnames(lrts1[[1]]), function(nn){
-      n1 <- data.frame(out4[, 1:2], "|", do.call(rbind, lapply(lrts1, '[[', nn)))
-      colnames(n1)[-c(1:2)] <- c("|", nodenames)
-      return(n1)
-    })
-    names(netLRTs) <- colnames(lrts1[[1]])
-    deci <- netLRTs$decision[, -c(1:3)]
-    deci2 <- do.call(cbind.data.frame, lapply(1:ncol(deci), function(z){
-      z <- table(deci[, z])
-      if(any(names(z) == "- ")){z <- z[names(z) != "- "]}
-      zz <- setNames(numeric(length(fits)), names(fits))
-      zz[match(names(z), names(zz))] <- unname(z)
-      return(zz)
-    }))
-    colnames(deci2) <- colnames(deci)
-    out <- list(nodes = lls2, LRT = netLRTs, counts = deci2)
-    if(is.character(nodes)){
-      out$decision <- netLRTs$decision
-      out$LRT <- NULL
-    }
-  }
-  attr(out, "alpha") <- alpha
-  return(out)
-}
-
-##### SURnet: create temporal and contemporaneous network of SUR results
 #' Creates temporal and contemporaneous network of SUR results
 #'
-#' Used after something
+#' A method for converting outputs from the \code{systemfit()} function of the
+#' \code{systemfit} package into temporal and contemporaneous networks. Intended
+#' as an internal function of \code{fitNetwork()}. Not intended for use by the
+#' user. The only purpose of making it available is to allow for extreme
+#' customization, and the capacity to convert any \code{systemfit()} output into
+#' a pair of network models compatible with the \code{modnets} package.
 #'
-#' @param fit network
-#' @param dat data
-#' @param s character
-#' @param m numeric
-#' @param threshold logical
-#' @param mval numeric
-#' @param medges numeric
-#' @param pcor character
+#' @param fit Output from \code{SURfit()}
+#' @param dat A list containing elements \code{"Y"} and \code{"X"} elements, to
+#'   reflect the outcome and predictor matrices. These are lagged data matrices,
+#'   and can be automatically created through the internal
+#'   \code{modnets:::lagMat()} function. These transformed matrices must be
+#'   supplied in conjunction with the \code{SURfit()} output in order to
+#'   construct network models.
+#' @param s Character string indicating which type of residual covariance matrix
+#'   to compute for SUR models. Options include \code{"res", "dfres", "sigma"}.
+#'   \code{"sigma"} uses the residual covariance matrix as computed by the
+#'   \code{systemfits} package. \code{"res"} and \code{"dfres"} compute the
+#'   matrix based directly on the residual values. \code{"dfres"} is the sample
+#'   estimator that uses \code{N - 1} in the denominator, while \code{"res"}
+#'   just uses \code{N}.
+#' @param m Character string or numeric value to specify the moderator (if any).
+#' @param threshold See corresponding argument of \code{fitNetwork()}
+#' @param mval Numeric. See corresponding argument of \code{fitNetwork()}
+#' @param medges Numeric. See corresponding argument of \code{fitNetwork()}
+#' @param pcor See corresponding argument of \code{fitNetwork()}
 #'
 #' @return Temporal and contemporaneous networks
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' SURnet(fit, dat)
+#' }
 SURnet <- function(fit, dat, s = "sigma", m = NULL, threshold = FALSE,
                    mval = NULL, medges = 1, pcor = "none"){
   y <- dat$Y
