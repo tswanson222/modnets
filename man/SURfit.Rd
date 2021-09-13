@@ -93,3 +93,8 @@ into the \code{modSelect()} function.
 SURfit(data)
 }
 }
+\seealso{
+Other SUR functions: 
+\code{\link{SURnet}()}
+}
+\concept{SUR functions}

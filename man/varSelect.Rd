@@ -2,7 +2,7 @@
 % Please edit documentation in R/varSelect.R
 \name{varSelect}
 \alias{varSelect}
-\title{Variable selection applied to network edges}
+\title{Variable selection for moderated networks}
 \usage{
 varSelect(
   data,
@@ -26,48 +26,110 @@ varSelect(
 )
 }
 \arguments{
-\item{data}{data.frame}
+\item{data}{\code{n x k} dataframe or matrix.}
 
-\item{m}{numeric}
+\item{m}{Character vector or numeric vector indicating the moderator(s), if
+any. Can also specify \code{"all"} to make every variable serve as a
+moderator, or \code{0} to indicate that there are no moderators. If the
+length of \code{m} is \code{k - 1} or longer, then it will not be possible
+to have the moderators as exogenous variables. Thus, \code{exogenous} will
+automatically become \code{FALSE}.}
 
-\item{criterion}{character}
+\item{criterion}{The criterion for the variable selection procedure. Options
+include: \code{"cv", "aic", "bic", "ebic", "cp", "rss", "adjr2", "rsq",
+  "r2"}. \code{"CV"} refers to cross-validation, the information criteria are
+\code{"AIC", "BIC", "EBIC"}, and \code{"Cp"}, which refers to Mallow's Cp.
+\code{"RSS"} is the residual sum of squares, \code{"adjR2"} is adjusted
+R-squared, and \code{"Rsq"} or \code{"R2"} is R-squared. Capitalization is
+ignored. For methods based on the LASSO, only \code{"CV", "AIC", "BIC",
+  "EBIC"} are available. For methods based on subset selection, only
+\code{"Cp", "BIC", "RSS", "adjR2", "R2"} are available.}
 
-\item{method}{character}
+\item{method}{Character string to indicate which method to use for variable
+selection. Options include \code{"lasso"} and \code{"glmnet"}, both of
+which use the LASSO via the \code{glmnet} package. \code{"subset",
+  "backward", "forward", "seqrep"}, all call different types of subset
+selection using the \code{regsubsets()} function of the \code{leaps}
+package. Finally \code{"glinternet"} is used for applying the hierarchical
+lasso, and is the only method available for moderated network estimation.
+If one or more moderators are specified, then \code{method} will
+automatically default to \code{"glinternet"}.}
 
-\item{lags}{numeric or logical}
+\item{lags}{Numeric or logical. Can only be 0, 1 or \code{TRUE} or
+\code{FALSE}. \code{NULL} is interpreted as \code{FALSE}. Indicates whether
+to fit a time-lagged network or a GGM.}
 
-\item{exogenous}{logical}
+\item{exogenous}{Logical. Indicates whether moderator variables should be
+treated as exogenous or not. If they are exogenous, they will not be
+modeled as outcomes/nodes in the network. If the number of moderators
+reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
+be \code{FALSE}.}
 
-\item{type}{character}
+\item{type}{Determines whether to use gaussian models \code{"g"} or binomial
+models \code{"c"}. Can also just use \code{"gaussian"} or
+\code{"binomial"}. Moreover, a vector of length \code{k} can be provided
+such that a value is given to every variable. Ultimately this is not
+necessary, though, as such values are automatically detected.}
 
-\item{center}{logical}
+\item{center}{Logical. Determines whether to mean-center the variables.}
 
-\item{scale}{logical}
+\item{scale}{Logical. Determines whether to standardize the variables.}
 
-\item{gamma}{numeric}
+\item{gamma}{Numeric value of the hyperparameter for the \code{"EBIC"}
+criterion. Only relevant if \code{criterion = "EBIC"}. Recommended to use a
+value between 0 and .5, where larger values impose a larger penalty on the
+criterion.}
 
-\item{nfolds}{numeric}
+\item{nfolds}{Only relevant if \code{criterion = "CV"}. Determines the number
+of folds to use in cross-validation.}
 
-\item{varSeed}{numeric}
+\item{varSeed}{Numeric value providing a seed to be set at the beginning of
+the selection procedure. Recommended for reproducible results.}
 
-\item{useSE}{logical}
+\item{useSE}{Logical. Only relevant if \code{method = "glinternet"} and
+\code{criterion = "CV"}. Indicates whether to use the standard error of the
+estimates across folds, if \code{TRUE}, or to use the standard deviation,
+if \code{FALSE}.}
 
-\item{nlam}{numeric}
+\item{nlam}{if \code{method = "glinternet"}, determines the number of lambda
+values to evaluate in the selection path.}
 
-\item{covs}{logical?}
+\item{covs}{Numeric or character string indicating a variable to be used as a
+covariate. Currently not working properly.}
 
-\item{verbose}{logical}
+\item{verbose}{Logical. Determines whether to provide output to the console
+about the status of the procedure.}
 
-\item{beepno}{something}
+\item{beepno}{Character string or numeric value to indicate which variable
+(if any) encodes the survey number within a single day. Must be used in
+conjunction with \code{dayno} argument.}
 
-\item{dayno}{something}
+\item{dayno}{Character string or numeric value to indiciate which variable
+(if any) encodes the survey number within a single day. Must be used in
+conjunction with \code{beepno} argument.}
 }
 \value{
-Output from procedure
+List of all models, with the selected variables for each along with
+model coefficients and the variable selection models themselves. Primarily
+for use as input to the \code{type} argument of the \code{fitNetwork()}
+function.
 }
 \description{
-Returns output from a given variable selection procedure
+Perform variable selection via the LASSO, best subsets selection, forward
+selection, backward selection, or sequential replacement on unmoderated
+networks. Or, perform variable selection via the hierarchical LASSO for
+moderated networks. Can be used for both GGMs and SUR networks.
+}
+\details{
+The primary value of the output is to be used as input when fitting the
+selected model with the \code{fitNetwork()} function. Specifically, the
+output of \code{varSelect()} can be assigned to the \code{type} arugment of
+\code{fitNetwork()} in order to fit the constrained models that were selected
+across nodes.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- varSelect(data)
+fit <- fitNetwork(data, type = x)
+}
 }

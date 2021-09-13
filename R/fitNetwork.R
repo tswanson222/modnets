@@ -81,8 +81,6 @@
 #'
 #' @export
 #'
-#' @family some family
-#'
 #' @seealso The end of the world, especially \code{\link{varSelect}}
 #'
 #' @examples

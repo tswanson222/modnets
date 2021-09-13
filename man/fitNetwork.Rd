@@ -152,8 +152,4 @@ Yes, I believe so.
 }
 \seealso{
 The end of the world, especially \code{\link{varSelect}}
-
-Other some family: 
-\code{\link{resample}()}
 }
-\concept{some family}

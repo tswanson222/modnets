@@ -1,50 +1,188 @@
 #' Bootstrapping or multi-sample splits for variable selection
 #'
-#' Multiple resampling procedures for selecting variables for a final network model.
+#' Multiple resampling procedures for selecting variables for a final network
+#' model. There are three resampling methods that can be parameterized in a
+#' variety of different ways. The ultimate goal is to fit models across iterated
+#' resamples with variable selection procedures built in so as to home in on the
+#' best predictors to include within a given model. The methods available
+#' include: bootstrapped resampling, multi-sample splitting, and stability
+#' selection.
 #'
-#' @param data data.frame
-#' @param m numeric
-#' @param niter numeric
-#' @param sampMethod character
-#' @param criterion character
-#' @param method character
-#' @param rule character
-#' @param gamma numeric
-#' @param nfolds numeric
-#' @param nlam numeric
-#' @param which.lam character
-#' @param threshold numeric or logical
-#' @param bonf logical
-#' @param alpha numeric
-#' @param exogenous logical
-#' @param split numeric
-#' @param center logical
-#' @param scale logical
-#' @param varSeed numeric
-#' @param seed numeric
-#' @param verbose logical
-#' @param lags numeric or logical
-#' @param binary logical
-#' @param type character
-#' @param saveMods logical
-#' @param saveData logical
-#' @param saveVars logical
-#' @param fitit logical
-#' @param nCores numeric
-#' @param cluster character
-#' @param block logical
-#' @param beepno something
-#' @param dayno something
+#' Sampling methods can be specified via the \code{sampMethod} argument.
+#' \describe{ \item{Bootstrapped resampling}{Standard bootstrapped resampling,
+#' wherein a bootstrapped sample of size \code{n} is drawn with replacement at
+#' each iteration. Then, a variable selection procedure is applied to the
+#' sample, and the selected model is fit to obtain the parameter values.
+#' P-values and confidence intervals for the parameter distributions are then
+#' estimated.} \item{Multi-sample splitting}{Involves taking two disjoint
+#' samples from the original data -- a training sample and a test sample. At
+#' each iteration the variable selection procedure is applied to the training
+#' sample, and then the resultant model is fit on the test sample. Parameters
+#' are then aggregated based on the coefficients in the models fit to the test
+#' samples.} \item{Stability selection}{Stability selection begins the same as
+#' multi-sample splitting, in that two disjoint samples are drawn from the data
+#' at each iteration. However, the variable selection procedure is then applied
+#' to each of the two subsamples at each iteration. The objective is to compute
+#' the proportion of times that each predictor was selected in each subsample
+#' across iterations, as well as the proportion of times that it was
+#' simultaneously selected in both disjoint samples. At the end of the
+#' resampling, the final model is selected by setting a frequency threshold
+#' between 0 and 1, indicating the minimum proportion of samples that a variable
+#' would have to have been selected to be retained in the final model.} }
+#'
+#' For the bootstrapping and multi-sample split methods, p-values are aggregated
+#' for each parameter using a method developed by Meinshausen, Meier, & Buhlmann
+#' (2009) that employs error control based on the false-discovery rate. The same
+#' procedure is employed for creating adjusted confidence intervals.
+#'
+#' A key distinguishing feature of the bootstrapping procedure implemented in
+#' this function versus the \code{bootNet()} function is that the latter is
+#' designed to estimate the parameter distributions of a single model, whereas
+#' the version here is aimed at using the bootstrapped resamples to select a
+#' final model. In a practical sense, this boils down to the bootstrapping in
+#' the \code{resample()} function to perform variable selection at each
+#' iteration of the resampling, rather than taking a single constrained model
+#' and applying it equally at all iterations.
+#'
+#' @param data \code{n x k} dataframe. Cannot supply a matrix as input.
+#' @param m Character vector or numeric vector indicating the moderator(s), if
+#'   any. Can also specify \code{"all"} to make every variable serve as a
+#'   moderator, or \code{0} to indicate that there are no moderators. If the
+#'   length of \code{m} is \code{k - 1} or longer, then it will not be possible
+#'   to have the moderators as exogenous variables. Thus, \code{exogenous} will
+#'   automatically become \code{FALSE}.
+#' @param niter Number of iterations for the resampling procedure.
+#' @param sampMethod Character string indicating which type of procedure to use.
+#'   \code{"bootstrap"} is a standard bootstrapping procedure. \code{"split"} is
+#'   the multi-sample split procedure where the data are split into disjoint
+#'   training and test sets, the variables to be modeled are selected based on
+#'   the training set, and then the final model is fit to the test set.
+#'   \code{"stability"} is stability selection, where models are fit to each of
+#'   two disjoint subsamples of the data, and it is calculated how frequently
+#'   each variable is selected in each subset, as well how frequently they are
+#'   simultaneously selected in both subsets at each iteration.
+#' @param criterion The criterion for the variable selection procedure. Options
+#'   include: \code{"cv", "aic", "bic", "ebic", "cp", "rss", "adjr2", "rsq",
+#'   "r2"}. \code{"CV"} refers to cross-validation, the information criteria are
+#'   \code{"AIC", "BIC", "EBIC"}, and \code{"Cp"}, which refers to Mallow's Cp.
+#'   \code{"RSS"} is the residual sum of squares, \code{"adjR2"} is adjusted
+#'   R-squared, and \code{"Rsq"} or \code{"R2"} is R-squared. Capitalization is
+#'   ignored. For methods based on the LASSO, only \code{"CV", "AIC", "BIC",
+#'   "EBIC"} are available. For methods based on subset selection, only
+#'   \code{"Cp", "BIC", "RSS", "adjR2", "R2"} are available.
+#' @param method Character string to indicate which method to use for variable
+#'   selection. Options include \code{"lasso"} and \code{"glmnet"}, both of
+#'   which use the LASSO via the \code{glmnet} package. \code{"subset",
+#'   "backward", "forward", "seqrep"}, all call different types of subset
+#'   selection using the \code{regsubsets()} function of the \code{leaps}
+#'   package. Finally \code{"glinternet"} is used for applying the hierarchical
+#'   lasso, and is the only method available for moderated network estimation.
+#'   If one or more moderators are specified, then \code{method} will
+#'   automatically default to \code{"glinternet"}.
+#' @param rule Only applies to GGMs (including between-subjects networks) when a
+#'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
+#'   both corresponding coefficients have p-values below the threshold, while
+#'   the \code{"OR"} rule will preserve an edge so long as one of the two
+#'   coefficients have a p-value below the supplied threshold.
+#' @param gamma Numeric value of the hyperparameter for the \code{"EBIC"}
+#'   criterion. Only relevant if \code{criterion = "EBIC"}. Recommended to use a
+#'   value between 0 and .5, where larger values impose a larger penalty on the
+#'   criterion.
+#' @param nfolds Only relevant if \code{criterion = "CV"}. Determines the number
+#'   of folds to use in cross-validation.
+#' @param nlam if \code{method = "glinternet"}, determines the number of lambda
+#'   values to evaluate in the selection path.
+#' @param which.lam Character string. Only applies if \code{criterion = "CV"}.
+#'   Options include \code{"min"}, which uses the lambda value that minimizes
+#'   the objective function, or \code{"1se"} which uses the lambda value at 1
+#'   standard error above the value that minimizes the objective function.
+#' @param threshold Logical or numeric. If \code{TRUE}, then a default value of
+#'   .05 will be set. Indicates whether a threshold should be placed on the
+#'   models at each iteration of the sampling. A significant choice by the
+#'   researcher.
+#' @param bonf Logical. Determines whether to apply a bonferroni adjustment on
+#'   the distribution of p-values for each coefficient.
+#' @param alpha Type 1 error rate. Defaults to .05.
+#' @param exogenous Logical. Indicates whether moderator variables should be
+#'   treated as exogenous or not. If they are exogenous, they will not be
+#'   modeled as outcomes/nodes in the network. If the number of moderators
+#'   reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
+#'   be \code{FALSE}.
+#' @param split If \code{sampMethod == "split"} or \code{sampMethod =
+#'   "stability"} then this is a value between 0 and 1 that indicates the
+#'   proportion of the sample to be used for the training set. When
+#'   \code{sampMethod = "stability"} there isn't an important distinction
+#'   between the labels "training" and "test", although this value will still
+#'   cause the two samples to be taken of complementary size.
+#' @param center Logical. Determines whether to mean-center the variables.
+#' @param scale Logical. Determines whether to standardize the variables.
+#' @param varSeed Numeric value providing a seed to be set at the beginning of
+#'   the selection procedure. Recommended for reproducible results. Importantly,
+#'   this seed will be used for the variable selection models at each iteration
+#'   of the resampler. Caution this means that while each model is run with a
+#'   different sample, it will always have the same seed.
+#' @param seed Can be a single value, to set a seed before drawing random seeds
+#'   of length \code{niter} to be used across iterations. Alternatively, one can
+#'   supply a vector of seeds of length \code{niter}. It is recommended to use
+#'   this argument for reproducibility over the \code{varSeed} argument.
+#' @param verbose Logical. Determines whether information about the modeling
+#'   progress should be displayed in the console.
+#' @param lags Numeric or logical. Can only be 0, 1 or \code{TRUE} or
+#'   \code{FALSE}. \code{NULL} is interpreted as \code{FALSE}. Indicates whether
+#'   to fit a time-lagged network or a GGM.
+#' @param binary Numeric vector indicating which columns of the data contain
+#'   binary variables.
+#' @param type Determines whether to use gaussian models \code{"g"} or binomial
+#'   models \code{"c"}. Can also just use \code{"gaussian"} or
+#'   \code{"binomial"}. Moreover, a vector of length \code{k} can be provided
+#'   such that a value is given to every variable. Ultimately this is not
+#'   necessary, though, as such values are automatically detected.
+#' @param saveMods Logical. Indicates whether to save the models fit to the
+#'   samples at each iteration or not.
+#' @param saveData Logical. Determines whether to save the data from each
+#'   subsample across iterations or not.
+#' @param saveVars Logical. Determines whether to save the variable selection
+#'   models at each iteration.
+#' @param fitit Logical. Determines whether to fit the final selected model on
+#'   the original sample. If \code{FALSE}, then this can still be done with
+#'   \code{fitNetwork()} and \code{modSelect()}.
+#' @param nCores Numeric value indicating the number of CPU cores to use for the
+#'   resampling. If \code{TRUE}, then the \code{detectCores()} function from the
+#'   \code{parallel} package will be used to maximize the number of cores
+#'   available.
+#' @param cluster Character vector indicating which type of parallelization to
+#'   use, if \code{nCores > 1}. Options include \code{"mclapply"} and
+#'   \code{"SOCK"}.
+#' @param block Logical or numeric. If specified, then this indicates that
+#'   \code{lags != 0} or \code{lags != NULL}. If numeric, then this indicates
+#'   that block bootstrapping will be used, and the value specifies the block
+#'   size. If \code{TRUE} then an appropriate block size will be estimated
+#'   automatically.
+#' @param beepno Character string or numeric value to indicate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{dayno} argument.
+#' @param dayno Character string or numeric value to indiciate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{beepno} argument.
 #' @param ... Additional arguments.
 #'
-#' @return Lots of stuff
+#' @return \code{resample} output
 #' @export
+#' @references
+#'   Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
+#'   high-dimensional regression. Journal of the American Statistical
+#'   Association. 104, 1671-1681.
 #'
-#' @family some family
-#' @seealso \code{\link{plot.resample}}
+#'   Meinshausen, N., & Buhlmann, P. (2010). Stability selection.
+#'   Journal of the Royal Statistical Society: Series B (Statistical
+#'   Methodology). 72, 417-423
+#'
+#' @seealso \code{\link{plot.resample}, \link{modSelect}}
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- resample(data)
+#' }
 resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", criterion = "AIC",
                      method = "glmnet", rule = "OR", gamma = .5, nfolds = 10,
                      nlam = 50, which.lam = "min", threshold = FALSE, bonf = FALSE,
@@ -667,24 +805,73 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
   out
 }
 
-#' Select a model from the resample function
+#' Select a model based on output from \code{resample()}
 #'
-#' Creates the necessary input for fitNetwork when selecting variables.
+#' Creates the necessary input for fitNetwork when selecting variables based on
+#' the \code{resample()} function. The purpose of making this function available
+#' to the user is to that different decisions can be made about how exactly to
+#' use the \code{resample()} output to select a model, as sometimes there is
+#' more than one option for choosing a final model.
 #'
-#' @param obj resample object
-#' @param data data
-#' @param fit logical
-#' @param select character
-#' @param thresh numeric
-#' @param ascall logical
-#' @param type character
+#' @param obj \code{resample} object
+#' @param data The dataframe used to create the \code{resample} object. Necesary
+#'   if \code{ascall = TRUE} or \code{fit = TRUE}.
+#' @param fit Logical. Determines whether to fit the selected model to the data
+#'   or just return the model specifications. Must supply a dataset in the
+#'   \code{data} argument as well.
+#' @param select Character string, referring to which variable of the output
+#'   should be used as the basis for selecting variables. If the resampling
+#'   method was either \code{"bootstrap"} or \code{"split"}, then setting
+#'   \code{select = "select"} will select variables based on the aggregated
+#'   p-values being below a pre-specified threshold. Setting \code{select =
+#'   "select_ci"}, however, will use the adjusted confidence intervals rather
+#'   than p-values to select variables. Alternatively, if \code{select = "freq"}
+#'   then the \code{thresh} argument can be used to indicate the minimum
+#'   selection frequency across iterations. In this case, variables are selected
+#'   based on how frequently they were selected in the resampling procedure.
+#'   This also works if \code{select} is simply set a numeric value (this value
+#'   will serve as the value for \code{thresh}).
+#'
+#'   When the resampling method was \code{"stability"}, the default option of
+#'   \code{select = "select"} chooses variables based on the original threshold
+#'   provided to the \code{resample()} function, and relies on the simultaneous
+#'   selection proportion (the \code{"freq"} column in the \code{"results"}
+#'   element). Alternatively, if \code{select} is a numeric value, or a value
+#'   for \code{thresh} is provided, that new frequency selection threshold will
+#'   determine the choice of variables. Alternatively, one can specify
+#'   \code{select = "split1"} or \code{select = "split2"} to base the threshold
+#'   on the selection frequency in one of the two splits rather than on the
+#'   simultaneous selection frequency which is likely to be the most
+#'   conservative.
+#'
+#'   For all types of \code{resample} objects, when \code{select = "Pvalue"}
+#'   then \code{thresh} can be set to a numeric value in order to select
+#'   variables based on aggregated p-values. For the \code{"bootstrapping"} and
+#'   \code{"split"} methods this allows one to override the original threshold
+#'   (set as part of \code{resample()}) if desired.
+#' @param thresh Numeric value. If \code{select = "Pvalue"}, then this value
+#'   will be the p-value threshold. Otherwise, this value will determine the
+#'   minimum frequency selection threshold.
+#' @param ascall Logical. Determines whether to return a list with arguments
+#'   necessary for fitting the model with \code{do.call} to \code{fitNetwork()}.
+#'   Only possible if a dataset is supplied.
+#' @param type Should just leave as-is. Automatically taken from the
+#'   \code{resample} object.
 #' @param ... Additional arguments.
 #'
-#' @return a list of information for fitNetwork
+#' @return A call ready for \code{fitNetwork()}, a fitted network model, or a
+#'   list of selected variables for each node along with relevant attributes.
+#'   Essentially, the output is either the selected model itself or a list of
+#'   the necessary parameters to fit it.
 #' @export
 #'
+#' @seealso \code{\link{resample}}
+#'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- resample(data)
+#' modSelect(x, data = data, fit = TRUE)
+#' }
 modSelect <- function(obj, data = NULL, fit = FALSE, select = "select",
                       thresh = NULL, ascall = TRUE, type = "gaussian", ...){
   if(is.null(data)){ascall <- FALSE}

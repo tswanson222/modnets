@@ -59,3 +59,8 @@ a pair of network models compatible with the \code{modnets} package.
 SURnet(fit, dat)
 }
 }
+\seealso{
+Other SUR functions: 
+\code{\link{SURfit}()}
+}
+\concept{SUR functions}

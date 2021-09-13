@@ -53,6 +53,8 @@
 #' @return A SUR model, as fit with the \code{systemfit()} function.
 #' @export
 #'
+#' @family SUR functions
+#'
 #' @examples
 #' \dontrun{
 #' SURfit(data)
@@ -109,6 +111,8 @@ SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL,
 #'
 #' @return Temporal and contemporaneous networks
 #' @export
+#'
+#' @family SUR functions
 #'
 #' @examples
 #' \dontrun{

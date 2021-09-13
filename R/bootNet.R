@@ -8,6 +8,18 @@
 #' a case-drop bootstrap. Details on these two methods can be found in the help
 #' page for the \code{bootnet()} function within the \code{bootnet} package.
 #'
+#' The defining feature of \code{bootNet()} that differentiates it from the
+#' \code{resample(..., sampMethod = "bootstrap")} function is that the *same
+#' model is fit at every iteration* in \code{bootNet()}. The only time that
+#' models may differ across iterations is if a \code{threshold} is specified.
+#' When \code{threshold = FALSE}, then the saturated model is fit to each
+#' bootstrapped sample. Alternatively, bootstrapping can be performed with
+#' respect to a specific constrained model. In this case, the constrained model
+#' (variable selection model; output of \code{varSelect()} or \code{resample()})
+#' can be supplied to the \code{type} argument, and thus this function provides
+#' a way to estimate the posterior distributions of the nodes based on a
+#' constrained model.
+#'
 #' In addition to expanding \code{bootnet()} to moderated networks, there are
 #' also some additional features such as the capacity to perform the block
 #' bootstrap for temporal networks via the \code{block} argument. The block
@@ -59,7 +71,9 @@
 #'   when a variable selection procedure is applied, or whether a
 #'   \code{resample()} object is used as input.
 #' @param fits A list of all fitted models, if available. Not likely to be used.
-#' @param type See \code{type} argument in \code{fitNetwork()} function.
+#' @param type See \code{type} argument in \code{fitNetwork()} function. This is
+#'   where a variable selection model can be provided. This will fit the same
+#'   selected model across all iterations of the bootstrapping procedure.
 #' @param saveMods Logical. Determines whether or not to return all of the
 #'   fitted models -- that is, all the models fit to each bootstrapped sample.
 #'   Defaults to \code{TRUE}, but if \code{FALSE} then models will not be
