@@ -123,5 +123,10 @@ Power simulation results
 Simulation process for power
 }
 \examples{
-1 + 1
+\dontrun{
+x <- mnetPowerSim()
+}
+}
+\seealso{
+\code{\link{summary.mnetPower}, \link{plotPower}}
 }

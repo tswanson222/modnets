@@ -1041,17 +1041,28 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
 
 #' Provides model coefficients with confidence intervals
 #'
-#' Requires that either 'fitobj' or 'SURfit' is included in the object
+#' Requires that either 'fitobj' or 'SURfit' is included in the object from
+#' \code{fitNetwork()}. Returns a list of nodewise model coefficients, including
+#' confidence intervals computed from the estimated standard errors.
 #'
-#' @param fit fitNetwork object
-#' @param allNames not sure
-#' @param alpha error level
+#' The \code{select} column in the output indicates whether the variable would
+#' be selected given the supplied alpha level.
 #'
-#' @return List of tables
+#' @param fit Output from \code{fitNetwork()}, or either the \code{fixedNets} or
+#'   \code{betweenNet} element of the output from \code{mlGVAR()}
+#' @param allNames Character vector containing all the predictor names. Do not
+#'   change, as these are automatically detected.
+#' @param alpha Type 1 error rate. The complement of the confidence level.
+#'
+#' @return List of tables containing model coefficients along with confidence
+#'   intervals
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- fitNetwork(data)
+#' getFitCIs(x)
+#' }
 getFitCIs <- function(fit, allNames = NULL, alpha = .05){
   if("SURnet" %in% names(fit)){
     if(!'SURfit' %in% names(fit)){stop('Requires SURfit')}

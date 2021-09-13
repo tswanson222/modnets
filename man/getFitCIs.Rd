@@ -7,18 +7,30 @@
 getFitCIs(fit, allNames = NULL, alpha = 0.05)
 }
 \arguments{
-\item{fit}{fitNetwork object}
+\item{fit}{Output from \code{fitNetwork()}, or either the \code{fixedNets} or
+\code{betweenNet} element of the output from \code{mlGVAR()}}
 
-\item{allNames}{not sure}
+\item{allNames}{Character vector containing all the predictor names. Do not
+change, as these are automatically detected.}
 
-\item{alpha}{error level}
+\item{alpha}{Type 1 error rate. The complement of the confidence level.}
 }
 \value{
-List of tables
+List of tables containing model coefficients along with confidence
+intervals
 }
 \description{
-Requires that either 'fitobj' or 'SURfit' is included in the object
+Requires that either 'fitobj' or 'SURfit' is included in the object from
+\code{fitNetwork()}. Returns a list of nodewise model coefficients, including
+confidence intervals computed from the estimated standard errors.
+}
+\details{
+The \code{select} column in the output indicates whether the variable would
+be selected given the supplied alpha level.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- fitNetwork(data)
+getFitCIs(x)
+}
 }

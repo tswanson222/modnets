@@ -2,27 +2,47 @@
 % Please edit documentation in R/lmerVAR.R
 \name{compareVAR}
 \alias{compareVAR}
-\title{Compare two to three lmerVAR models}
+\title{Compare two to three \code{lmerVAR} models}
 \usage{
 compareVAR(m1, m2, m3 = NULL, anova = NULL, type = "tempMods")
 }
 \arguments{
-\item{m1}{model 1}
+\item{m1}{Output from \code{lmerVAR()}.}
 
-\item{m2}{model 2}
+\item{m2}{Output from another run of \code{lmerVAR()}. Necessary to supp}
 
-\item{m3}{model 3 (optional)}
+\item{m3}{Output from a third run or \code{lmerVAR()}. This is optional.}
 
-\item{anova}{numeric?}
+\item{anova}{If \code{NULL}, then the results of each nodewise comparison
+will be displayed. If numeric, then this indicates which nodewise
+comparison to home in on. \code{anova = 1} will show the full ANOVA results
+for the first predictor. \code{anova = 2} will show the full ANOVA results
+for the second predictor, etc.}
 
-\item{type}{character}
+\item{type}{Character string. Either \code{"tempMods"} or
+\code{"contempMods"}. Determines whether to compare the temporal network
+outputs or the contemporaneous network outputs with ANOVA.}
 }
 \value{
-Table of ANOVA
+Table of ANOVA results comparing two or three models.
 }
 \description{
-Gotta see how this works
+Affords ANOVAs to compare two or three \code{lmerVAR} models. It is necessary
+to supply at least two different models for comparison, although a third can
+also be supplied if desired.
+}
+\details{
+Performs individual nodewise model comparisons across multiple \code{lmerVAR}
+models.
 }
 \examples{
-1 + 1
+\dontrun{
+x1 <- lmerVAR(data, temporal = "correlated")
+x2 <- lmerVAR(data, temporal = "orthogonal")
+
+compareVAR(x1, x2)
+}
+}
+\seealso{
+\code{\link{lmerVAR}}
 }

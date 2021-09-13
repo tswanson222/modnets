@@ -1,31 +1,95 @@
-#' Legit mixed-effects modeling for the GVAR in multilevel data
+#' Mixed-effects modeling for the GVAR in multilevel data
 #'
-#' Something or other
+#' Proper estimation of mixed-effects GVAR models. This is an alternative
+#' fitting procedure to that provided by the \code{mlGVAR()} function. The key
+#' differences are that this function can take significantly longer to fit, and
+#' it may fail when trying to fit especially large models.
 #'
-#' @param data data.frame
-#' @param m numeric
-#' @param temporal character
-#' @param contemp character
-#' @param idvar character
-#' @param intvars character vector
-#' @param center logical
-#' @param scale logical
-#' @param centerWithin logical
-#' @param scaleWithin logical
-#' @param exogenous logical
-#' @param covariates character or list
-#' @param fix something
-#' @param warnings logical
-#' @param verbose logical
-#' @param beepno something
-#' @param dayno something
-#' @param deleteMissing logical
+#' In the process of adding further documentation. More details to come.
 #'
-#' @return lmerVAR models
+#' @param data \code{n x k} dataframe or matrix.
+#' @param m Character vector or numeric vector indicating the moderator(s), if
+#'   any. Can also specify \code{"all"} to make every variable serve as a
+#'   moderator, or \code{0} to indicate that there are no moderators. If the
+#'   length of \code{m} is \code{k - 1} or longer, then it will not be possible
+#'   to have the moderators as exogenous variables. Thus, \code{exogenous} will
+#'   automatically become \code{FALSE}.
+#' @param temporal Only affects the model for the temporal network and
+#'   between-subjects network (which is derived from the temporal network).
+#'   Options are \code{"default", "correlated", "orthogonal", "fixed",
+#'   "intfixed"}. \code{"correlated"} makes it so that all random-effect terms
+#'   are correlated, and \code{"orthogonal"} makes it so they are not.
+#'   \code{"fixed"} makes it so that there is only a random intercept, but no
+#'   other random-effect terms related to the individual predictors.
+#'   \code{"intfixed"} essentially mimics \code{"orthogonal"}, with the
+#'   exception that no interaction terms have random slopes. \code{"default"}
+#'   will automatically set the value to \code{"correlated"} if there are 6 or
+#'   fewer nodes in the network, and \code{"orthogonal"} otherwise. The reason
+#'   for this is that models with correlated random effects take substantially
+#'   longer to fit than those with orthogonal effects. The \code{"default"}
+#'   option is designed to strike a balance between comprehensiveness and
+#'   efficiency for the average user. It is recommended to set this value
+#'   manually in order to produce results according to one's individual
+#'   specifications.
+#' @param contemp Options are \code{"default", "correlated", "orthogonal"}.
+#'   \code{"correlated"} makes it so that random-effect terms are correlated,
+#'   and \code{"orthogonal"} makes it so they are not. \code{"default"} will
+#'   automatically set the value to \code{"correlated"} if there are 6 or fewer
+#'   nodes in the network, and \code{"orthogonal"} otherwise. The reason for
+#'   this is that models with correlated random effects take substantially
+#'   longer to fit than those with orthogonal effects. The \code{"default"}
+#'   option is designed to strike a balance between comprehensiveness and
+#'   efficiency for the average user. It is recommended to set this value
+#'   manually in order to produce results according to one's individual
+#'   specifications.
+#' @param idvar Character string to indicate which variable contains the
+#'   participant identification numbers.
+#' @param intvars Character vector to indicate which interaction terms to
+#'   include in the model. Not necessary, but useful to add significant
+#'   customization and explicitly state which interactions to include in the
+#'   model.
+#' @param center Logical. Determines whether to mean-center the variables.
+#' @param scale Logical. Determines whether to standardize the variables.
+#' @param centerWithin Following the application of \code{center} and
+#'   \code{scale}, this determines whether to center variables within individual
+#'   subjects to create subject-centered values.
+#' @param scaleWithin Following the application of \code{center} and
+#'   \code{scale}, this determines whether to scale variables within individual
+#'   subjects to create subject-standardized values.
+#' @param exogenous Logical. Indicates whether moderator variables should be
+#'   treated as exogenous or not. If they are exogenous, they will not be
+#'   modeled as outcomes/nodes in the network. If the number of moderators
+#'   reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
+#'   be \code{FALSE}.
+#' @param covariates See corresponding argument in \code{fitNetwork()} function.
+#'   Can supply a numeric value or vector to indicate which variables are
+#'   covariates, or can supply a list containing the individual covariates
+#'   separately from the dataset.
+#' @param fix Character vector to indicate which variables to only create fixed
+#'   effects terms for.
+#' @param warnings If \code{FALSE}, warnings will not be returned in the console
+#'   during the fitting process. Can be useful when the warnings are repetitive,
+#'   unimportant, and annoying.
+#' @param verbose Logical. Determines whether to output progress bars and
+#'   messages in the console during the fitting process.
+#' @param beepno Character string or numeric value to indicate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{dayno} argument.
+#' @param dayno Character string or numeric value to indiciate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{beepno} argument.
+#' @param deleteMissing Logical. Determines whether to automatically perform
+#'   listwise deletion if there are any missing values in the dataset.
+#'
+#' @return A \code{lmerVAR} mixed-effects model with corresponding networks.
 #' @export
 #'
+#' @seealso \code{\link{compareVAR}}
+#'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- lmerVAR(data)
+#' }
 lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
                     idvar = "ID", intvars = NULL, center = TRUE, scale = TRUE,
                     centerWithin = TRUE, scaleWithin = FALSE, exogenous = TRUE,
@@ -180,22 +244,8 @@ lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
   return(out)
 }
 
-#' Create networks out of lmerVAR models
-#'
-#' Gotta look into how this works
-#'
-#' @param model output from lmerVAR?
-#' @param inds something
-#' @param m mnames
-#' @param threshold logical numeric
-#' @param rule character
-#' @param ggm character
-#'
-#' @return lmerNetworks
-#' @export
-#'
-#' @examples
-#' 1 + 1
+##### lmerNets: Internal function to create networks from lmerVAR models
+## Some arguments are not changeable via lmerVAR. Which might be okay, but gotta look into
 lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
                      rule = "OR", ggm = "pcor"){
   rule <- match.arg(tolower(rule), c("or", "and"))
@@ -369,22 +419,39 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
   return(output)
 }
 
-
-#' Compare two to three lmerVAR models
+#' Compare two to three \code{lmerVAR} models
 #'
-#' Gotta see how this works
+#' Affords ANOVAs to compare two or three \code{lmerVAR} models. It is necessary
+#' to supply at least two different models for comparison, although a third can
+#' also be supplied if desired.
 #'
-#' @param m1 model 1
-#' @param m2 model 2
-#' @param m3 model 3 (optional)
-#' @param anova numeric?
-#' @param type character
+#' Performs individual nodewise model comparisons across multiple \code{lmerVAR}
+#' models.
 #'
-#' @return Table of ANOVA
+#' @param m1 Output from \code{lmerVAR()}.
+#' @param m2 Output from another run of \code{lmerVAR()}. Necessary to supp
+#' @param m3 Output from a third run or \code{lmerVAR()}. This is optional.
+#' @param anova If \code{NULL}, then the results of each nodewise comparison
+#'   will be displayed. If numeric, then this indicates which nodewise
+#'   comparison to home in on. \code{anova = 1} will show the full ANOVA results
+#'   for the first predictor. \code{anova = 2} will show the full ANOVA results
+#'   for the second predictor, etc.
+#' @param type Character string. Either \code{"tempMods"} or
+#'   \code{"contempMods"}. Determines whether to compare the temporal network
+#'   outputs or the contemporaneous network outputs with ANOVA.
+#'
+#' @return Table of ANOVA results comparing two or three models.
 #' @export
 #'
+#' @seealso \code{\link{lmerVAR}}
+#'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x1 <- lmerVAR(data, temporal = "correlated")
+#' x2 <- lmerVAR(data, temporal = "orthogonal")
+#'
+#' compareVAR(x1, x2)
+#' }
 compareVAR <- function(m1, m2, m3 = NULL, anova = NULL, type = "tempMods"){
   if(is.null(m3)){
     if(all(unlist(lapply(list(m1, m2), function(z) "temporal" %in% names(attributes(z)))))){

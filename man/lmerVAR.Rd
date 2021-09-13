@@ -2,7 +2,7 @@
 % Please edit documentation in R/lmerVAR.R
 \name{lmerVAR}
 \alias{lmerVAR}
-\title{Legit mixed-effects modeling for the GVAR in multilevel data}
+\title{Mixed-effects modeling for the GVAR in multilevel data}
 \usage{
 lmerVAR(
   data,
@@ -26,48 +26,114 @@ lmerVAR(
 )
 }
 \arguments{
-\item{data}{data.frame}
+\item{data}{\code{n x k} dataframe or matrix.}
 
-\item{m}{numeric}
+\item{m}{Character vector or numeric vector indicating the moderator(s), if
+any. Can also specify \code{"all"} to make every variable serve as a
+moderator, or \code{0} to indicate that there are no moderators. If the
+length of \code{m} is \code{k - 1} or longer, then it will not be possible
+to have the moderators as exogenous variables. Thus, \code{exogenous} will
+automatically become \code{FALSE}.}
 
-\item{temporal}{character}
+\item{temporal}{Only affects the model for the temporal network and
+between-subjects network (which is derived from the temporal network).
+Options are \code{"default", "correlated", "orthogonal", "fixed",
+  "intfixed"}. \code{"correlated"} makes it so that all random-effect terms
+are correlated, and \code{"orthogonal"} makes it so they are not.
+\code{"fixed"} makes it so that there is only a random intercept, but no
+other random-effect terms related to the individual predictors.
+\code{"intfixed"} essentially mimics \code{"orthogonal"}, with the
+exception that no interaction terms have random slopes. \code{"default"}
+will automatically set the value to \code{"correlated"} if there are 6 or
+fewer nodes in the network, and \code{"orthogonal"} otherwise. The reason
+for this is that models with correlated random effects take substantially
+longer to fit than those with orthogonal effects. The \code{"default"}
+option is designed to strike a balance between comprehensiveness and
+efficiency for the average user. It is recommended to set this value
+manually in order to produce results according to one's individual
+specifications.}
 
-\item{contemp}{character}
+\item{contemp}{Options are \code{"default", "correlated", "orthogonal"}.
+\code{"correlated"} makes it so that random-effect terms are correlated,
+and \code{"orthogonal"} makes it so they are not. \code{"default"} will
+automatically set the value to \code{"correlated"} if there are 6 or fewer
+nodes in the network, and \code{"orthogonal"} otherwise. The reason for
+this is that models with correlated random effects take substantially
+longer to fit than those with orthogonal effects. The \code{"default"}
+option is designed to strike a balance between comprehensiveness and
+efficiency for the average user. It is recommended to set this value
+manually in order to produce results according to one's individual
+specifications.}
 
-\item{idvar}{character}
+\item{idvar}{Character string to indicate which variable contains the
+participant identification numbers.}
 
-\item{intvars}{character vector}
+\item{intvars}{Character vector to indicate which interaction terms to
+include in the model. Not necessary, but useful to add significant
+customization and explicitly state which interactions to include in the
+model.}
 
-\item{center}{logical}
+\item{center}{Logical. Determines whether to mean-center the variables.}
 
-\item{scale}{logical}
+\item{scale}{Logical. Determines whether to standardize the variables.}
 
-\item{centerWithin}{logical}
+\item{centerWithin}{Following the application of \code{center} and
+\code{scale}, this determines whether to center variables within individual
+subjects to create subject-centered values.}
 
-\item{scaleWithin}{logical}
+\item{scaleWithin}{Following the application of \code{center} and
+\code{scale}, this determines whether to scale variables within individual
+subjects to create subject-standardized values.}
 
-\item{exogenous}{logical}
+\item{exogenous}{Logical. Indicates whether moderator variables should be
+treated as exogenous or not. If they are exogenous, they will not be
+modeled as outcomes/nodes in the network. If the number of moderators
+reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
+be \code{FALSE}.}
 
-\item{covariates}{character or list}
+\item{covariates}{See corresponding argument in \code{fitNetwork()} function.
+Can supply a numeric value or vector to indicate which variables are
+covariates, or can supply a list containing the individual covariates
+separately from the dataset.}
 
-\item{fix}{something}
+\item{fix}{Character vector to indicate which variables to only create fixed
+effects terms for.}
 
-\item{warnings}{logical}
+\item{warnings}{If \code{FALSE}, warnings will not be returned in the console
+during the fitting process. Can be useful when the warnings are repetitive,
+unimportant, and annoying.}
 
-\item{verbose}{logical}
+\item{verbose}{Logical. Determines whether to output progress bars and
+messages in the console during the fitting process.}
 
-\item{beepno}{something}
+\item{beepno}{Character string or numeric value to indicate which variable
+(if any) encodes the survey number within a single day. Must be used in
+conjunction with \code{dayno} argument.}
 
-\item{dayno}{something}
+\item{dayno}{Character string or numeric value to indiciate which variable
+(if any) encodes the survey number within a single day. Must be used in
+conjunction with \code{beepno} argument.}
 
-\item{deleteMissing}{logical}
+\item{deleteMissing}{Logical. Determines whether to automatically perform
+listwise deletion if there are any missing values in the dataset.}
 }
 \value{
-lmerVAR models
+A \code{lmerVAR} mixed-effects model with corresponding networks.
 }
 \description{
-Something or other
+Proper estimation of mixed-effects GVAR models. This is an alternative
+fitting procedure to that provided by the \code{mlGVAR()} function. The key
+differences are that this function can take significantly longer to fit, and
+it may fail when trying to fit especially large models.
+}
+\details{
+In the process of adding further documentation. More details to come.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- lmerVAR(data)
+}
+}
+\seealso{
+\code{\link{compareVAR}}
 }

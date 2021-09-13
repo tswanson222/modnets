@@ -42,8 +42,12 @@
 #' @return Power simulation results
 #' @export
 #'
+#' @seealso \code{\link{summary.mnetPower}, \link{plotPower}}
+#'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- mnetPowerSim()
+#' }
 mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1, sparsity = .5,
                          lags = NULL, trueNet = NULL, threshold = TRUE, rule = 'OR', avg = TRUE,
                          maxiter = 100, saveFits = TRUE, saveData = FALSE, intercepts = NULL,
@@ -671,19 +675,36 @@ sampleSize <- function(p, m = 0, lags = 0, print = TRUE){
 
 #' Descriptive statistics for power simulation results
 #'
-#' Description
+#' A quick way to view the results of power simulations conducted with
+#' \code{mnetPowerSim()}.
 #'
-#' @param object mnetPowerSim output
-#' @param ind performance indices
-#' @param order character
-#' @param decreasing logical
+#' @param object Output from \code{mnetPowerSim()} function.
+#' @param ind Character string or vector to indicate which aspects of the
+#'   results to view. If \code{"means"}, then only the means will be returned
+#'   for all performance indices. \code{"sds"} returns the standard deviations,
+#'   \code{"ses"} returns the standard errors, and \code{"medians"} returns the
+#'   medians. These statistics describe the sample distributions according to
+#'   each combination of input parameters, and with regard to all performance
+#'   indices. Any combination of these options will return a list with each
+#'   table as a separate element. \code{"all"} returns a list of length 4 with
+#'   tables for all 4 types of statistic.
+#' @param order Character string referring to which output index to organize
+#'   output by.
+#' @param decreasing Logical. Determines whether to organize values from highest
+#'   to lowest or vice versa according to the value of the \code{order}
+#'   argument.
 #' @param ... Additional arguments.
 #'
-#' @return summary table
+#' @return Summary table, or list of summary tables.
 #' @export
 #'
+#' @seealso \code{\link{mnetPowerSim}}
+#'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- mnetPowerSim()
+#' summary(x)
+#' }
 summary.mnetPower <- function(object, ind = 'all', order = NULL, decreasing = FALSE, ...){
   if(is(object, 'list')){object <- object$Results}
   inds <- list(N = unique(object$N), p = unique(object$p), sparsity = unique(object$sparsity),

@@ -7,22 +7,40 @@
 \method{summary}{mnetPower}(object, ind = "all", order = NULL, decreasing = FALSE, ...)
 }
 \arguments{
-\item{object}{mnetPowerSim output}
+\item{object}{Output from \code{mnetPowerSim()} function.}
 
-\item{ind}{performance indices}
+\item{ind}{Character string or vector to indicate which aspects of the
+results to view. If \code{"means"}, then only the means will be returned
+for all performance indices. \code{"sds"} returns the standard deviations,
+\code{"ses"} returns the standard errors, and \code{"medians"} returns the
+medians. These statistics describe the sample distributions according to
+each combination of input parameters, and with regard to all performance
+indices. Any combination of these options will return a list with each
+table as a separate element. \code{"all"} returns a list of length 4 with
+tables for all 4 types of statistic.}
 
-\item{order}{character}
+\item{order}{Character string referring to which output index to organize
+output by.}
 
-\item{decreasing}{logical}
+\item{decreasing}{Logical. Determines whether to organize values from highest
+to lowest or vice versa according to the value of the \code{order}
+argument.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-summary table
+Summary table, or list of summary tables.
 }
 \description{
-Description
+A quick way to view the results of power simulations conducted with
+\code{mnetPowerSim()}.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- mnetPowerSim()
+summary(x)
+}
+}
+\seealso{
+\code{\link{mnetPowerSim}}
 }
