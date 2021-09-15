@@ -127,12 +127,19 @@ differences are that this function can take significantly longer to fit, and
 it may fail when trying to fit especially large models.
 }
 \details{
-In the process of adding further documentation. More details to come.
+In the process of adding further documentation. More details to come. The
+method is referred to as the "two-step multilevel VAR" (Epskamp et al.,
+2018).
 }
 \examples{
 \dontrun{
 x <- lmerVAR(data)
 }
+}
+\references{
+Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
+The gaussian graphical model in cross-sectional and time-series data.
+Multivariate Behavioral Research. 53, 453-580.
 }
 \seealso{
 \code{\link{compareVAR}}

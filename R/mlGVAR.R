@@ -1,36 +1,100 @@
 #' Fit GVAR models with multilevel data
 #'
-#' Pseudo mixed-effects model. No real estimation of random effects.
+#' Fits a graphical vector autoregressive model to data containing mutliple time
+#' points measured for multiple individuals.
 #'
-#' @param data data.frame
-#' @param m numeric
-#' @param selectFUN character?
-#' @param subjectNets logical
-#' @param idvar character
-#' @param exogenous logical
-#' @param center logical
-#' @param scale logical
-#' @param fixedType character
-#' @param betweenType character
-#' @param centerWithin logical
-#' @param scaleWithin logical
-#' @param rule character
-#' @param threshold character or numeric or logical
-#' @param verbose logical
-#' @param pcor logical
-#' @param fixedArgs list
-#' @param betweenArgs list
-#' @param bm logical
-#' @param beepno something
-#' @param dayno something
-#' @param deleteMissing logical
+#' Uses a pseudo-mixed effects approach, wherein fixed effects are estimated and
+#' random effects are approximated. See the work of Epskamp et al. (2018) for
+#' more details on how these types of effects are estimated.
+#'
+#' @param data \code{n x k} dataframe or matrix
+#' @param m Character vector or numeric vector indicating the moderator(s), if
+#'   any. Can also specify \code{"all"} to make every variable serve as a
+#'   moderator, or \code{0} to indicate that there are no moderators. If the
+#'   length of \code{m} is \code{k - 1} or longer, then it will not be possible
+#'   to have the moderators as exogenous variables. Thus, \code{exogenous} will
+#'   automatically become \code{FALSE}.
+#' @param selectFUN Choose a variable selection function. Can specify either
+#'   \code{"varSelect"} or \code{"resample"} to use the corresponding functions.
+#'   If you want to use the \code{resample()} algorithm though, then it is
+#'   recommended to specify \code{selectFUN} as one of: \code{"stability",
+#'   "split", "bootstrap"} in order to identify the specific method. If
+#'   \code{selectFUN = "resample"}, then it is recommended to add the
+#'   \code{sampMethod} argument to the call to \code{mlGVAR()}.
+#' @param subjectNets If \code{TRUE}, then subject-specific networks are fit for
+#'   all subjects and returned in the final output. Otherwise, can specify a
+#'   single value or a vector of values to represent which subjects to return
+#'   individual networks for -- specifically, the SUR network. One caveat is
+#'   that variable selection methods are not applied to these subject-specific
+#'   networks. Further modeling could be done using the output, however.
+#' @param idvar Character string to indicate which variable contains the
+#'   participant identification numbers.
+#' @param exogenous Logical. Indicates whether moderator variables should be
+#'   treated as exogenous or not. If they are exogenous, they will not be
+#'   modeled as outcomes/nodes in the network. If the number of moderators
+#'   reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
+#'   be \code{FALSE}.
+#' @param center Logical. Determines whether to mean-center the variables.
+#' @param scale Logical. Determines whether to standardize the variables.
+#' @param fixedType If logical, then any variable selection procedure specified
+#'   by \code{selectFUN} will not be applied to the SUR network. Alternatively,
+#'   a variable selection result, such as the output from either
+#'   \code{varSelect()} or \code{moSelect(resample(...))}, can be supplied to
+#'   choose a specific constrained model in advance.
+#' @param betweenType If logical, then any variable selection procedure
+#'   specified by \code{selectFUN} will not be applied to the SUR network.
+#'   Alternatively, a variable selection result, such as the output from either
+#'   \code{varSelect()} or \code{moSelect(resample(...))}, can be supplied to
+#'   choose a specific constrained model in advance.
+#' @param centerWithin Following the application of \code{center} and
+#'   \code{scale}, this determines whether to center variables within individual
+#'   subjects to create subject-centered values.
+#' @param scaleWithin Following the application of \code{center} and
+#'   \code{scale}, this determines whether to scale variables within individual
+#'   subjects to create subject-standardized values.
+#' @param rule Only applies to the between-subject network when a threshold is
+#'   supplied. The \code{"AND"} rule will only preserve edges when both
+#'   corresponding coefficients have p-values below the threshold, while the
+#'   \code{"OR"} rule will preserve an edge so long as one of the two
+#'   coefficients have a p-value below the supplied threshold.
+#' @param threshold Logical or numeric. If \code{TRUE}, then a default value of
+#'   .05 will be set. Indicates whether a threshold should be placed on the
+#'   models at each iteration of the sampling. A significant choice by the
+#'   researcher.
+#' @param verbose Logical. Determines whether to output progress bars and
+#'   messages in the console during the fitting process.
+#' @param pcor See corresponding argument in the \code{fitNetwork()} function
+#' @param fixedArgs A named list of arguments for the variable selection
+#'   function can be provided here, specifically those that are meant to be
+#'   applied to the SUR network estimation.
+#' @param betweenArgs A named list of arguments for the variable selection
+#'   function can be provided for the between-subjects network.
+#' @param bm Logical. Determines whether the same moderators are applied in the
+#'   between-subjects network. By default, the value of \code{m} only applies to
+#'   the SUR network. This allows one to decide whether or not to apply those
+#'   moderators in the between-subject network.
+#' @param beepno Character string or numeric value to indicate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{dayno} argument.
+#' @param dayno Character string or numeric value to indiciate which variable
+#'   (if any) encodes the survey number within a single day. Must be used in
+#'   conjunction with \code{beepno} argument.
+#' @param deleteMissing Logical. Determines whether to automatically perform
+#'   listwise deletion if there are any missing values in the dataset.
 #' @param ... Additional arguments.
 #'
-#' @return ML-GVAR models
+#' @return \code{mlGVAR} objects
 #' @export
+#' @references Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
+#'   The gaussian graphical model in cross-sectional and time-series data.
+#'   Multivariate Behavioral Research. 53, 453-580.
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- mlGVARsim()
+#' data <- x$data
+#' fit <- mlGVAR(data)
+#' }
 mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar = 'ID',
                    exogenous = TRUE, center = TRUE, scale = TRUE, fixedType = 'g',
                    betweenType = 'g', centerWithin = TRUE, scaleWithin = FALSE,
@@ -311,47 +375,100 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 
 #' Main workhorse for simulating VAR and mlGVAR data
 #'
-#' Description
+#' Affords the generation of simulated data containing multiple timepoint
+#' measurements for a number of subjects. Can simulate data with a single
+#' moderator as well.
 #'
-#' @param nTime numeric
-#' @param nPerson numeric
-#' @param nNode numeric
-#' @param m numeric or logical
-#' @param m2 numeric
-#' @param m1 numeric
-#' @param m0 numeric
-#' @param lag numeric or logical
-#' @param thetaVar numeric
-#' @param mu_SD numeric
-#' @param init_beta_SD numeric
-#' @param fixedMuSD numeric
-#' @param shrink_fixed numeric
-#' @param propPos numeric
-#' @param m1SD numeric
-#' @param m2SD numeric
-#' @param m1_range numeric, two values
-#' @param m2_range numeric, two values
-#' @param shrink_deviation numeric
-#' @param getM logical
-#' @param contemporaneous character
-#' @param GGMsparsity numeric
-#' @param mcenter logical
-#' @param skew logical
-#' @param skewErr logical
-#' @param ordinal logical
-#' @param nLevels numeric
-#' @param ordWithin logical
-#' @param minOrd numeric
-#' @param thresholds numeric vector
-#' @param mseed numeric
-#' @param onlyNets logical
-#' @param modType character
+#' Made to simulate data based on pre-specified parameters, possibly for power
+#' simulations or other analyses. Output can be used to fit models with either
+#' \code{mlGVAR()} or \code{lmerVAR()}.
 #'
-#' @return Simulated mlGVAR or VAR data
+#' @param nTime Numeric value. The number of timepoints to simulate for each
+#'   individual.
+#' @param nPerson The number of subjects to create data for. Can set to \code{1}
+#'   to just simulate a single graphical VAR network.
+#' @param nNode The number of nodes/variables to simulate. Does not include a
+#'   moderator if one is specified.
+#' @param m Logical. If \code{TRUE}, then a moderator variable will be
+#'   simulated. Various options also available for highly specific moderator
+#'   specification: \code{"fixed", "random", "mixed1", "mixed2", "ar", "binary",
+#'   "skewed", "random0", "ordinal"}.
+#' @param m2 Numeric. If \code{m2 >= 1}, then this will determine the number of
+#'   interaction effects between the moderator and some node in the network. If
+#'   a value between 0 and 1 is provided, then this determines the probability
+#'   of any given edge being moderated by the moderator.
+#' @param m1 Functions similarly to \code{m2}, except that this argument refers
+#'   to the number/probability of main effects of the moderator on any given
+#'   node.
+#' @param m0 Only relevant when \code{m = "ar"}. Determines the autoregressive
+#'   coefficient in the estimated models. Defaults to .3
+#' @param lag Numeric value, supposed to indicate the number of lags to simulate
+#'   models parameters for. Recommended to leave at \code{1}.
+#' @param thetaVar Numeric vector containing the variance associated with each
+#'   node (excluding the moderator) in the contemporaneous network. If
+#'   \code{NULL}, then it is assumed that the variance for each term is 1.
+#' @param mu_SD Numeric vector of length 2. The first value determines the
+#'   standard deviation of the means associated with the temporal data, and the
+#'   second value determines the standard deviations of the means associated
+#'   with the between-subjects network.
+#' @param init_beta_SD Similar to \code{mu_SD} except that it applies to the
+#'   coefficient estimates.
+#' @param fixedMuSD Standard deviation of the random values for the means of the
+#'   fixed effects.
+#' @param shrink_fixed Numeric value to determine the factor by which to shrink
+#'   sampled beta coefficients for fixed effects. Value between 0 and 1, where
+#'   higher values are recommended.
+#' @param propPos The proportion of edges with a positive sign.
+#' @param m1SD Standard deviation of the moderator main effect coefficients.
+#' @param m2SD Standard deviation of the moderator interaction effect
+#'   coefficients.
+#' @param m1_range Numeric vector of length 2. The range of values for moderator
+#'   main effect coefficients.
+#' @param m2_range Numeric vector of length 2. The range of values for moderator
+#'   interaction effect coefficients.
+#' @param shrink_deviation Numeric value to determine the factor by which to
+#'   shrink contemporaneous coefficients. Value between 0 and 1, where higher
+#'   values are recommended.
+#' @param getM If \code{TRUE}, only the data for the moderator, the moderator
+#'   main effects, and interaction effects are returned.
+#' @param contemporaneous Options include \code{"wishart", "randomGGM",
+#'   "fixed"}. Determines how the contemporaneous network is sampled. The former
+#'   two options sample different matrices for each subject, whereas
+#'   \code{"fixed"} only samples one matrix and uses it for all subject
+#'   contemporaneous networks.
+#' @param GGMsparsity Numeric value between 0 and 1. Determines the sparsity of
+#'   sampled network matrices.
+#' @param mcenter If \code{TRUE} then the moderator variable is mean-centered.
+#' @param skew If \code{TRUE} then random values will be generated to represent
+#'   the skewness of the node distributions. Alternatively, a numeric vector of
+#'   length \code{nNode} can be provided to specify the skewness of each
+#'   variable.
+#' @param skewErr The skewness parameter for the \code{alpha} argument in the
+#'   \code{rmsn()} function in the \code{sn} package.
+#' @param ordinal Logical. Determines whether to sample ordinal variables. If a
+#'   numeric value is provided, then this will automatically be assigned to the
+#'   \code{nLevels} argument.
+#' @param nLevels Number of levels for the ordinal variables. Only relevant if
+#'   \code{ordinal} is not \code{FALSE}.
+#' @param ordWithin If \code{TRUE}, then variables will ordinalized within
+#'   subjects, rather than across subjects.
+#' @param minOrd The minimum number of unique values allowed for each variable.
+#' @param thresholds List of length \code{k}, where each element is a numeric
+#'   vector of length \code{(nLevels - 1)} containing the splitpoints for
+#'   grouping each variable into ordered categories.
+#' @param mseed Numeric value for the seed to be set when
+#' @param onlyNets If \code{TRUE} then only the network models are returned,
+#'   without the data. Could be used to create random models and then simulate
+#'   data by another method.
+#' @param modType Determines the type of moderation to employ, such as
+#'   \code{"none", "full", "partial"}
+#'
+#' @return Simulated mlGVAR or VAR data.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' set.seed(1)
+#' x <- mlGVARsim()
 mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m1 = .7,
                       m0 = 1, lag = 1, thetaVar = NULL, mu_SD = NULL, init_beta_SD = NULL,
                       fixedMuSD = 1, shrink_fixed = 0.9, propPos = .5, m1SD = .1, m2SD = .1,

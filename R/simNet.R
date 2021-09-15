@@ -1,49 +1,97 @@
 #' Simulate network structure and data
 #'
-#' Has some problems
+#' Used for generating moderated and unmoderated adjancency matrices, along with
+#' data based on those model structures. Uses a Gibbs sampler for moderated
+#' networks.
 #'
-#' @param N Sample size
-#' @param p Number of nodes
-#' @param m moderator
-#' @param m2 numeric
-#' @param b1 vector or matrix?
-#' @param b2 vector or matrix?
-#' @param sparsity numeric
-#' @param intercepts vector
-#' @param nIter numeric
-#' @param msym logical
-#' @param onlyDat logical
-#' @param pbar logical
-#' @param div numeric
-#' @param gibbs logical
-#' @param ordinal logical
-#' @param nLevels numeric
-#' @param mord logical
-#' @param time logical
-#' @param mbinary logical
-#' @param minOrd numeric
-#' @param m1 numeric
-#' @param m1_range numeric
-#' @param m2_range numeric
-#' @param modType character
-#' @param lags numeric or logical
-#' @param V numeric
-#' @param skewErr logical or numeric
-#' @param onlyNets logical
-#' @param netArgs list
-#' @param nCores numeric
-#' @param cluster character
-#' @param getChains logical
-#' @param const numeric
-#' @param fixedPar something
-#' @param V2 numeric
+#' @param N Numeric value. Total number of subjects.
+#' @param p Numeric value. Total number of nodes (excluding moderator).
+#' @param m If \code{TRUE}, a moderator is generated and named \code{M} in the
+#'   resultant data.
+#' @param m2 Numeric. If \code{m2 >= 1}, then this will determine the number of
+#'   interaction effects between the moderator and some node in the network. If
+#'   a value between 0 and 1 is provided, then this determines the probability
+#'   of any given edge being moderated by the moderator.
+#' @param b1 Can provide an adjacency matrix to use for generating data.
+#' @param b2 Can provide an interaction matrix for generated moderated data.
+#' @param sparsity Numeric value between 0 and 1. Determines the sparsity of
+#'   sampled network matrices.
+#' @param intercepts A vector of means for sampling node values.
+#' @param nIter Number of iterations for generating each instance of a datapoint
+#'   with the Gibbs sampler.
+#' @param msym If \code{TRUE} then will force the interaction matrix to be
+#'   symmetric.
+#' @param onlyDat If \code{TRUE} then the function only returns the simulated
+#'   data.
+#' @param pbar If \code{TRUE} then a progress bar will be shown as samples are
+#'   generated.
+#' @param div A value to use as a sign that the sampler diverged. Can be
+#'   increased based on expected range of values. If a datapoint is larger than
+#'   \code{div}, then the sampler will stop.
+#' @param gibbs If \code{TRUE}, then Gibbs sampling will be used. Otherwise,
+#'   data are generated from the \code{rmvnorm()} function in the \code{mvtnorm}
+#'   package based on the partial correlation matrix that is created.
+#' @param ordinal Logical. Determines whether to generate ordinal values or not.
+#' @param nLevels Number of levels for the ordinal variables. Only relevant if
+#'   \code{ordinal} is not \code{FALSE}.
+#' @param mord Logical. Determines whether the moderator variable should be
+#'   simulated as ordinal.
+#' @param time If \code{TRUE} then the time it takes to simulate the data is
+#'   printed to screen at the end of the sampling.
+#' @param mbinary Logical. Determines whether the moderator should be a binary
+#'   variable.
+#' @param minOrd The minimum number of unique values allowed for each variable.
+#' @param m1 Functions similarly to \code{m2}, except that this argument refers
+#'   to the number/probability of main effects of the moderator on any given
+#'   node.
+#' @param m1_range Numeric vector of length 2. The range of values for moderator
+#'   main effect coefficients.
+#' @param m2_range Numeric vector of length 2. The range of values for moderator
+#'   interaction effect coefficients.
+#' @param modType Determines the type of moderation to employ, such as
+#'   \code{"none", "full", "partial"}
+#' @param lags If \code{TRUE} or 1, then arguments are rerouted to the
+#'   \code{mlGVARsim()} function to simulate temporal data for a single
+#'   individual.
+#' @param V Numeric, either 1 or 2. Determines whether to randomize the order of
+#'   simulating node values at each iteration of the Gibbs sampler. If \code{V =
+#'   2}, then the order is randomized at each iteration. If \code{V = 1}, then
+#'   the sampler moves through the nodes from the first to the last in order at
+#'   each iteration.
+#' @param skewErr The skewness parameter for the \code{alpha} argument in the
+#'   \code{rmsn()} function in the \code{sn} package.
+#' @param onlyNets If \code{TRUE} then only the network models are returned,
+#'   without the data. Could be used to create random models and then simulate
+#'   data by another method.
+#' @param netArgs Only for use by the internal function \code{simNet2}, which
+#'   serves as a wrapper for the current function to prevent it from failing.
+#' @param nCores Numeric value indicating the number of CPU cores to use for the
+#'   resampling. If \code{TRUE}, then the \code{detectCores()} function from the
+#'   \code{parallel} package will be used to maximize the number of cores
+#'   available.
+#' @param cluster Character vector indicating which type of parallelization to
+#'   use, if \code{nCores > 1}. Options include \code{"mclapply"} and
+#'   \code{"SOCK"}.
+#' @param getChains Logical. Determines whether to return the data-generating
+#'   chains from the Gibbs sampler.
+#' @param const Numeric. The constant to be used in the \code{simPcor()}
+#'   function.
+#' @param fixedPar Numeric. If provided, then this will be set as the
+#'   coefficient value for all edges in the network. Provides a way to
+#'   standardize the parameter values while varying the sparsity of the network.
+#' @param V2 If \code{V2 = 1} and \code{m2} is between 0 and 1, the number of
+#'   interaction terms in the model will be determined by multiplying \code{m2}
+#'   with the number of elements in the interaction matrix and taking the
+#'   \code{ceiling}.
 #' @param ... Additional arguments.
 #'
-#' @return A buncha stuff
+#' @return Simulated network models as well as data generated from those models.
 #' @export
 #'
 #' @examples
-#' 1 + 1
+#' \dontrun{
+#' x <- simNet(N = 100, p = 5, m = TRUE)
+#' }
 simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL,
                    sparsity = .5, intercepts = NULL, nIter = 250, msym = FALSE,
                    onlyDat = FALSE, pbar = TRUE, div = 10, gibbs = TRUE,

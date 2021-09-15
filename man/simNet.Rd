@@ -44,84 +44,132 @@ simNet(
 )
 }
 \arguments{
-\item{N}{Sample size}
+\item{N}{Numeric value. Total number of subjects.}
 
-\item{p}{Number of nodes}
+\item{p}{Numeric value. Total number of nodes (excluding moderator).}
 
-\item{m}{moderator}
+\item{m}{If \code{TRUE}, a moderator is generated and named \code{M} in the
+resultant data.}
 
-\item{m2}{numeric}
+\item{m2}{Numeric. If \code{m2 >= 1}, then this will determine the number of
+interaction effects between the moderator and some node in the network. If
+a value between 0 and 1 is provided, then this determines the probability
+of any given edge being moderated by the moderator.}
 
-\item{b1}{vector or matrix?}
+\item{b1}{Can provide an adjacency matrix to use for generating data.}
 
-\item{b2}{vector or matrix?}
+\item{b2}{Can provide an interaction matrix for generated moderated data.}
 
-\item{sparsity}{numeric}
+\item{sparsity}{Numeric value between 0 and 1. Determines the sparsity of
+sampled network matrices.}
 
-\item{intercepts}{vector}
+\item{intercepts}{A vector of means for sampling node values.}
 
-\item{nIter}{numeric}
+\item{nIter}{Number of iterations for generating each instance of a datapoint
+with the Gibbs sampler.}
 
-\item{msym}{logical}
+\item{msym}{If \code{TRUE} then will force the interaction matrix to be
+symmetric.}
 
-\item{onlyDat}{logical}
+\item{onlyDat}{If \code{TRUE} then the function only returns the simulated
+data.}
 
-\item{pbar}{logical}
+\item{pbar}{If \code{TRUE} then a progress bar will be shown as samples are
+generated.}
 
-\item{div}{numeric}
+\item{div}{A value to use as a sign that the sampler diverged. Can be
+increased based on expected range of values. If a datapoint is larger than
+\code{div}, then the sampler will stop.}
 
-\item{gibbs}{logical}
+\item{gibbs}{If \code{TRUE}, then Gibbs sampling will be used. Otherwise,
+data are generated from the \code{rmvnorm()} function in the \code{mvtnorm}
+package based on the partial correlation matrix that is created.}
 
-\item{ordinal}{logical}
+\item{ordinal}{Logical. Determines whether to generate ordinal values or not.}
 
-\item{nLevels}{numeric}
+\item{nLevels}{Number of levels for the ordinal variables. Only relevant if
+\code{ordinal} is not \code{FALSE}.}
 
-\item{mord}{logical}
+\item{mord}{Logical. Determines whether the moderator variable should be
+simulated as ordinal.}
 
-\item{time}{logical}
+\item{time}{If \code{TRUE} then the time it takes to simulate the data is
+printed to screen at the end of the sampling.}
 
-\item{mbinary}{logical}
+\item{mbinary}{Logical. Determines whether the moderator should be a binary
+variable.}
 
-\item{minOrd}{numeric}
+\item{minOrd}{The minimum number of unique values allowed for each variable.}
 
-\item{m1}{numeric}
+\item{m1}{Functions similarly to \code{m2}, except that this argument refers
+to the number/probability of main effects of the moderator on any given
+node.}
 
-\item{m1_range}{numeric}
+\item{m1_range}{Numeric vector of length 2. The range of values for moderator
+main effect coefficients.}
 
-\item{m2_range}{numeric}
+\item{m2_range}{Numeric vector of length 2. The range of values for moderator
+interaction effect coefficients.}
 
-\item{modType}{character}
+\item{modType}{Determines the type of moderation to employ, such as
+\code{"none", "full", "partial"}}
 
-\item{lags}{numeric or logical}
+\item{lags}{If \code{TRUE} or 1, then arguments are rerouted to the
+\code{mlGVARsim()} function to simulate temporal data for a single
+individual.}
 
-\item{V}{numeric}
+\item{V}{Numeric, either 1 or 2. Determines whether to randomize the order of
+simulating node values at each iteration of the Gibbs sampler. If \code{V =
+  2}, then the order is randomized at each iteration. If \code{V = 1}, then
+the sampler moves through the nodes from the first to the last in order at
+each iteration.}
 
-\item{skewErr}{logical or numeric}
+\item{skewErr}{The skewness parameter for the \code{alpha} argument in the
+\code{rmsn()} function in the \code{sn} package.}
 
-\item{onlyNets}{logical}
+\item{onlyNets}{If \code{TRUE} then only the network models are returned,
+without the data. Could be used to create random models and then simulate
+data by another method.}
 
-\item{netArgs}{list}
+\item{netArgs}{Only for use by the internal function \code{simNet2}, which
+serves as a wrapper for the current function to prevent it from failing.}
 
-\item{nCores}{numeric}
+\item{nCores}{Numeric value indicating the number of CPU cores to use for the
+resampling. If \code{TRUE}, then the \code{detectCores()} function from the
+\code{parallel} package will be used to maximize the number of cores
+available.}
 
-\item{cluster}{character}
+\item{cluster}{Character vector indicating which type of parallelization to
+use, if \code{nCores > 1}. Options include \code{"mclapply"} and
+\code{"SOCK"}.}
 
-\item{getChains}{logical}
+\item{getChains}{Logical. Determines whether to return the data-generating
+chains from the Gibbs sampler.}
 
-\item{const}{numeric}
+\item{const}{Numeric. The constant to be used in the \code{simPcor()}
+function.}
 
-\item{fixedPar}{something}
+\item{fixedPar}{Numeric. If provided, then this will be set as the
+coefficient value for all edges in the network. Provides a way to
+standardize the parameter values while varying the sparsity of the network.}
 
-\item{V2}{numeric}
+\item{V2}{If \code{V2 = 1} and \code{m2} is between 0 and 1, the number of
+interaction terms in the model will be determined by multiplying \code{m2}
+with the number of elements in the interaction matrix and taking the
+\code{ceiling}.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A buncha stuff
+Simulated network models as well as data generated from those models.
 }
 \description{
-Has some problems
+Used for generating moderated and unmoderated adjancency matrices, along with
+data based on those model structures. Uses a Gibbs sampler for moderated
+networks.
 }
 \examples{
-1 + 1
+\dontrun{
+x <- simNet(N = 100, p = 5, m = TRUE)
+}
 }

@@ -54,7 +54,7 @@ automatically be detected.}
 
 \item{sur}{Logical. Provides input to the \code{method} argument of the
 \code{systemfit()} function. If \code{TRUE}, then the \code{method} will be
-\code{"SUR"}. If \code{"FALSE"}, then the \code{method} will be
+\code{"SUR"}. If \code{FALSE}, then the \code{method} will be
 \code{"OLS"}. These two methods only differ when constraints are applied.
 When a saturated model is fit, both methods produce the same results.}
 

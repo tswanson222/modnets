@@ -5,7 +5,9 @@
 #' differences are that this function can take significantly longer to fit, and
 #' it may fail when trying to fit especially large models.
 #'
-#' In the process of adding further documentation. More details to come.
+#' In the process of adding further documentation. More details to come. The
+#' method is referred to as the "two-step multilevel VAR" (Epskamp et al.,
+#' 2018).
 #'
 #' @param data \code{n x k} dataframe or matrix.
 #' @param m Character vector or numeric vector indicating the moderator(s), if
@@ -83,6 +85,9 @@
 #'
 #' @return A \code{lmerVAR} mixed-effects model with corresponding networks.
 #' @export
+#' @references Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
+#'   The gaussian graphical model in cross-sectional and time-series data.
+#'   Multivariate Behavioral Research. 53, 453-580.
 #'
 #' @seealso \code{\link{compareVAR}}
 #'

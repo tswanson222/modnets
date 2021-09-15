@@ -41,78 +41,132 @@ mlGVARsim(
 )
 }
 \arguments{
-\item{nTime}{numeric}
+\item{nTime}{Numeric value. The number of timepoints to simulate for each
+individual.}
 
-\item{nPerson}{numeric}
+\item{nPerson}{The number of subjects to create data for. Can set to \code{1}
+to just simulate a single graphical VAR network.}
 
-\item{nNode}{numeric}
+\item{nNode}{The number of nodes/variables to simulate. Does not include a
+moderator if one is specified.}
 
-\item{m}{numeric or logical}
+\item{m}{Logical. If \code{TRUE}, then a moderator variable will be
+simulated. Various options also available for highly specific moderator
+specification: \code{"fixed", "random", "mixed1", "mixed2", "ar", "binary",
+  "skewed", "random0", "ordinal"}.}
 
-\item{m2}{numeric}
+\item{m2}{Numeric. If \code{m2 >= 1}, then this will determine the number of
+interaction effects between the moderator and some node in the network. If
+a value between 0 and 1 is provided, then this determines the probability
+of any given edge being moderated by the moderator.}
 
-\item{m1}{numeric}
+\item{m1}{Functions similarly to \code{m2}, except that this argument refers
+to the number/probability of main effects of the moderator on any given
+node.}
 
-\item{m0}{numeric}
+\item{m0}{Only relevant when \code{m = "ar"}. Determines the autoregressive
+coefficient in the estimated models. Defaults to .3}
 
-\item{lag}{numeric or logical}
+\item{lag}{Numeric value, supposed to indicate the number of lags to simulate
+models parameters for. Recommended to leave at \code{1}.}
 
-\item{thetaVar}{numeric}
+\item{thetaVar}{Numeric vector containing the variance associated with each
+node (excluding the moderator) in the contemporaneous network. If
+\code{NULL}, then it is assumed that the variance for each term is 1.}
 
-\item{mu_SD}{numeric}
+\item{mu_SD}{Numeric vector of length 2. The first value determines the
+standard deviation of the means associated with the temporal data, and the
+second value determines the standard deviations of the means associated
+with the between-subjects network.}
 
-\item{init_beta_SD}{numeric}
+\item{init_beta_SD}{Similar to \code{mu_SD} except that it applies to the
+coefficient estimates.}
 
-\item{fixedMuSD}{numeric}
+\item{fixedMuSD}{Standard deviation of the random values for the means of the
+fixed effects.}
 
-\item{shrink_fixed}{numeric}
+\item{shrink_fixed}{Numeric value to determine the factor by which to shrink
+sampled beta coefficients for fixed effects. Value between 0 and 1, where
+higher values are recommended.}
 
-\item{propPos}{numeric}
+\item{propPos}{The proportion of edges with a positive sign.}
 
-\item{m1SD}{numeric}
+\item{m1SD}{Standard deviation of the moderator main effect coefficients.}
 
-\item{m2SD}{numeric}
+\item{m2SD}{Standard deviation of the moderator interaction effect
+coefficients.}
 
-\item{m1_range}{numeric, two values}
+\item{m1_range}{Numeric vector of length 2. The range of values for moderator
+main effect coefficients.}
 
-\item{m2_range}{numeric, two values}
+\item{m2_range}{Numeric vector of length 2. The range of values for moderator
+interaction effect coefficients.}
 
-\item{shrink_deviation}{numeric}
+\item{shrink_deviation}{Numeric value to determine the factor by which to
+shrink contemporaneous coefficients. Value between 0 and 1, where higher
+values are recommended.}
 
-\item{getM}{logical}
+\item{getM}{If \code{TRUE}, only the data for the moderator, the moderator
+main effects, and interaction effects are returned.}
 
-\item{contemporaneous}{character}
+\item{contemporaneous}{Options include \code{"wishart", "randomGGM",
+  "fixed"}. Determines how the contemporaneous network is sampled. The former
+two options sample different matrices for each subject, whereas
+\code{"fixed"} only samples one matrix and uses it for all subject
+contemporaneous networks.}
 
-\item{GGMsparsity}{numeric}
+\item{GGMsparsity}{Numeric value between 0 and 1. Determines the sparsity of
+sampled network matrices.}
 
-\item{mcenter}{logical}
+\item{mcenter}{If \code{TRUE} then the moderator variable is mean-centered.}
 
-\item{skew}{logical}
+\item{skew}{If \code{TRUE} then random values will be generated to represent
+the skewness of the node distributions. Alternatively, a numeric vector of
+length \code{nNode} can be provided to specify the skewness of each
+variable.}
 
-\item{skewErr}{logical}
+\item{skewErr}{The skewness parameter for the \code{alpha} argument in the
+\code{rmsn()} function in the \code{sn} package.}
 
-\item{ordinal}{logical}
+\item{ordinal}{Logical. Determines whether to sample ordinal variables. If a
+numeric value is provided, then this will automatically be assigned to the
+\code{nLevels} argument.}
 
-\item{nLevels}{numeric}
+\item{nLevels}{Number of levels for the ordinal variables. Only relevant if
+\code{ordinal} is not \code{FALSE}.}
 
-\item{ordWithin}{logical}
+\item{ordWithin}{If \code{TRUE}, then variables will ordinalized within
+subjects, rather than across subjects.}
 
-\item{minOrd}{numeric}
+\item{minOrd}{The minimum number of unique values allowed for each variable.}
 
-\item{thresholds}{numeric vector}
+\item{thresholds}{List of length \code{k}, where each element is a numeric
+vector of length \code{(nLevels - 1)} containing the splitpoints for
+grouping each variable into ordered categories.}
 
-\item{mseed}{numeric}
+\item{mseed}{Numeric value for the seed to be set when}
 
-\item{onlyNets}{logical}
+\item{onlyNets}{If \code{TRUE} then only the network models are returned,
+without the data. Could be used to create random models and then simulate
+data by another method.}
 
-\item{modType}{character}
+\item{modType}{Determines the type of moderation to employ, such as
+\code{"none", "full", "partial"}}
 }
 \value{
-Simulated mlGVAR or VAR data
+Simulated mlGVAR or VAR data.
 }
 \description{
-Description
+Affords the generation of simulated data containing multiple timepoint
+measurements for a number of subjects. Can simulate data with a single
+moderator as well.
+}
+\details{
+Made to simulate data based on pre-specified parameters, possibly for power
+simulations or other analyses. Output can be used to fit models with either
+\code{mlGVAR()} or \code{lmerVAR()}.
 }
 \examples{
-1 + 1
+set.seed(1)
+x <- mlGVARsim()
 }

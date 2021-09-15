@@ -168,14 +168,12 @@
 #'
 #' @return \code{resample} output
 #' @export
-#' @references
-#'   Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
-#'   high-dimensional regression. Journal of the American Statistical
-#'   Association. 104, 1671-1681.
+#' @references Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
+#' high-dimensional regression. Journal of the American Statistical Association.
+#' 104, 1671-1681.
 #'
-#'   Meinshausen, N., & Buhlmann, P. (2010). Stability selection.
-#'   Journal of the Royal Statistical Society: Series B (Statistical
-#'   Methodology). 72, 417-423
+#' Meinshausen, N., & Buhlmann, P. (2010). Stability selection. Journal of the
+#' Royal Statistical Society: Series B (Statistical Methodology). 72, 417-423
 #'
 #' @seealso \code{\link{plot.resample}, \link{modSelect}}
 #'
