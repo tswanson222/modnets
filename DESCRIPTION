@@ -1,11 +1,12 @@
 Package: modnets
 Title: Moderated Network Models
-Version: 0.0.0.9000
+Version: 0.9
 Authors@R: 
     person(given = "Trevor",
            family = "Swanson",
            role = c("aut", "cre"),
            email = "trevorswanson222@gmail.com")
+Maintainer: Trevor Swanson <trevorswanson222@gmail.com>
 Description: What the package does (one paragraph).
 License: GPL (>= 3)
 Imports: 
