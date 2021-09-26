@@ -71,7 +71,7 @@ plot(fit, threshold = TRUE)
 
 ### Stability \& power analyses
 * Currently, these methods are not supported in the multilevel setting.
-* For bootstrapping/edge-weight accuracy analysis, you can use the `bootNet` function (the name will be changed, given the popularity of the `bootnet` function by Sacha Epskamp that my code is based on).
+* For bootstrapping/edge-weight accuracy analysis, you can use the `bootNet` function.
 * For case-dropping stability analysis, you can use `bootNet` while setting `caseDrop = TRUE`.
 * For power analysis, you can use: `mnetPowerSim` to simulate data based on expected network structure(s).
 
