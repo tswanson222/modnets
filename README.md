@@ -6,20 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-R package for moderated network models.
-
-## Installation
-
-You can install the developmental version of modnets from
-[GitHub](https://github.com/tswanson222/modnets) with:
-
-``` r
-# library(devtools)
-# devtools::install_package('tswanson222/modnets')
-```
-
-Designed to afford exploratory and confirmatory estimation of 3 types of
-moderated networks:
+R package designed to afford exploratory and confirmatory estimation of
+3 types of moderated networks:
 
 1.  Cross-sectional moderated networks
     -   Involves nodewise estimation of a GGM with higher-order
@@ -52,9 +40,33 @@ LASSO, and the hierarchical LASSO. Hyperparameter selection will be
 performed automatically based on either the AIC, BIC, EBIC, or
 cross-validation depending upon user input.
 
-# Package Functions
+## Installation
 
-## Primary functions
+You can install the development version of modnets from
+[GitHub](https://github.com/tswanson222/modnets) with:
+
+``` r
+# install.packages('devtools')
+devtools::install_github('tswanson222/modnets')
+```
+
+## Usage
+
+``` r
+library(modnets)
+
+data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
+
+fit <- fitNetwork(data, moderators = 'depressed')
+
+plot(fit, threshold = TRUE)
+```
+
+<img src="man/figures/README-example-1.png" width="100%" />
+
+## Package Functions
+
+### Primary functions
 
 -   The primary function used for the first two types of models is:
     `fitNetwork`. There are a variety of arguments and options that can
@@ -62,7 +74,7 @@ cross-validation depending upon user input.
 -   The primary functions used for the third model are: `mlGVAR` and
     `lmerVAR`, depending on which approach you wish to use.
 
-## Model selection
+### Model selection
 
 -   For model selection, you can use `varSelect` to employ either
     best-subset selection (via `leaps`), the LASSO, ridge regression, or
@@ -79,7 +91,7 @@ cross-validation depending upon user input.
     values (such as those obtained in the GLS-driven SUR for temporal
     networks)
 
-## Stability & power analyses
+### Stability & power analyses
 
 -   Currently, these methods are not supported in the multilevel
     setting.
@@ -92,9 +104,9 @@ cross-validation depending upon user input.
 -   For power analysis, you can use: `mnetPowerSim` to simulate data
     based on expected network structure(s).
 
-# Examples
+## Examples
 
-## Cross-sectional moderated network
+### Cross-sectional moderated network
 
 ``` r
 library(modnets)
@@ -107,7 +119,7 @@ library(modnets)
 set.seed(999)
 x <- simNet(N = 100, p = 5, m = TRUE, sparsity = .5)
 #>   |                                                                              |                                                                      |   0%  |                                                                              |=                                                                     |   1%  |                                                                              |=                                                                     |   2%  |                                                                              |==                                                                    |   3%  |                                                                              |===                                                                   |   4%  |                                                                              |====                                                                  |   5%  |                                                                              |====                                                                  |   6%  |                                                                              |=====                                                                 |   7%  |                                                                              |======                                                                |   8%  |                                                                              |======                                                                |   9%  |                                                                              |=======                                                               |  10%  |                                                                              |========                                                              |  11%  |                                                                              |========                                                              |  12%  |                                                                              |=========                                                             |  13%  |                                                                              |==========                                                            |  14%  |                                                                              |==========                                                            |  15%  |                                                                              |===========                                                           |  16%  |                                                                              |============                                                          |  17%  |                                                                              |=============                                                         |  18%  |                                                                              |=============                                                         |  19%  |                                                                              |==============                                                        |  20%  |                                                                              |===============                                                       |  21%  |                                                                              |===============                                                       |  22%  |                                                                              |================                                                      |  23%  |                                                                              |=================                                                     |  24%  |                                                                              |==================                                                    |  25%  |                                                                              |==================                                                    |  26%  |                                                                              |===================                                                   |  27%  |                                                                              |====================                                                  |  28%  |                                                                              |====================                                                  |  29%  |                                                                              |=====================                                                 |  30%  |                                                                              |======================                                                |  31%  |                                                                              |======================                                                |  32%  |                                                                              |=======================                                               |  33%  |                                                                              |========================                                              |  34%  |                                                                              |========================                                              |  35%  |                                                                              |=========================                                             |  36%  |                                                                              |==========================                                            |  37%  |                                                                              |===========================                                           |  38%  |                                                                              |===========================                                           |  39%  |                                                                              |============================                                          |  40%  |                                                                              |=============================                                         |  41%  |                                                                              |=============================                                         |  42%  |                                                                              |==============================                                        |  43%  |                                                                              |===============================                                       |  44%  |                                                                              |================================                                      |  45%  |                                                                              |================================                                      |  46%  |                                                                              |=================================                                     |  47%  |                                                                              |==================================                                    |  48%  |                                                                              |==================================                                    |  49%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================                                  |  51%  |                                                                              |====================================                                  |  52%  |                                                                              |=====================================                                 |  53%  |                                                                              |======================================                                |  54%  |                                                                              |======================================                                |  55%  |                                                                              |=======================================                               |  56%  |                                                                              |========================================                              |  57%  |                                                                              |=========================================                             |  58%  |                                                                              |=========================================                             |  59%  |                                                                              |==========================================                            |  60%  |                                                                              |===========================================                           |  61%  |                                                                              |===========================================                           |  62%  |                                                                              |============================================                          |  63%  |                                                                              |=============================================                         |  64%  |                                                                              |==============================================                        |  65%  |                                                                              |==============================================                        |  66%  |                                                                              |===============================================                       |  67%  |                                                                              |================================================                      |  68%  |                                                                              |================================================                      |  69%  |                                                                              |=================================================                     |  70%  |                                                                              |==================================================                    |  71%  |                                                                              |==================================================                    |  72%  |                                                                              |===================================================                   |  73%  |                                                                              |====================================================                  |  74%  |                                                                              |====================================================                  |  75%  |                                                                              |=====================================================                 |  76%  |                                                                              |======================================================                |  77%  |                                                                              |=======================================================               |  78%  |                                                                              |=======================================================               |  79%  |                                                                              |========================================================              |  80%  |                                                                              |=========================================================             |  81%  |                                                                              |=========================================================             |  82%  |                                                                              |==========================================================            |  83%  |                                                                              |===========================================================           |  84%  |                                                                              |============================================================          |  85%  |                                                                              |============================================================          |  86%  |                                                                              |=============================================================         |  87%  |                                                                              |==============================================================        |  88%  |                                                                              |==============================================================        |  89%  |                                                                              |===============================================================       |  90%  |                                                                              |================================================================      |  91%  |                                                                              |================================================================      |  92%  |                                                                              |=================================================================     |  93%  |                                                                              |==================================================================    |  94%  |                                                                              |==================================================================    |  95%  |                                                                              |===================================================================   |  96%  |                                                                              |====================================================================  |  97%  |                                                                              |===================================================================== |  98%  |                                                                              |===================================================================== |  99%  |                                                                              |======================================================================| 100%
-#> Time difference of 4.734021 secs
+#> Time difference of 4.404011 secs
 str(x)
 #> List of 6
 #>  $ data      :'data.frame':  100 obs. of  6 variables:
@@ -131,7 +143,7 @@ str(x)
 #>  - attr(*, "m2")= num 1
 #>  - attr(*, "modType")= chr "none"
 #>  - attr(*, "class")= chr [1:2] "list" "ggmSim"
-#>  - attr(*, "time")= 'difftime' num 4.73381280899048
+#>  - attr(*, "time")= 'difftime' num 4.40380239486694
 #>   ..- attr(*, "units")= chr "secs"
 ### Contents:
 # x$data -------- 100x6 dataset, where 'M' is the moderator
@@ -356,9 +368,9 @@ vars1 <- varSelect(data = dat1, m = 6, criterion = 'BIC', method = 'glinternet')
 #> Fitting model 1/5...  Complete! (0.05 secs)
 #> Fitting model 2/5...  Complete! (0.04 secs)
 #> Fitting model 3/5...  Complete! (0.04 secs)
-#> Fitting model 4/5...  Complete! (0.05 secs)
-#> Fitting model 5/5...  Complete! (0.04 secs)
-#> ####### Total time: 0.22 secs
+#> Fitting model 4/5...  Complete! (0.06 secs)
+#> Fitting model 5/5...  Complete! (0.05 secs)
+#> ####### Total time: 0.23 secs
 mfit1 <- fitNetwork(data = dat1, moderators = 6, type = vars1)
 mfit2 <- fitNetwork(data = dat1, moderators = 6, type = 'varSelect', criterion = 'BIC')
 predictNet(mfit1, mfit2)
@@ -647,4 +659,4 @@ modTable(fits, nodes = TRUE)
 
 More examples to be added soon.
 
-Please contact <t092s958@ku.edu> with any questions.
+Please contact <trevorswanson222@gmail.com> with any questions.

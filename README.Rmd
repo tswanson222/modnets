@@ -18,28 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-R package for moderated network models.
-
-## Installation
-
-You can install the developmental version of modnets from [GitHub](https://github.com/tswanson222/modnets) with:
-
-```{r}
-# library(devtools)
-# devtools::install_package('tswanson222/modnets')
-```
-
-```{r example, include = FALSE, eval = FALSE}
-library(modnets)
-
-data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
-
-fit <- fitNetwork(data, moderators = 'depressed')
-
-plot(fit, threshold = TRUE)
-```
-
-Designed to afford exploratory and confirmatory estimation of 3 types of moderated networks:
+R package designed to afford exploratory and confirmatory estimation of 3 types of moderated networks:
 
 1. Cross-sectional moderated networks
 	* Involves nodewise estimation of a GGM with higher-order interactions
@@ -57,28 +36,49 @@ Designed to afford exploratory and confirmatory estimation of 3 types of moderat
 
 Penalized estimators for each of these models are also available, such as the LASSO, ridge regression, elastic net, the (overlapping) group LASSO, and the hierarchical LASSO. Hyperparameter selection will be performed automatically based on either the AIC, BIC, EBIC, or cross-validation depending upon user input.
 
-# Package Functions
+## Installation
 
-## Primary functions
+You can install the development version of modnets from [GitHub](https://github.com/tswanson222/modnets) with:
+
+```{r, eval = FALSE}
+# install.packages('devtools')
+devtools::install_github('tswanson222/modnets')
+```
+
+## Usage
+
+```{r example}
+library(modnets)
+
+data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
+
+fit <- fitNetwork(data, moderators = 'depressed')
+
+plot(fit, threshold = TRUE)
+```
+
+## Package Functions
+
+### Primary functions
 * The primary function used for the first two types of models is: `fitNetwork`. There are a variety of arguments and options that can be used for, e.g., penalized estimation, model specification, etc.
 * The primary functions used for the third model are: `mlGVAR` and `lmerVAR`, depending on which approach you wish to use.
 
-## Model selection
+### Model selection
 * For model selection, you can use `varSelect` to employ either best-subset selection (via `leaps`), the LASSO, ridge regression, or elastic net (via `glmnet`), or the hierarchical LASSO (via `glinternet`). These methods support various information criteria as well as cross-validation for model selection, and are embedded within the `varSelect` function.
 * As a note, all of the model selection procedures in `varSelect` operate on a sequential, nodewise basis.
 * Additionally, you can use the `resample` function to use repeated subsampling or bootstrapping with the `varSelect` algorithm built in. 
 * This latter method will take into account the actual model-fit values (such as those obtained in the GLS-driven SUR for temporal networks)
 
-## Stability \& power analyses
+### Stability \& power analyses
 * Currently, these methods are not supported in the multilevel setting.
 * For bootstrapping/edge-weight accuracy analysis, you can use the `bootNet` function (the name will be changed, given the popularity of the `bootnet` function by Sacha Epskamp that my code is based on).
 * For case-dropping stability analysis, you can use `bootNet` while setting `caseDrop = TRUE`.
 * For power analysis, you can use: `mnetPowerSim` to simulate data based on expected network structure(s).
 
 
-# Examples
+## Examples
 
-## Cross-sectional moderated network
+### Cross-sectional moderated network
 ```{r, ggm}
 library(modnets)
 # Package is now loaded! 
@@ -226,4 +226,4 @@ modTable(fits, nodes = TRUE)
 
 More examples to be added soon.
 
-Please contact t092s958@ku.edu with any questions.
+Please contact trevorswanson222@gmail.com with any questions.
