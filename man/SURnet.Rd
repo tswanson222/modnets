@@ -16,43 +16,45 @@ SURnet(
 )
 }
 \arguments{
-\item{fit}{Output from \code{SURfit()}}
+\item{fit}{Output from \code{\link{SURfit}}}
 
 \item{dat}{A list containing elements \code{"Y"} and \code{"X"} elements, to
 reflect the outcome and predictor matrices. These are lagged data matrices,
 and can be automatically created through the internal
-\code{modnets:::lagMat()} function. These transformed matrices must be
-supplied in conjunction with the \code{SURfit()} output in order to
+\code{modnets:::lagMat} function. These transformed matrices must be
+supplied in conjunction with the \code{\link{SURfit}} output in order to
 construct network models.}
 
 \item{s}{Character string indicating which type of residual covariance matrix
 to compute for SUR models. Options include \code{"res", "dfres", "sigma"}.
 \code{"sigma"} uses the residual covariance matrix as computed by the
-\code{systemfits} package. \code{"res"} and \code{"dfres"} compute the
-matrix based directly on the residual values. \code{"dfres"} is the sample
-estimator that uses \code{N - 1} in the denominator, while \code{"res"}
-just uses \code{N}.}
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
+\code{"res"} and \code{"dfres"} compute the matrix based directly on the
+residual values. \code{"dfres"} is the sample estimator that uses \code{N -
+  1} in the denominator, while \code{"res"} just uses \code{N}.}
 
 \item{m}{Character string or numeric value to specify the moderator (if any).}
 
-\item{threshold}{See corresponding argument of \code{fitNetwork()}}
+\item{threshold}{See corresponding argument of \code{\link{fitNetwork}}}
 
-\item{mval}{Numeric. See corresponding argument of \code{fitNetwork()}}
+\item{mval}{Numeric. See corresponding argument of \code{\link{fitNetwork}}}
 
-\item{medges}{Numeric. See corresponding argument of \code{fitNetwork()}}
+\item{medges}{Numeric. See corresponding argument of \code{\link{fitNetwork}}}
 
-\item{pcor}{See corresponding argument of \code{fitNetwork()}}
+\item{pcor}{See corresponding argument of \code{\link{fitNetwork}}}
 }
 \value{
 Temporal and contemporaneous networks
 }
 \description{
-A method for converting outputs from the \code{systemfit()} function of the
-\code{systemfit} package into temporal and contemporaneous networks. Intended
-as an internal function of \code{fitNetwork()}. Not intended for use by the
-user. The only purpose of making it available is to allow for extreme
-customization, and the capacity to convert any \code{systemfit()} output into
-a pair of network models compatible with the \code{modnets} package.
+A method for converting outputs from the
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function into
+temporal and contemporaneous networks. Intended as an internal function of
+\code{\link{fitNetwork}}. Not intended for use by the user. The only purpose
+of making it available is to allow for extreme customization, and the
+capacity to convert any
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} output into a pair of
+network models compatible with the \code{modnets} package.
 }
 \examples{
 \dontrun{
@@ -60,7 +62,6 @@ SURnet(fit, dat)
 }
 }
 \seealso{
-Other SUR functions: 
-\code{\link{SURfit}()}
+\code{\link{SURfit}, \link{fitNetwork},
+  \link[systemfit:systemfit]{systemfit::systemfit}}
 }
-\concept{SUR functions}

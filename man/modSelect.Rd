@@ -2,7 +2,7 @@
 % Please edit documentation in R/resample.R
 \name{modSelect}
 \alias{modSelect}
-\title{Select a model based on output from \code{resample()}}
+\title{Select a model based on output from \code{\link{resample}}}
 \usage{
 modSelect(
   obj,
@@ -16,7 +16,7 @@ modSelect(
 )
 }
 \arguments{
-\item{obj}{\code{resample} object}
+\item{obj}{\code{\link{resample}} output}
 
 \item{data}{The dataframe used to create the \code{resample} object. Necesary
 if \code{ascall = TRUE} or \code{fit = TRUE}.}
@@ -40,29 +40,29 @@ will serve as the value for \code{thresh}).
 
 When the resampling method was \code{"stability"}, the default option of
 \code{select = "select"} chooses variables based on the original threshold
-provided to the \code{resample()} function, and relies on the simultaneous
-selection proportion (the \code{"freq"} column in the \code{"results"}
-element). Alternatively, if \code{select} is a numeric value, or a value
-for \code{thresh} is provided, that new frequency selection threshold will
-determine the choice of variables. Alternatively, one can specify
-\code{select = "split1"} or \code{select = "split2"} to base the threshold
-on the selection frequency in one of the two splits rather than on the
-simultaneous selection frequency which is likely to be the most
-conservative.
+provided to the \code{\link{resample}} function, and relies on the
+simultaneous selection proportion (the \code{"freq"} column in the
+\code{"results"} element). Alternatively, if \code{select} is a numeric
+value, or a value for \code{thresh} is provided, that new frequency
+selection threshold will determine the choice of variables. Alternatively,
+one can specify \code{select = "split1"} or \code{select = "split2"} to
+base the threshold on the selection frequency in one of the two splits
+rather than on the simultaneous selection frequency which is likely to be
+the most conservative.
 
 For all types of \code{resample} objects, when \code{select = "Pvalue"}
 then \code{thresh} can be set to a numeric value in order to select
 variables based on aggregated p-values. For the \code{"bootstrapping"} and
 \code{"split"} methods this allows one to override the original threshold
-(set as part of \code{resample()}) if desired.}
+(set as part of \code{\link{resample}}) if desired.}
 
 \item{thresh}{Numeric value. If \code{select = "Pvalue"}, then this value
 will be the p-value threshold. Otherwise, this value will determine the
 minimum frequency selection threshold.}
 
 \item{ascall}{Logical. Determines whether to return a list with arguments
-necessary for fitting the model with \code{do.call} to \code{fitNetwork()}.
-Only possible if a dataset is supplied.}
+necessary for fitting the model with \code{do.call} to
+\code{\link{fitNetwork}}. Only possible if a dataset is supplied.}
 
 \item{type}{Should just leave as-is. Automatically taken from the
 \code{resample} object.}
@@ -70,17 +70,17 @@ Only possible if a dataset is supplied.}
 \item{...}{Additional arguments.}
 }
 \value{
-A call ready for \code{fitNetwork()}, a fitted network model, or a
-list of selected variables for each node along with relevant attributes.
+A call ready for \code{\link{fitNetwork}}, a fitted network model, or
+a list of selected variables for each node along with relevant attributes.
 Essentially, the output is either the selected model itself or a list of
 the necessary parameters to fit it.
 }
 \description{
 Creates the necessary input for fitNetwork when selecting variables based on
-the \code{resample()} function. The purpose of making this function available
-to the user is to that different decisions can be made about how exactly to
-use the \code{resample()} output to select a model, as sometimes there is
-more than one option for choosing a final model.
+the \code{\link{resample}} function. The purpose of making this function
+available to the user is to that different decisions can be made about how
+exactly to use the \code{\link{resample}} output to select a model, as
+sometimes there is more than one option for choosing a final model.
 }
 \examples{
 \dontrun{

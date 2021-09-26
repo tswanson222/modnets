@@ -6,7 +6,7 @@
 \alias{plot.SURnet}
 \alias{plot.mlGVAR}
 \alias{plot.lmerVAR}
-\alias{plot.mgmSim}
+\alias{plot.ggmSim}
 \alias{plot.mlVARsim}
 \alias{plot.simMLgvar}
 \title{Plot moderated and unmoderated network models}
@@ -131,7 +131,7 @@ plotNet(
   ...
 )
 
-\method{plot}{mgmSim}(
+\method{plot}{ggmSim}(
   x,
   which.net = "temporal",
   threshold = FALSE,
@@ -217,19 +217,19 @@ standardized contemporaneous network (Partial Contemporaneous
 Correlations). All of these terms apply for multilevel networks, but
 \code{"between"} can also plot the between-subjects network. Additionally,
 the value \code{"coef"} will plot the model coefficients and confidence
-intervals, defaulting to the \code{plotCoefs()} function. Moreover, with
-GGMs or outputs from \code{mlGVAR()} with a moderated between-subjects
-network, the value \code{"ints"} will call the \code{intsPlot()} function.
-If a numeric or logical value is supplied, however, this argument will
-function as the \code{threshold} argument. A numeric value will set a
-threshold at the supplied value, while \code{TRUE} will set a threshold of
-.05.}
+intervals, defaulting to the \code{\link{plotCoefs}} function. Moreover,
+with GGMs or outputs from \code{\link{mlGVAR}} with a moderated
+between-subjects network, the value \code{"ints"} will call the
+\code{\link{intsPlot}} function. If a numeric or logical value is supplied,
+however, this argument will function as the \code{threshold} argument. A
+numeric value will set a threshold at the supplied value, while \code{TRUE}
+will set a threshold of .05.}
 
 \item{threshold}{A numeric or logical value to set a p-value threshold.
 \code{TRUE} will automatically set the threshold at .05.}
 
 \item{layout}{Character. Corresponds to the \code{layout} argument in the
-\code{qgraph()} function.}
+\code{\link[qgraph:qgraph]{qgraph::qgraph}} function.}
 
 \item{predict}{If \code{TRUE}, then prediction error associated with each
 node will be plotted as a pie graph around the nodes. For continuous
@@ -252,8 +252,8 @@ vector can be provided to serve as custom labels for the nodes.}
 will be plotted rather than the undirected averages of corresponding edges.}
 
 \item{scale}{Logical. Only applies when \code{predict} does not equal
-\code{FALSE}. The value of this argument is sent to the \code{predictNet()}
-function.}
+\code{FALSE}. The value of this argument is sent to the
+\code{\link{predictNet}} function.}
 
 \item{lag}{DEPRECATED!}
 
@@ -302,11 +302,16 @@ Displays a network plot, or returns a \code{qgraph} object if
 }
 \description{
 Core function for plotting various types of network models. Accessible
-through the \code{plot()} S3 generic.
+through the \code{plot()} S3 generic function.
 }
 \examples{
 \dontrun{
 x <- fitNetwork(data)
 plot(x)
 }
+}
+\seealso{
+\code{\link{fitNetwork}, \link{predictNet}, \link{mlGVAR},
+  \link{lmerVAR}, \link{simNet}, \link{mlGVARsim}, \link{plotCoefs},
+  \link{intsPlot}, \link{resample}}
 }

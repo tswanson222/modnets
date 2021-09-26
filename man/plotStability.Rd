@@ -13,7 +13,8 @@ plotStability(
 )
 }
 \arguments{
-\item{x}{Output of \code{resample()} where \code{sampMethod = "stability"}.}
+\item{x}{Output of \code{\link{resample}} where \code{sampMethod =
+"stability"}.}
 
 \item{outcome}{Character string or numeric value (in terms of columns in the
 dataset) to indicate which outcome to plot the stability path for.}
@@ -51,4 +52,7 @@ plot(x, what = "stability")
 Meinshausen, N., & Buhlmann, P. (2010). Stability selection.
 Journal of the Royal Statistical Society: Series B (Statistical
 Methodology). 72, 417-423
+}
+\seealso{
+\code{\link{resample}}
 }

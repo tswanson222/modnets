@@ -42,11 +42,11 @@ automatically become \code{FALSE}.}
 
 \item{selectFUN}{Choose a variable selection function. Can specify either
 \code{"varSelect"} or \code{"resample"} to use the corresponding functions.
-If you want to use the \code{resample()} algorithm though, then it is
+If you want to use the \code{\link{resample}} function though, then it is
 recommended to specify \code{selectFUN} as one of: \code{"stability",
   "split", "bootstrap"} in order to identify the specific method. If
 \code{selectFUN = "resample"}, then it is recommended to add the
-\code{sampMethod} argument to the call to \code{mlGVAR()}.}
+\code{sampMethod} argument to the call to \code{\link{mlGVAR}}.}
 
 \item{subjectNets}{If \code{TRUE}, then subject-specific networks are fit for
 all subjects and returned in the final output. Otherwise, can specify a
@@ -71,13 +71,13 @@ be \code{FALSE}.}
 \item{fixedType}{If logical, then any variable selection procedure specified
 by \code{selectFUN} will not be applied to the SUR network. Alternatively,
 a variable selection result, such as the output from either
-\code{varSelect()} or \code{moSelect(resample(...))}, can be supplied to
+\code{\link{varSelect}} or \code{\link{modSelect}}, can be supplied to
 choose a specific constrained model in advance.}
 
 \item{betweenType}{If logical, then any variable selection procedure
 specified by \code{selectFUN} will not be applied to the SUR network.
 Alternatively, a variable selection result, such as the output from either
-\code{varSelect()} or \code{moSelect(resample(...))}, can be supplied to
+\code{\link{varSelect}} or \code{\link{modSelect}}, can be supplied to
 choose a specific constrained model in advance.}
 
 \item{centerWithin}{Following the application of \code{center} and
@@ -102,7 +102,8 @@ researcher.}
 \item{verbose}{Logical. Determines whether to output progress bars and
 messages in the console during the fitting process.}
 
-\item{pcor}{See corresponding argument in the \code{fitNetwork()} function}
+\item{pcor}{See corresponding argument in the \code{\link{fitNetwork}}
+function}
 
 \item{fixedArgs}{A named list of arguments for the variable selection
 function can be provided here, specifically those that are meant to be
@@ -152,4 +153,9 @@ fit <- mlGVAR(data)
 Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
 The gaussian graphical model in cross-sectional and time-series data.
 Multivariate Behavioral Research. 53, 453-580.
+}
+\seealso{
+\code{\link{mlGVARsim}, \link{lmerVAR}, \link{fitNetwork},
+  \link{varSelect}, \link{resample}, \link{net}, \link{netInts},
+  \link{plotNet}}
 }

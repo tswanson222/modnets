@@ -1,18 +1,19 @@
 #' Create table of centrality values or clustering coefficients
 #'
-#' Mimics the output of the \code{centralityTable()} and
-#' \code{clusteringTable()} functions in the \code{qgraph} package. The purpose
-#' of revising these function was to make them compatible with outputs from the
-#' \code{modnets} package.
+#' Mimics the output of the
+#' \code{\link[qgraph:centralityTable]{qgraph::centralityTable}} and
+#' \code{\link[qgraph:clusteringTable]{qgraph::clusteringTable}} functions. The
+#' purpose of revising these function was to make them compatible with outputs
+#' from the \code{modnets} package.
 #'
-#' For \code{centTable()}, centrality values can be computed for the matrix of
-#' interactions within a temporal network.
+#' For \code{\link{centTable}}, centrality values can be computed for the matrix
+#' of interactions within a temporal network.
 #'
 #' @param Wmats Output from one of the primary \code{modnets} functions.
 #' @param scale Logical. Determines whether to standardize values within each
 #'   measure (i.e., convert to z-scores).
 #' @param which.net Only applies to SUR networks, as well as those fit with the
-#'   \code{mlGVAR()} function. Character string to indicate which type of
+#'   \code{\link{mlGVAR}} function. Character string to indicate which type of
 #'   network to compute centrality values for. Options are \code{"temporal"} for
 #'   the temporal network, \code{"contemporaneous"} for the contemporaneous
 #'   network, \code{"PDC"} for the partial directed correlation network, and
@@ -31,6 +32,11 @@
 #'   and their corresponding centrality values or clustering coefficients.
 #' @export
 #' @name CentralityAndClustering
+#'
+#' @seealso \code{\link{centAuto}, \link{clustAuto}, \link{centPlot},
+#'   \link{clustPlot}, \link{plotCentrality},
+#'   \link[qgraph:centralityTable]{qgraph::centralityTable},
+#'   \link[qgraph:clusteringTable]{qgraph::clusteringTable}}
 #'
 #' @examples
 #' \dontrun{
@@ -194,12 +200,14 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
   return(LongCent)
 }
 
-#' Node centrality and shortest path lengths
+#' Node centrality, clustering coefficients, and shortest path lengths
 #'
-#' Mimics the \code{centrality_auto()} function from the \code{qgraph} package.
-#' The purpose of amending this function was to make it compatible with outputs
-#' from the \code{modnets} package. The main use of this function is as the
-#' engine for the \code{centTable()} function.
+#' Mimics the \code{\link[qgraph:centrality_auto]{qgraph::centrality_auto}} and
+#' \code{\link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}} functions. The
+#' purpose of amending these functions was to make them compatible with outputs
+#' from the \code{modnets} package. The main use of these functions is as the
+#' engines for the \code{\link{centTable}} and \code{\link{clustTable}}
+#' functions.
 #'
 #' Returns several node centrality statistics, edge-betweenness centrality, and
 #' shortest path lengths. Betweenness and Closeness centrality are computed for
@@ -208,15 +216,17 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
 #' computed. For SUR networks, InStrength, OutStrength, InExpectedInfluence, and
 #' OutExpectedInfluence are computed instead.
 #'
-#' The key distinction between this function and \code{centrality_auto()} is
-#' that centrality values can be computed for the matrix of interactions within
-#' a temporal network.
+#' The key distinction between these functions and the
+#' \code{\link[qgraph:centrality_auto]{qgraph::centrality_auto}} and
+#' \code{\link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}} functions is that
+#' centrality and clustering values can be computed for the matrix of
+#' interactions within a temporal network.
 #'
 #' @param x Output from one of the primary \code{modnets} functions. Can also
 #'   supply a list of network models, and the function will be applied to all
 #'   models in the list.
 #' @param which.net Only applies to SUR networks, as well as those fit with the
-#'   \code{mlGVAR()} function. Character string to indicate which type of
+#'   \code{\link{mlGVAR}} function. Character string to indicate which type of
 #'   network to compute centrality values for. Options are \code{"temporal"} for
 #'   the temporal network, \code{"contemporaneous"} for the contemporaneous
 #'   network, \code{"PDC"} for the partial directed correlation network, and
@@ -232,6 +242,11 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
 #'   values, and shortest path lengths.
 #' @export
 #' @name CentClust
+#'
+#' @seealso \code{\link{centTable}, \link{clustTable}, \link{centPlot},
+#'   \link{clustPlot}, \link{plotCentrality},
+#'   \link[qgraph:centrality_auto]{qgraph::centrality_auto},
+#'   \link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}}
 #'
 #' @examples
 #' \dontrun{
@@ -374,19 +389,21 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
 
 #' Plots for node centrality values or clustering coefficients
 #'
-#' Mimics the \code{centralityPlot()} and \code{clusteringPlot()} functions from
-#' the \code{qgraph} package. The purpose of revising this function was to make
-#' it compatible with outputs from the \code{modnets} package.
+#' Mimics the \code{\link[qgraph:centralityPlot]{qgraph::centralityPlot}} and
+#' \code{\link[qgraph:clusteringPlot]{qgraph::clusteringPlot}} functions. The
+#' purpose of revising this function was to make it compatible with outputs from
+#' the \code{modnets} package.
 #'
-#' The only utility of the \code{plotCentrality()} function is as an easy way to
-#' combine centrality measures and clustering coefficients into a single plot.
+#' The only utility of the \code{\link{plotCentrality}} function is as an easy
+#' way to combine centrality measures and clustering coefficients into a single
+#' plot.
 #'
 #' @param Wmats Output from one of the primary \code{modnets} functions.
 #' @param scale If \code{"z-scores"}, then standardized values will be plotted.
 #'   If \code{"relative"}, then values will be scaled relative to the largest
 #'   value on each measure. \code{"raw"} can be used to plot raw values.
 #' @param which.net Only applies to SUR networks, as well as those fit with the
-#'   \code{mlGVAR()} function. Character string to indicate which type of
+#'   \code{\link{mlGVAR}} function. Character string to indicate which type of
 #'   network to compute centrality values for. Options are \code{"temporal"} for
 #'   the temporal network, \code{"contemporaneous"} for the contemporaneous
 #'   network, \code{"PDC"} for the partial directed correlation network, and
@@ -406,8 +423,8 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
 #' @param plot Logical. Determines whether to plot the output or not.
 #' @param verbose Logical. Determines whether to return a message about the plot
 #'   (messages are only shown if values are scaled).
-#' @param weighted See \code{centTable()} or \code{clustTable()}.
-#' @param signed See \code{centTable()} or \code{clustTable()}.
+#' @param weighted See \code{\link{centTable}} or \code{\link{clustTable}}.
+#' @param signed See \code{\link{centTable}} or \code{\link{clustTable}}.
 #' @param centrality Character vector of centrality measures to plot. Defaults
 #'   to \code{"all"}.
 #' @param clustering Character vector of clustering measures to plot. Defaults
@@ -417,6 +434,10 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
 #'   measures.
 #' @export
 #' @name CentralityAndClusteringPlots
+#'
+#' @seealso \code{\link{centTable}, \link{clustTable}, \link{centAuto},
+#'   \link{clustAuto}, \link[qgraph:centralityPlot]{qgraph::centralityPlot},
+#'   \link[qgraph:clusteringPlot]{qgraph::clusteringPlot}}
 #'
 #' @examples
 #' \dontrun{

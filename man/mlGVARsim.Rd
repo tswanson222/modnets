@@ -126,7 +126,7 @@ length \code{nNode} can be provided to specify the skewness of each
 variable.}
 
 \item{skewErr}{The skewness parameter for the \code{alpha} argument in the
-\code{rmsn()} function in the \code{sn} package.}
+\code{\link[sn:rmsn]{sn::rmsn}} function.}
 
 \item{ordinal}{Logical. Determines whether to sample ordinal variables. If a
 numeric value is provided, then this will automatically be assigned to the
@@ -164,9 +164,13 @@ moderator as well.
 \details{
 Made to simulate data based on pre-specified parameters, possibly for power
 simulations or other analyses. Output can be used to fit models with either
-\code{mlGVAR()} or \code{lmerVAR()}.
+\code{\link{mlGVAR}} or \code{\link{lmerVAR}}.
 }
 \examples{
 set.seed(1)
 x <- mlGVARsim()
+}
+\seealso{
+\code{\link{mlGVAR}, \link{lmerVAR}, \link{simNet}, \link{plotNet},
+  \link{net}, \link{netInts}}
 }

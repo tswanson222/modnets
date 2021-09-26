@@ -7,7 +7,7 @@
 plotPvals(x, outcome = 1, predictor = 1, title = TRUE, alpha = 0.05)
 }
 \arguments{
-\item{x}{Output from \code{resample()}, given that \code{sampMethod =
+\item{x}{Output from \code{\link{resample}}, given that \code{sampMethod =
 "bootstrap"} or \code{sampMethod = "split"}.}
 
 \item{outcome}{Character string or numeric value (in terms of columns in the
@@ -43,6 +43,9 @@ plot(x, what = 'pvals')
 }
 \references{
 Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
-high-dimensional regression. Journal of the American Statistical Association.
-104, 1671-1681.
+high-dimensional regression. Journal of the American Statistical
+Association. 104, 1671-1681.
+}
+\seealso{
+\code{\link{resample}}
 }

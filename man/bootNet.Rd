@@ -73,13 +73,13 @@ tested when \code{caseDrop = TRUE}.}
 .05 will be set. Indicates whether a threshold should be placed on the
 bootstrapped samples. A significant choice by the researcher. Only applies
 when a variable selection procedure is applied, or whether a
-\code{resample()} object is used as input.}
+\code{\link{resample}} object is used as input.}
 
 \item{fits}{A list of all fitted models, if available. Not likely to be used.}
 
-\item{type}{See \code{type} argument in \code{fitNetwork()} function. This is
-where a variable selection model can be provided. This will fit the same
-selected model across all iterations of the bootstrapping procedure.}
+\item{type}{See \code{type} argument in \code{\link{fitNetwork}} function.
+This is where a variable selection model can be provided. This will fit the
+same selected model across all iterations of the bootstrapping procedure.}
 
 \item{saveMods}{Logical. Determines whether or not to return all of the
 fitted models -- that is, all the models fit to each bootstrapped sample.
@@ -89,8 +89,9 @@ returned which can save memory.}
 \item{verbose}{Logical. Determines whether a progress bar should be shown, as
 well as whether messages should be shown.}
 
-\item{fitCoefs}{Logical, refers to the argument in the \code{fitNetwork()}
-function. Most likely this should always be \code{FALSE}.}
+\item{fitCoefs}{Logical, refers to the argument in the
+\code{\link{fitNetwork}} function. Most likely this should always be
+\code{FALSE}.}
 
 \item{size}{Numeric. Size of sample to use for bootstrapping. Not
 recommended.}
@@ -98,9 +99,10 @@ recommended.}
 \item{nCores}{If a logical or numeric value is provided, then the
 bootstrapping procedure will be parallelized across multiple CPUs. If
 numeric, this will specify the number of cores to use for the procedure. If
-\code{TRUE}, then the \code{detectCores()} function of the \code{parallel}
-package will be run to maximize the number of cores available. Defaults to
-1, which does not run any parallelization functions.}
+\code{TRUE}, then the
+\code{\link[parallel:detectCores]{parallel::detectCores}} function of the
+\code{parallel} package will be run to maximize the number of cores
+available. Defaults to 1, which does not run any parallelization functions.}
 
 \item{cluster}{Character string to indicate which type of parallelization
 function to use, if \code{nCores > 1}. Options are \code{"mclapply"} or
@@ -134,50 +136,59 @@ conjunction with \code{beepno} argument.}
 A \code{bootNet} object
 }
 \description{
-Follows closely to the methods of bootstrapping found in the \code{bootnet()}
-function of the \code{bootnet} package. An essential goal behind this
-function to expand \code{bootnet()} to encompass moderated networks.
+Follows closely to the methods of bootstrapping found in the
+\code{\link[bootnet:bootnet]{bootnet::bootnet}} function. An essential goal
+behind this function is to expand
+\code{\link[bootnet:bootnet]{bootnet::bootnet}} to encompass moderated
+networks.
 }
 \details{
-Can be used to perform bootstrapped network estimation, as well as to perform
-a case-drop bootstrap. Details on these two methods can be found in the help
-page for the \code{bootnet()} function within the \code{bootnet} package.
+Can be used to perform bootstrapped network estimation, as well as perform a
+case-drop bootstrap. Details on these two methods can be found in the help
+page for the \code{\link[bootnet:bootnet]{bootnet::bootnet}} function.
 
-The defining feature of \code{bootNet()} that differentiates it from the
-\code{resample(..., sampMethod = "bootstrap")} function is that the \emph{same
-model is fit at every iteration} in \code{bootNet()}. The only time that
-models may differ across iterations is if a \code{threshold} is specified.
-When \code{threshold = FALSE}, then the saturated model is fit to each
-bootstrapped sample. Alternatively, bootstrapping can be performed with
+The defining feature of \code{\link{bootNet}} that differentiates it from the
+\code{\link{resample}} function when \code{sampMethod = "bootstrap"} is that
+the \emph{same model is fit at every iteration} in \code{\link{bootNet}}. The only
+time that models may differ across iterations is if a \code{threshold} is
+specified. When \code{threshold = FALSE}, then the saturated model is fit to
+each bootstrapped sample. Alternatively, bootstrapping can be performed with
 respect to a specific constrained model. In this case, the constrained model
-(variable selection model; output of \code{varSelect()} or \code{resample()})
-can be supplied to the \code{type} argument, and thus this function provides
-a way to estimate the posterior distributions of the nodes based on a
-constrained model.
+(variable selection model; output of \code{\link{varSelect}} or
+\code{\link{resample}}) can be supplied to the \code{type} argument, and thus
+this function provides a way to estimate the posterior distributions of the
+nodes based on a constrained model.
 
-In addition to expanding \code{bootnet()} to moderated networks, there are
-also some additional features such as the capacity to perform the block
-bootstrap for temporal networks via the \code{block} argument. The block
-bootstrap is \strong{highly} recommended for resampling temporal networks.
+In addition to expanding \code{\link[bootnet:bootnet]{bootnet::bootnet}} to
+moderated networks, there are also some additional features such as the
+capacity to perform the block bootstrap for temporal networks via the
+\code{block} argument. The block bootstrap is \strong{highly} recommended for
+resampling temporal networks.
 
 Another feature of this function is that it can be used on outputs from the
-\code{resample()} function. This can be used as a way to evaluate the
-iterations of \code{resample()} beyond just using it for variable selection.
+\code{\link{resample}} function. This can be used as a way to evaluate the
+iterations of \code{\link{resample}} beyond just using it for variable
+selection.
 }
 \section{Warning}{
 
 
-Importantly, if output from the \code{resample()} function is used as input
-for the \code{bootNet()} function, and the user wishes to use the model
-selected by the \code{resample()} function as the comparison to the
-bootstrapped results, you must add the \code{fit0} argument to this
-function. Use the fitted object in the \code{resample()} output as the
-input for the undocumented \code{fit0} argument for the \code{bootNet()}
-function.
+Importantly, if output from the \code{\link{resample}} function is used as
+input for the \code{\link{bootNet}} function, and the user wishes to use
+the model selected by the \code{\link{resample}} function as the comparison
+to the bootstrapped results, you must add the \code{fit0} argument to this
+function. Use the fitted object in the \code{\link{resample}} output as the
+input for the undocumented \code{fit0} argument for the
+\code{\link{bootNet}} function.
 }
 
 \examples{
 \dontrun{
 x <- bootNet(data)
 }
+}
+\seealso{
+\code{\link{summary.bootNet}, \link{fitNetwork}, \link{varSelect},
+  \link{resample}, \link{plotBoot}, \link{plotNet}, \link{net},
+  \link{netInts}, \link[bootnet:bootnet]{bootnet::bootnet}}
 }

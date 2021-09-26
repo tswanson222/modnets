@@ -1,7 +1,7 @@
 #' Plot moderated and unmoderated network models
 #'
 #' Core function for plotting various types of network models. Accessible
-#' through the \code{plot()} S3 generic.
+#' through the \code{plot()} S3 generic function.
 #'
 #' @param x Output from any of the \code{modnets} model fitting or simulation
 #'   functions.
@@ -15,17 +15,17 @@
 #'   Correlations). All of these terms apply for multilevel networks, but
 #'   \code{"between"} can also plot the between-subjects network. Additionally,
 #'   the value \code{"coef"} will plot the model coefficients and confidence
-#'   intervals, defaulting to the \code{plotCoefs()} function. Moreover, with
-#'   GGMs or outputs from \code{mlGVAR()} with a moderated between-subjects
-#'   network, the value \code{"ints"} will call the \code{intsPlot()} function.
-#'   If a numeric or logical value is supplied, however, this argument will
-#'   function as the \code{threshold} argument. A numeric value will set a
-#'   threshold at the supplied value, while \code{TRUE} will set a threshold of
-#'   .05.
+#'   intervals, defaulting to the \code{\link{plotCoefs}} function. Moreover,
+#'   with GGMs or outputs from \code{\link{mlGVAR}} with a moderated
+#'   between-subjects network, the value \code{"ints"} will call the
+#'   \code{\link{intsPlot}} function. If a numeric or logical value is supplied,
+#'   however, this argument will function as the \code{threshold} argument. A
+#'   numeric value will set a threshold at the supplied value, while \code{TRUE}
+#'   will set a threshold of .05.
 #' @param threshold A numeric or logical value to set a p-value threshold.
 #'   \code{TRUE} will automatically set the threshold at .05.
 #' @param layout Character. Corresponds to the \code{layout} argument in the
-#'   \code{qgraph()} function.
+#'   \code{\link[qgraph:qgraph]{qgraph::qgraph}} function.
 #' @param predict If \code{TRUE}, then prediction error associated with each
 #'   node will be plotted as a pie graph around the nodes. For continuous
 #'   variables, the type of prediction error is determined by the \code{con}
@@ -43,8 +43,8 @@
 #' @param nodewise Only applies to GGMs. If \code{TRUE}, then nodewise edges
 #'   will be plotted rather than the undirected averages of corresponding edges.
 #' @param scale Logical. Only applies when \code{predict} does not equal
-#'   \code{FALSE}. The value of this argument is sent to the \code{predictNet()}
-#'   function.
+#'   \code{FALSE}. The value of this argument is sent to the
+#'   \code{\link{predictNet}} function.
 #' @param lag DEPRECATED!
 #' @param con Character string indicating which type of prediction error to plot
 #'   for continuous variables, if \code{predict} does not equal \code{FALSE}.
@@ -78,6 +78,10 @@
 #' @return Displays a network plot, or returns a \code{qgraph} object if
 #'   \code{plot = FALSE}.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{predictNet}, \link{mlGVAR},
+#'   \link{lmerVAR}, \link{simNet}, \link{mlGVARsim}, \link{plotCoefs},
+#'   \link{intsPlot}, \link{resample}}
 #'
 #' @examples
 #' \dontrun{
@@ -141,7 +145,7 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
   if(is(x, 'bootNet') | (isTRUE(attr(x, 'resample')) & 'fit0' %in% names(x))){
     x <- x$fit0
   }
-  if(is(x, 'mgmSim')){
+  if(is(x, 'ggmSim')){
     names(x)[grep('^trueNet$|^b1$', names(x))] <- 'adjMat'
     dimnames(x$adjMat) <- rep(list(1:ncol(x$adjMat)), 2)
     x$edgeColors <- getEdgeColors(x$adjMat)
@@ -437,7 +441,7 @@ plot.lmerVAR <- function(x, which.net = 'temporal', threshold = FALSE, layout = 
 
 #' @rdname plotNet
 #' @export
-plot.mgmSim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+plot.ggmSim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                         predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
                         scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
                         plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
@@ -471,7 +475,7 @@ plot.simMLgvar <- function(x, which.net = 'temporal', threshold = FALSE, layout 
 #' Plot conditional networks at different levels of the moderator
 #'
 #' An easy wrapper for plotting the same network at different levels of a
-#' moderator. Using the \code{mval} argument of the \code{fitNetwork()}
+#' moderator. Using the \code{mval} argument of the \code{\link{fitNetwork}}
 #' function, you can create multiple models---conditional networks---wherein the
 #' same model is fit at different values of the moderator.
 #'
@@ -479,26 +483,30 @@ plot.simMLgvar <- function(x, which.net = 'temporal', threshold = FALSE, layout 
 #' networks so that the network can be easily compared (visually) at different
 #' levels of the moderator.
 #'
-#' @param nets List of network models fit with \code{fitNetwork()}, where
+#' @param nets List of network models fit with \code{\link{fitNetwork}}, where
 #'   \code{mval} has been specified.
-#' @param nodewise See corresponding argument in \code{plotNet()}.
+#' @param nodewise See corresponding argument in \code{\link{plotNet}}.
 #' @param elsize Numeric value to indicate the size of the edge labels.
 #' @param vsize Numeric value to indicate the size of the nodes. If \code{NULL},
 #'   then a default value will be determined based on the number of nodes in the
 #'   network.
 #' @param elabs If \code{TRUE}, then edges will be labeled with their numeric
 #'   values.
-#' @param predict See corresponding argument in \code{plotNet()}.
+#' @param predict See corresponding argument in \code{\link{plotNet}}.
 #' @param layout Can be a character string, corresponding to the options in
-#'   \code{qgraph()}, or can be a matrix that defines the layout (e.g., based on
-#'   the \code{averageLayout()} function). Recommended to leave as \code{NULL},
-#'   so that the layout will be based on the list of networks provided.
-#' @param which.net See corresponding argument in \code{plotNet()}.
+#'   \code{\link[qgraph:qgraph]{qgraph::qgraph}}, or can be a matrix that
+#'   defines the layout (e.g., based on the
+#'   \code{\link[qgraph:averageLayout]{qgraph::averageLayout}} function).
+#'   Recommended to leave as \code{NULL}, so that the layout will be based on
+#'   the list of networks provided.
+#' @param which.net See corresponding argument in \code{\link{plotNet}}.
 #' @param ... Additional arguments.
 #'
 #' @return Returns a plot where multiple conditional networks are plotted side
 #'   by side.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}}
 #'
 #' @examples
 #' data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])
@@ -566,7 +574,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'
 #' Creates various types of plot to visualize \code{bootNet} objects.
 #'
-#' @param x Output from \code{bootNet()}. Also some compatiblity with
+#' @param x Output from \code{\link{bootNet}}. Also some compatablity with
 #'   \code{resample} objects (when sampMethod != 'stability').
 #' @param type The outcome measure to plot. Options include: \code{"edges",
 #'   "strength", "ei", "outstrength", "instrength", "outei", "inei"}. The "out-"
@@ -609,14 +617,14 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'   produce a symmetric confidence band, whereas for \code{"quantile"} argument
 #'   this is not necessary. Not relevant to outputs for the case-drop bootstrap.
 #' @param true Defaults to \code{NULL}, not relevant for the case-drop
-#'   bootstrap. Can supply another output from \code{fitNetwork()}, or an
+#'   bootstrap. Can supply another output from \code{\link{fitNetwork}}, or an
 #'   adjacency matrix, to serve as the true network in the plot. If there are
-#'   interactions in the model, then a \code{fitNetwork()} object is
+#'   interactions in the model, then a \code{\link{fitNetwork}} object is
 #'   recommended. Alternatively, this argument can be extremely useful for
-#'   simulated data -- especially anything created with \code{simNet()}. For
-#'   whatever outcome (e.g., \code{edges, strength, EI}) is plotted, supplying
-#'   another object to \code{true} will plot the values related to the true
-#'   network, i.e., the data-generating model.
+#'   simulated data -- especially anything created with \code{\link{simNet}}.
+#'   For whatever outcome (e.g., \code{edges, strength, EI}) is plotted,
+#'   supplying another object to \code{true} will plot the values related to the
+#'   true network, i.e., the data-generating model.
 #' @param errbars Logical. Not relevant to the case-drop bootstrap. If
 #'   \code{TRUE}, then error bars are used rather than confidence bands. Can be
 #'   useful to home in on specific variables and see their confidence interval.
@@ -626,7 +634,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #' @param threshold Numeric or logical. Not relevant to the case-drop bootstrap.
 #'   Has a significant effect on the bootstrapped coefficient distributions. If
 #'   \code{TRUE}, then the default p-value threshold is set to .05. A numeric
-#'   value can specify a different threshold. Causes the \code{bootNet()}
+#'   value can specify a different threshold. Causes the \code{\link{bootNet}}
 #'   function to run the object again, only to re-compute the bootstrapped
 #'   distributions after applying a p-value threshold to the results of each
 #'   model iteration. If \code{NULL}, all coefficient estimates are used in
@@ -649,9 +657,9 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'   variable to reflect the proportion of times that it was selected across all
 #'   bootstrapped iterations. Only relevant if a threshold was set for the
 #'   fitted bootstrap models, either specified in the current function or was
-#'   specified in creating the \code{bootNet} object. If a numeric value is
-#'   provided, this will determine the size of the text label. Defaults to 1.2
-#'   when \code{text = TRUE}.
+#'   specified in creating the \code{\link{bootNet}} object. If a numeric value
+#'   is provided, this will determine the size of the text label. Defaults to
+#'   1.2 when \code{text = TRUE}.
 #' @param textPos Supports the \code{text} argument for coefficient plots.
 #'   Indicates the x-axis position of where to plot the coefficient labels.
 #'   Generally will be numeric, but defaults to \code{"value"}, which means that
@@ -663,7 +671,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'   interactions (such as \code{text}) are plotted. This argument will
 #'   eventually be expanded to allow one to plot combinations of edge and
 #'   centrality plots.
-#' @param directedDiag See corresponding argument in the \code{bootNet()}.
+#' @param directedDiag See corresponding argument in the \code{\link{bootNet}}.
 #'   function.
 #' @param ... Additional arguments.
 #'
@@ -671,6 +679,8 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'   When \code{plot %in% c('none', FALSE)}, the table used to construct the
 #'   relevant plot will be returned as output instead.
 #' @export
+#'
+#' @seealso \code{\link{bootNet}, \link{resample}}
 #'
 #' @examples
 #' \dontrun{
@@ -1065,7 +1075,7 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 #'
 #' See Meinshausen, Meier, & Buhlmann (2009) for details.
 #'
-#' @param x Output from \code{resample()}, given that \code{sampMethod =
+#' @param x Output from \code{\link{resample}}, given that \code{sampMethod =
 #'   "bootstrap"} or \code{sampMethod = "split"}.
 #' @param outcome Character string or numeric value (in terms of columns in the
 #'   dataset) to indicate which outcome to plot the p-value distribution for.
@@ -1080,10 +1090,11 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 #' @return Returns a plot based on the relationship between a particular outcome
 #'   and predictor.
 #' @export
-#' @references
-#' Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
-#' high-dimensional regression. Journal of the American Statistical Association.
-#' 104, 1671-1681.
+#' @references Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
+#'   high-dimensional regression. Journal of the American Statistical
+#'   Association. 104, 1671-1681.
+#'
+#' @seealso \code{\link{resample}}
 #'
 #' @examples
 #' \dontrun{
@@ -1121,7 +1132,8 @@ plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
 #' be used when the criterion for stability selection was set as
 #' cross-validation.
 #'
-#' @param x Output of \code{resample()} where \code{sampMethod = "stability"}.
+#' @param x Output of \code{\link{resample}} where \code{sampMethod =
+#'   "stability"}.
 #' @param outcome Character string or numeric value (in terms of columns in the
 #'   dataset) to indicate which outcome to plot the stability path for.
 #' @param s Character string or numeric value. This indicates which stability
@@ -1138,6 +1150,8 @@ plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
 #' @references Meinshausen, N., & Buhlmann, P. (2010). Stability selection.
 #'   Journal of the Royal Statistical Society: Series B (Statistical
 #'   Methodology). 72, 417-423
+#'
+#' @seealso \code{\link{resample}}
 #'
 #' @examples
 #' \dontrun{
@@ -1191,13 +1205,13 @@ plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
 #' Return a plot or dataframe showing the point estimates from each model, along
 #' with confidence intervals based on the estimated standard errors.
 #'
-#' This is differentiated from the output of \code{bootNet()} and
-#' \code{plotBoot()} in that the confidence intervals are computed directly from
-#' model parameters rather than estimated from bootstrapping.
+#' This is differentiated from the output of \code{\link{bootNet}} and
+#' \code{\link{plotBoot}} in that the confidence intervals are computed directly
+#' from model parameters rather than estimated from bootstrapping.
 #'
-#' @param fit Output from \code{fitNetwork()}, \code{bootNet()}, or
-#'   \code{resample()}. Can also be the \code{fixedNets} or \code{betweenNet}
-#'   elements of the \code{mlGVAR()} output.
+#' @param fit Output from \code{\link{fitNetwork}}, \code{\link{bootNet}}, or
+#'   \code{\link{resample}}. Can also be the \code{fixedNets} or
+#'   \code{betweenNet} elements of the \code{\link{mlGVAR}} output.
 #' @param true An adjacency matrix containing the true parameter values, if
 #'   known. This can be used in conjunction with a simulated network, in that
 #'   the user can supply the true network and plot those values against the
@@ -1210,9 +1224,9 @@ plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
 #' @param flip Logical. If \code{FALSE}, the facets will be turned 90 degrees.
 #' @param data Supply the original dataset if not already included in the
 #'   \code{fit} object.
-#' @param select Relevant to the \code{resample()} output. Determines whether
-#'   all variables should be plotted, or only those that were selected according
-#'   to the resampling or variable selection procedure.
+#' @param select Relevant to the \code{\link{resample}} output. Determines
+#'   whether all variables should be plotted, or only those that were selected
+#'   according to the resampling or variable selection procedure.
 #' @param size Numeric. Size of the point estimates.
 #' @param labels If logical, determines whether or not variable labels should be
 #'   included. If a character vector, can be used to customize variable labels.
@@ -1223,6 +1237,9 @@ plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
 #' @return Plot displaying estimated model coefficients and confidence
 #'   intervals.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{resample}, \link{getFitCIs},
+#'   \link{plot.resample}, \link{plotNet}}
 #'
 #' @examples
 #' \dontrun{
@@ -1361,9 +1378,9 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 #' Creates a plot of the relationships between two variables at different levels
 #' of the moderator. Only works for relationships that include an interaction.
 #'
-#' @param out Output from \code{fitNetwork()} or \code{resample()}. Can also
-#'   provide the \code{fixedNets} or \code{betweenNet} element of the
-#'   \code{mlGVAR()} output.
+#' @param out Output from \code{\link{fitNetwork}} or \code{\link{resample}}.
+#'   Can also provide the \code{fixedNets} or \code{betweenNet} element of the
+#'   \code{\link{mlGVAR}} output.
 #' @param to Outcome variable, specified with character string or numeric value.
 #' @param from Predictor variable, specified with character string or numeric
 #'   value.
@@ -1375,7 +1392,7 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 #'   to be compared.
 #' @param hist Logical. Determines whether to show a histogram of the data
 #'   distribution at the bottom of the plot.
-#' @param xlab Character string for labelling the x-axis.
+#' @param xlab Character string for labeling the x-axis.
 #' @param mods DEPRECATED!
 #' @param nsims Number of iterations to simulate the posterior distribution.
 #' @param xn Numeric value to indicate how many values of the moderator should
@@ -1385,14 +1402,16 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 #'   maximum and minimum of the moderator will be returned.
 #' @param discrete Logical. Determines whether to treat the moderator as a
 #'   discrete or continuous variable.
-#' @param ylab Character string for labelling the y-axis.
-#' @param main Character string for labelling the title of the plot.
+#' @param ylab Character string for labeling the y-axis.
+#' @param main Character string for labeling the title of the plot.
 #' @param midline Logical. Only applies when \code{discrete = TRUE}. Shows a
 #'   line at the average level of the outcome.
 #'
 #' @return A plot of the conditional effects of one variable on another given
 #'   different levels of the moderator.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{resample}}
 #'
 #' @examples
 #' \dontrun{
@@ -1536,9 +1555,9 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
 #' moderator, but the labels will simply show which predictor interacts with
 #' that moderator to predict the outcome.
 #'
-#' @param out GGM moderated network output from \code{fitNetwork()}, or output
-#'   from a moderated between-subjects network fit with \code{mlGVAR()} (e.g.,
-#'   when \code{bm = TRUE}).
+#' @param out GGM moderated network output from \code{\link{fitNetwork}}, or
+#'   output from a moderated between-subjects network fit with
+#'   \code{\link{mlGVAR}} (e.g., when \code{bm = TRUE}).
 #' @param y Character string. The name of the outcome variable for which to
 #'   create the plot. If \code{y = "all"}, then all interaction terms associated
 #'   with all outcomes will be plotted.
@@ -1548,6 +1567,8 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
 #'
 #' @return A plot showing the spread of different interactions.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{plotNet}, \link{mlGVAR}}
 #'
 #' @examples
 #' \dontrun{
@@ -1613,14 +1634,14 @@ intsPlot <- function(out, y = 'all', nsims = 500, alpha = .05){
 
 #' Plot results of power simulations
 #'
-#' Plots the output from the \code{mnetPowerSim()} function.
+#' Plots the output from the \code{\link{mnetPowerSim}} function.
 #'
 #' The options of what performance metrics to plot include: \itemize{
 #' \item{Sensitivity} \item{Specificity} \item{Correlation} \item{MAE (Mean
 #' Absolute Error)} \item{Precision} \item{Accuracy} \item{FDR (False Discovery
 #' Rate)} }
 #'
-#' @param x \code{mnetPowerSim()} output
+#' @param x \code{\link{mnetPowerSim}} output
 #' @param by In development. Currently only supports \code{"type"} for creating
 #'   different facets for Pairwise and Interaction effects. \code{"network"} for
 #'   creating facets based on different networks (e.g., temporal,
@@ -1643,6 +1664,8 @@ intsPlot <- function(out, y = 'all', nsims = 500, alpha = .05){
 #' @return Plots the results of a power simulation according to a variety of
 #'   performance metrics.
 #' @export
+#'
+#' @seealso \code{\link{mnetPowerSim}}
 #'
 #' @examples
 #' \dontrun{
@@ -1712,22 +1735,23 @@ plot.mnetPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline 
 #' Plot temporal and contemporaneous networks in the same window
 #'
 #' Designed for easy-to-use plotting with temporal networks. Essentially just a
-#' wrapper for running \code{plotNet()} twice---once for a temporal network, and
-#' again for a contemporaneous network---and plotting the two networks in the
-#' same window. Good for a quick glance at results from a SUR network. Also
-#' compatible with \code{mlGVAR()} and \code{lmerVAR()} outputs, although can
-#' only plot two networks in the same window. \code{plotNet3()} can be used to
-#' plot 3 networks.
+#' wrapper for running \code{\link{plotNet}} twice---once for a temporal
+#' network, and again for a contemporaneous network---and plotting the two
+#' networks in the same window. Good for a quick glance at results from a SUR
+#' network. Also compatible with \code{\link{mlGVAR}} and \code{\link{lmerVAR}}
+#' outputs, although can only plot two networks in the same window.
+#' \code{\link{plotNet3}} can be used to plot 3 networks.
 #'
-#' @param object Output from \code{fitNetwork()}, specifically with a SUR model.
+#' @param object Output from \code{\link{fitNetwork}}, specifically with a SUR
+#'   model.
 #' @param whichNets Vector of length 2 indicating which networks to plot.
 #'   \code{"beta"} and \code{"temporal"} both refer to the unstandardized
 #'   temporal network coefficients, while \code{"PDC"} refers to the
 #'   standardized temporal network. \code{"PCC"} and \code{"contemporaneous"}
 #'   both refer to the standardized residual covariance matrix (the
 #'   contemporaneous network). If the \code{object} is fitted with
-#'   \code{mlGVAR()} or \code{lmerVAR()}, then \code{"between"} is also an
-#'   option for plotting the between-subjects network.
+#'   \code{\link{mlGVAR}} or \code{\link{lmerVAR}}, then \code{"between"} is
+#'   also an option for plotting the between-subjects network.
 #' @param whichTemp Which version of the temporal network should be plotted,
 #'   either \code{"temporal"} or \code{"PDC"}. This argument is ignored if
 #'   \code{whichNets} is not \code{NULL}.
@@ -1737,6 +1761,8 @@ plot.mnetPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline 
 #'
 #' @return Returns two network plots side by side.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}}
 #'
 #' @examples
 #' \dontrun{
@@ -1793,15 +1819,15 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
 
 #' Plot temporal, contemporaneous, and between-subject networks
 #'
-#' Quick, easy plotting for \code{mlGVAR()} and \code{lmerVAR()} output. Allows
-#' one to plot three networks in the same window: temporal, contemporaneous, and
-#' between-subject.
+#' Quick, easy plotting for \code{\link{mlGVAR}} and \code{\link{lmerVAR}}
+#' output. Allows one to plot three networks in the same window: temporal,
+#' contemporaneous, and between-subject.
 #'
-#' @param object Output from \code{mlGVAR()} or \code{lmerVAR()}.
+#' @param object Output from \code{\link{mlGVAR}} or \code{\link{lmerVAR}}.
 #' @param ... Additional arguments.
 #' @param nets Character vector of length 3 indicating which networks to plot,
 #'   and in what order. Same options as for \code{which.net} in
-#'   \code{plotNet()}.
+#'   \code{\link{plotNet}}.
 #' @param titles If \code{TRUE}, then uses default titles for temporal,
 #'   contemporaneous, and between-subject networks. If \code{FALSE}, then no
 #'   titles will be used. Can also be a character vector to provide custom plot
@@ -1815,6 +1841,8 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
 #'
 #' @return Returns 3 network plots.
 #' @export
+#'
+#' @seealso \code{\link{mlGVAR}, \link{lmerVAR}}
 #'
 #' @examples
 #' \dontrun{

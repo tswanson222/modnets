@@ -26,16 +26,16 @@
 #' @param lags Determines whether the network should be a temporal network or
 #'   not. If simulating a temporal network, set to \code{TRUE} or 1.
 #' @param trueNet The adjacency matrix of the data-generating network model, or
-#'   a list containing the adjancency matrix as the first element, and the
+#'   a list containing the adjacency matrix as the first element, and the
 #'   interaction matrix as the second element.
-#' @param threshold See corresponding argument in \code{fitNetwork()}.
+#' @param threshold See corresponding argument in \code{\link{fitNetwork}}.
 #'   Automatically set to \code{TRUE} if \code{select} is not \code{NULL}.
 #' @param rule Only applies to GGMs (including between-subjects networks) when a
 #'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
 #'   both corresponding coefficients have p-values below the threshold, while
 #'   the \code{"OR"} rule will preserve an edge so long as one of the two
 #'   coefficients have a p-value below the supplied threshold.
-#' @param avg See corresponding argument of \code{netInts()}
+#' @param avg See corresponding argument of \code{\link{netInts}}
 #' @param maxiter If a model fails to be fit, this determines the maximum number
 #'   of iterations to re-try it before giving up. Will also simulate new
 #'   datasets at each iteration.
@@ -47,8 +47,8 @@
 #' @param mbinary Logical. Determines whether the moderator should be a binary
 #'   variable.
 #' @param select Identifies a variable selection function -- either
-#'   \code{varSelect()} or \code{resample()} -- to use for introducing variable
-#'   selection at each iteration. The usefulness of this is to mimic a
+#'   \code{\link{varSelect}} or \code{\link{resample}} -- to use for introducing
+#'   variable selection at each iteration. The usefulness of this is to mimic a
 #'   real-world situation, wherein the researcher may be interested in seeing
 #'   how well datasets of different sizes afford models that approximate a true
 #'   model after employing iterated variable selection. If \code{TRUE} then this
@@ -59,14 +59,14 @@
 #' @param vargs A named list of arguments relevant to the variable selection
 #'   procedure specified by the \code{select} argument.
 #' @param type Can supply a variable selection object, such as the output from
-#'   either \code{varSelect()} or \code{moSelect(resample(...))}, can be
-#'   supplied to choose a specific constrained model to fit on all iterations.
-#'   This is essentially an alternative to \code{select}, in that \code{select}
-#'   performs variable selection at each iteration, whereas this argument
-#'   defines a constrained model that is applied at every iteration.
+#'   either \code{\link{varSelect}} or \code{\link{modSelect}}, can be supplied
+#'   to choose a specific constrained model to fit on all iterations. This is
+#'   essentially an alternative to \code{select}, in that \code{select} performs
+#'   variable selection at each iteration, whereas this argument defines a
+#'   constrained model that is applied at every iteration.
 #' @param gibbs If \code{TRUE}, then Gibbs sampling will be used. Otherwise,
-#'   data are generated from the \code{rmvnorm()} function in the \code{mvtnorm}
-#'   package based on the partial correlation matrix that is created.
+#'   data are generated from the \code{\link[mvtnorm:rmvnorm]{mvtnorm::rmvnorm}}
+#'   function based on the partial correlation matrix that is created.
 #' @param ordinal Logical. Determines whether to generate ordinal values or not.
 #' @param mord Logical. Determines whether the moderator variable should be
 #'   simulated as ordinal.
@@ -85,11 +85,11 @@
 #' @param time If \code{TRUE} then the time it takes to simulate the data is
 #'   printed to screen at the end of the sampling.
 #' @param skewErr The skewness parameter for the \code{alpha} argument in the
-#'   \code{rmsn()} function in the \code{sn} package.
+#'   \code{\link[sn:rmsn]{sn::rmsn}} function.
 #' @param nCores Numeric value indicating the number of CPU cores to use for the
-#'   resampling. If \code{TRUE}, then the \code{detectCores()} function from the
-#'   \code{parallel} package will be used to maximize the number of cores
-#'   available.
+#'   resampling. If \code{TRUE}, then the
+#'   \code{\link[parallel:detectCores]{parallel::detectCores}} function will be
+#'   used to maximize the number of cores available.
 #' @param cluster Character vector indicating which type of parallelization to
 #'   use, if \code{nCores > 1}. Options include \code{"mclapply"} and
 #'   \code{"SOCK"}.
@@ -105,7 +105,8 @@
 #' @return Power simulation results
 #' @export
 #'
-#' @seealso \code{\link{summary.mnetPower}, \link{plotPower}}
+#' @seealso \code{\link{summary.mnetPower}, \link{plotPower}, \link{simNet},
+#'   \link{mlGVARsim}}
 #'
 #' @examples
 #' \dontrun{
@@ -704,8 +705,8 @@ mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1,
 #' @param print if \code{FALSE}, then the minimum sample size is returned and
 #'   can be assigned to an object.
 #'
-#' @return Minimum sample size to fit a network model according to the
-#'   specified parameters.
+#' @return Minimum sample size to fit a network model according to the specified
+#'   parameters.
 #' @export
 #'
 #' @examples
@@ -739,9 +740,9 @@ sampleSize <- function(p, m = 0, lags = 0, print = TRUE){
 #' Descriptive statistics for power simulation results
 #'
 #' A quick way to view the results of power simulations conducted with
-#' \code{mnetPowerSim()}.
+#' \code{\link{mnetPowerSim}}.
 #'
-#' @param object Output from \code{mnetPowerSim()} function.
+#' @param object Output from \code{\link{mnetPowerSim}} function.
 #' @param ind Character string or vector to indicate which aspects of the
 #'   results to view. If \code{"means"}, then only the means will be returned
 #'   for all performance indices. \code{"sds"} returns the standard deviations,

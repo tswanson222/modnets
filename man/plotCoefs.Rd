@@ -20,9 +20,9 @@ plotCoefs(
 )
 }
 \arguments{
-\item{fit}{Output from \code{fitNetwork()}, \code{bootNet()}, or
-\code{resample()}. Can also be the \code{fixedNets} or \code{betweenNet}
-elements of the \code{mlGVAR()} output.}
+\item{fit}{Output from \code{\link{fitNetwork}}, \code{\link{bootNet}}, or
+\code{\link{resample}}. Can also be the \code{fixedNets} or
+\code{betweenNet} elements of the \code{\link{mlGVAR}} output.}
 
 \item{true}{An adjacency matrix containing the true parameter values, if
 known. This can be used in conjunction with a simulated network, in that
@@ -42,9 +42,9 @@ confidence interval data will be returned.}
 \item{data}{Supply the original dataset if not already included in the
 \code{fit} object.}
 
-\item{select}{Relevant to the \code{resample()} output. Determines whether
-all variables should be plotted, or only those that were selected according
-to the resampling or variable selection procedure.}
+\item{select}{Relevant to the \code{\link{resample}} output. Determines
+whether all variables should be plotted, or only those that were selected
+according to the resampling or variable selection procedure.}
 
 \item{size}{Numeric. Size of the point estimates.}
 
@@ -65,13 +65,17 @@ Return a plot or dataframe showing the point estimates from each model, along
 with confidence intervals based on the estimated standard errors.
 }
 \details{
-This is differentiated from the output of \code{bootNet()} and
-\code{plotBoot()} in that the confidence intervals are computed directly from
-model parameters rather than estimated from bootstrapping.
+This is differentiated from the output of \code{\link{bootNet}} and
+\code{\link{plotBoot}} in that the confidence intervals are computed directly
+from model parameters rather than estimated from bootstrapping.
 }
 \examples{
 \dontrun{
 x <- fitNetwork(data)
 plot(x, which.net = 'coef')
 }
+}
+\seealso{
+\code{\link{fitNetwork}, \link{resample}, \link{getFitCIs},
+  \link{plot.resample}, \link{plotNet}}
 }

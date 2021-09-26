@@ -82,8 +82,8 @@ increased based on expected range of values. If a datapoint is larger than
 \code{div}, then the sampler will stop.}
 
 \item{gibbs}{If \code{TRUE}, then Gibbs sampling will be used. Otherwise,
-data are generated from the \code{rmvnorm()} function in the \code{mvtnorm}
-package based on the partial correlation matrix that is created.}
+data are generated from the \code{\link[mvtnorm:rmvnorm]{mvtnorm::rmvnorm}}
+function based on the partial correlation matrix that is created.}
 
 \item{ordinal}{Logical. Determines whether to generate ordinal values or not.}
 
@@ -115,7 +115,7 @@ interaction effect coefficients.}
 \code{"none", "full", "partial"}}
 
 \item{lags}{If \code{TRUE} or 1, then arguments are rerouted to the
-\code{mlGVARsim()} function to simulate temporal data for a single
+\code{\link{mlGVARsim}} function to simulate temporal data for a single
 individual.}
 
 \item{V}{Numeric, either 1 or 2. Determines whether to randomize the order of
@@ -125,19 +125,20 @@ the sampler moves through the nodes from the first to the last in order at
 each iteration.}
 
 \item{skewErr}{The skewness parameter for the \code{alpha} argument in the
-\code{rmsn()} function in the \code{sn} package.}
+\code{\link[sn:rmsn]{sn::rmsn}} function.}
 
 \item{onlyNets}{If \code{TRUE} then only the network models are returned,
 without the data. Could be used to create random models and then simulate
 data by another method.}
 
-\item{netArgs}{Only for use by the internal function \code{simNet2}, which
-serves as a wrapper for the current function to prevent it from failing.}
+\item{netArgs}{Only for use by the internal function
+\code{modnets:::simNet2}, which serves as a wrapper for the current
+function to prevent it from failing.}
 
 \item{nCores}{Numeric value indicating the number of CPU cores to use for the
-resampling. If \code{TRUE}, then the \code{detectCores()} function from the
-\code{parallel} package will be used to maximize the number of cores
-available.}
+resampling. If \code{TRUE}, then the
+\code{\link[parallel:detectCores]{parallel::detectCores}} function will be
+used to maximize the number of cores available.}
 
 \item{cluster}{Character vector indicating which type of parallelization to
 use, if \code{nCores > 1}. Options include \code{"mclapply"} and
@@ -146,8 +147,8 @@ use, if \code{nCores > 1}. Options include \code{"mclapply"} and
 \item{getChains}{Logical. Determines whether to return the data-generating
 chains from the Gibbs sampler.}
 
-\item{const}{Numeric. The constant to be used in the \code{simPcor()}
-function.}
+\item{const}{Numeric. The constant to be used by the internal
+\code{modnets:::simPcor} function.}
 
 \item{fixedPar}{Numeric. If provided, then this will be set as the
 coefficient value for all edges in the network. Provides a way to
@@ -172,4 +173,8 @@ networks.
 \dontrun{
 x <- simNet(N = 100, p = 5, m = TRUE)
 }
+}
+\seealso{
+\code{\link{mlGVARsim}, \link{mnetPowerSim}, \link{plotNet},
+  \link{net}, \link{netInts}, \link{plotBoot}, \link{plotCoefs}}
 }

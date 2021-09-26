@@ -51,7 +51,7 @@ If \code{"relative"}, then values will be scaled relative to the largest
 value on each measure. \code{"raw"} can be used to plot raw values.}
 
 \item{which.net}{Only applies to SUR networks, as well as those fit with the
-\code{mlGVAR()} function. Character string to indicate which type of
+\code{\link{mlGVAR}} function. Character string to indicate which type of
 network to compute centrality values for. Options are \code{"temporal"} for
 the temporal network, \code{"contemporaneous"} for the contemporaneous
 network, \code{"PDC"} for the partial directed correlation network, and
@@ -78,9 +78,9 @@ versa.}
 \item{verbose}{Logical. Determines whether to return a message about the plot
 (messages are only shown if values are scaled).}
 
-\item{weighted}{See \code{centTable()} or \code{clustTable()}.}
+\item{weighted}{See \code{\link{centTable}} or \code{\link{clustTable}}.}
 
-\item{signed}{See \code{centTable()} or \code{clustTable()}.}
+\item{signed}{See \code{\link{centTable}} or \code{\link{clustTable}}.}
 
 \item{centrality}{Character vector of centrality measures to plot. Defaults
 to \code{"all"}.}
@@ -93,13 +93,15 @@ A plot of centrality values or clustering coefficients for several
 measures.
 }
 \description{
-Mimics the \code{centralityPlot()} and \code{clusteringPlot()} functions from
-the \code{qgraph} package. The purpose of revising this function was to make
-it compatible with outputs from the \code{modnets} package.
+Mimics the \code{\link[qgraph:centralityPlot]{qgraph::centralityPlot}} and
+\code{\link[qgraph:clusteringPlot]{qgraph::clusteringPlot}} functions. The
+purpose of revising this function was to make it compatible with outputs from
+the \code{modnets} package.
 }
 \details{
-The only utility of the \code{plotCentrality()} function is as an easy way to
-combine centrality measures and clustering coefficients into a single plot.
+The only utility of the \code{\link{plotCentrality}} function is as an easy
+way to combine centrality measures and clustering coefficients into a single
+plot.
 }
 \examples{
 \dontrun{
@@ -109,4 +111,9 @@ centPlot(x)
 clustPlot(x)
 plotCentrality(x)
 }
+}
+\seealso{
+\code{\link{centTable}, \link{clustTable}, \link{centAuto},
+  \link{clustAuto}, \link[qgraph:centralityPlot]{qgraph::centralityPlot},
+  \link[qgraph:clusteringPlot]{qgraph::clusteringPlot}}
 }

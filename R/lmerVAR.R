@@ -1,9 +1,9 @@
 #' Mixed-effects modeling for the GVAR in multilevel data
 #'
 #' Proper estimation of mixed-effects GVAR models. This is an alternative
-#' fitting procedure to that provided by the \code{mlGVAR()} function. The key
-#' differences are that this function can take significantly longer to fit, and
-#' it may fail when trying to fit especially large models.
+#' fitting procedure to that provided by the \code{\link{mlGVAR}} function. The
+#' key differences are that this function can take significantly longer to fit,
+#' and it may fail when trying to fit especially large models.
 #'
 #' In the process of adding further documentation. More details to come. The
 #' method is referred to as the "two-step multilevel VAR" (Epskamp et al.,
@@ -63,9 +63,9 @@
 #'   modeled as outcomes/nodes in the network. If the number of moderators
 #'   reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
 #'   be \code{FALSE}.
-#' @param covariates See corresponding argument in \code{fitNetwork()} function.
-#'   Can supply a numeric value or vector to indicate which variables are
-#'   covariates, or can supply a list containing the individual covariates
+#' @param covariates See corresponding argument in \code{\link{fitNetwork}}
+#'   function. Can supply a numeric value or vector to indicate which variables
+#'   are covariates, or can supply a list containing the individual covariates
 #'   separately from the dataset.
 #' @param fix Character vector to indicate which variables to only create fixed
 #'   effects terms for.
@@ -89,7 +89,7 @@
 #'   The gaussian graphical model in cross-sectional and time-series data.
 #'   Multivariate Behavioral Research. 53, 453-580.
 #'
-#' @seealso \code{\link{compareVAR}}
+#' @seealso \code{\link{compareVAR}, \link{mlGVAR}, \link{mlGVARsim}}
 #'
 #' @examples
 #' \dontrun{
@@ -424,18 +424,18 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
   return(output)
 }
 
-#' Compare two to three \code{lmerVAR} models
+#' Compare two to three \code{\link{lmerVAR}} models
 #'
-#' Affords ANOVAs to compare two or three \code{lmerVAR} models. It is necessary
-#' to supply at least two different models for comparison, although a third can
-#' also be supplied if desired.
+#' Affords ANOVAs to compare two or three \code{\link{lmerVAR}} models. It is
+#' necessary to supply at least two different models for comparison, although a
+#' third can also be supplied if desired.
 #'
-#' Performs individual nodewise model comparisons across multiple \code{lmerVAR}
-#' models.
+#' Performs individual nodewise model comparisons across multiple
+#' \code{\link{lmerVAR}} models.
 #'
-#' @param m1 Output from \code{lmerVAR()}.
-#' @param m2 Output from another run of \code{lmerVAR()}. Necessary to supp
-#' @param m3 Output from a third run or \code{lmerVAR()}. This is optional.
+#' @param m1 Output from \code{\link{lmerVAR}}.
+#' @param m2 Output from another run of \code{\link{lmerVAR}}. Necessary to supp
+#' @param m3 Output from a third run of \code{\link{lmerVAR}}. This is optional.
 #' @param anova If \code{NULL}, then the results of each nodewise comparison
 #'   will be displayed. If numeric, then this indicates which nodewise
 #'   comparison to home in on. \code{anova = 1} will show the full ANOVA results

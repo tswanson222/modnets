@@ -24,9 +24,9 @@ condPlot(
 )
 }
 \arguments{
-\item{out}{Output from \code{fitNetwork()} or \code{resample()}. Can also
-provide the \code{fixedNets} or \code{betweenNet} element of the
-\code{mlGVAR()} output.}
+\item{out}{Output from \code{\link{fitNetwork}} or \code{\link{resample}}.
+Can also provide the \code{fixedNets} or \code{betweenNet} element of the
+\code{\link{mlGVAR}} output.}
 
 \item{to}{Outcome variable, specified with character string or numeric value.}
 
@@ -45,7 +45,7 @@ to be compared.}
 \item{hist}{Logical. Determines whether to show a histogram of the data
 distribution at the bottom of the plot.}
 
-\item{xlab}{Character string for labelling the x-axis.}
+\item{xlab}{Character string for labeling the x-axis.}
 
 \item{mods}{DEPRECATED!}
 
@@ -61,9 +61,9 @@ maximum and minimum of the moderator will be returned.}
 \item{discrete}{Logical. Determines whether to treat the moderator as a
 discrete or continuous variable.}
 
-\item{ylab}{Character string for labelling the y-axis.}
+\item{ylab}{Character string for labeling the y-axis.}
 
-\item{main}{Character string for labelling the title of the plot.}
+\item{main}{Character string for labeling the title of the plot.}
 
 \item{midline}{Logical. Only applies when \code{discrete = TRUE}. Shows a
 line at the average level of the outcome.}
@@ -81,4 +81,7 @@ of the moderator. Only works for relationships that include an interaction.
 x <- fitNetwork(data, moderators = 'M')
 condPlot(x, to = 1, from = 2)
 }
+}
+\seealso{
+\code{\link{fitNetwork}, \link{resample}}
 }

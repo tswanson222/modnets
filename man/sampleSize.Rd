@@ -17,8 +17,8 @@ sampleSize(p, m = 0, lags = 0, print = TRUE)
 can be assigned to an object.}
 }
 \value{
-Minimum sample size to fit a network model according to the
-specified parameters.
+Minimum sample size to fit a network model according to the specified
+parameters.
 }
 \description{
 Indicates the minimum sample size required to fit a moderated or unmoderated

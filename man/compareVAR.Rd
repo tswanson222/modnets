@@ -2,16 +2,16 @@
 % Please edit documentation in R/lmerVAR.R
 \name{compareVAR}
 \alias{compareVAR}
-\title{Compare two to three \code{lmerVAR} models}
+\title{Compare two to three \code{\link{lmerVAR}} models}
 \usage{
 compareVAR(m1, m2, m3 = NULL, anova = NULL, type = "tempMods")
 }
 \arguments{
-\item{m1}{Output from \code{lmerVAR()}.}
+\item{m1}{Output from \code{\link{lmerVAR}}.}
 
-\item{m2}{Output from another run of \code{lmerVAR()}. Necessary to supp}
+\item{m2}{Output from another run of \code{\link{lmerVAR}}. Necessary to supp}
 
-\item{m3}{Output from a third run or \code{lmerVAR()}. This is optional.}
+\item{m3}{Output from a third run of \code{\link{lmerVAR}}. This is optional.}
 
 \item{anova}{If \code{NULL}, then the results of each nodewise comparison
 will be displayed. If numeric, then this indicates which nodewise
@@ -27,13 +27,13 @@ outputs or the contemporaneous network outputs with ANOVA.}
 Table of ANOVA results comparing two or three models.
 }
 \description{
-Affords ANOVAs to compare two or three \code{lmerVAR} models. It is necessary
-to supply at least two different models for comparison, although a third can
-also be supplied if desired.
+Affords ANOVAs to compare two or three \code{\link{lmerVAR}} models. It is
+necessary to supply at least two different models for comparison, although a
+third can also be supplied if desired.
 }
 \details{
-Performs individual nodewise model comparisons across multiple \code{lmerVAR}
-models.
+Performs individual nodewise model comparisons across multiple
+\code{\link{lmerVAR}} models.
 }
 \examples{
 \dontrun{

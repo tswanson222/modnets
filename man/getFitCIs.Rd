@@ -7,8 +7,9 @@
 getFitCIs(fit, allNames = NULL, alpha = 0.05)
 }
 \arguments{
-\item{fit}{Output from \code{fitNetwork()}, or either the \code{fixedNets} or
-\code{betweenNet} element of the output from \code{mlGVAR()}}
+\item{fit}{Output from \code{\link{fitNetwork}}, or either the
+\code{fixedNets} or \code{betweenNet} element of the output from
+\code{\link{mlGVAR}}}
 
 \item{allNames}{Character vector containing all the predictor names. Do not
 change, as these are automatically detected.}
@@ -21,8 +22,8 @@ intervals
 }
 \description{
 Requires that either 'fitobj' or 'SURfit' is included in the object from
-\code{fitNetwork()}. Returns a list of nodewise model coefficients, including
-confidence intervals computed from the estimated standard errors.
+\code{\link{fitNetwork}}. Returns a list of nodewise model coefficients,
+including confidence intervals computed from the estimated standard errors.
 }
 \details{
 The \code{select} column in the output indicates whether the variable would
@@ -33,4 +34,7 @@ be selected given the supplied alpha level.
 x <- fitNetwork(data)
 getFitCIs(x)
 }
+}
+\seealso{
+\code{\link{fitNetwork}, \link{plotCoefs}}
 }

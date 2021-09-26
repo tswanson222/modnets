@@ -12,7 +12,7 @@ fitNetwork(
   seed = NULL,
   folds = 10,
   gamma = 0.5,
-  which.lam = "lambda.min",
+  which.lam = "min",
   rule = "OR",
   threshold = FALSE,
   scale = FALSE,
@@ -43,7 +43,7 @@ fitNetwork(
 any) to use as moderators.}
 
 \item{type}{Primarily used to supply a variable selection object, such as
-those created with \code{varSelect()} or \code{modSelect(resample())}, or
+those created with \code{\link{varSelect}} or \code{\link{modSelect}}, or
 to indicate that a variable selection method should be employed by setting
 the value to \code{"varSelect"}. Currently doesn't support setting the
 value to \code{"resample"}, although this will be implemented in the
@@ -51,8 +51,9 @@ future. Alternatively, this can be used to specify the type of variable for
 each node. In this case it should be either a single value --
 \code{"gaussian"} or \code{"binomial"} -- or can be a vector of length
 \code{k} to specify which of those two types apply to each variable. These
-dictate which family to use for the call to \code{glm()}. Cannot use
-binomial models for SUR networks.}
+dictate which family to use for the call to
+\code{\link[stats:glm]{stats::glm}}. Cannot use binomial models for SUR
+networks.}
 
 \item{lags}{Logical or numeric, to indicate whether to fit a SUR model or
 not. Set to \code{TRUE} or 1 for a SUR model fit to temporal data for a
@@ -73,25 +74,26 @@ Options include \code{"min"}, which uses the lambda value that minimizes
 the objective function, or \code{"1se"} which uses the lambda value at 1
 standard error above the value that minimizes the objective function.}
 
-\item{rule}{#' @param rule Only applies to GGMs (including between-subjects
-networks) when a threshold is supplied. The \code{"AND"} rule will only
-preserve edges when both corresponding coefficients have p-values below the
-threshold, while the \code{"OR"} rule will preserve an edge so long as one
-of the two coefficients have a p-value below the supplied threshold.}
+\item{rule}{Only applies to GGMs (including between-subjects networks) when a
+threshold is supplied. The \code{"AND"} rule will only preserve edges when
+both corresponding coefficients have p-values below the threshold, while
+the \code{"OR"} rule will preserve an edge so long as one of the two
+coefficients have a p-value below the supplied threshold.}
 
 \item{threshold}{Determines whether to employ a p-value threshold on the
 model. If \code{TRUE} then this defaults to .05. Not recommended, as
 thresholds can be applied post-hoc through the plotting functions, or via
-the \code{net()} and \code{netInts()} functions. Recommended to leave as
-\code{FALSE}.}
+the \code{\link{net}} and \code{\link{netInts}} functions. Recommended to
+leave as \code{FALSE}.}
 
 \item{scale}{Determines whether to standardize all variables or not.}
 
 \item{std}{Only applies to SUR networks. Logical. Provides input to the
-\code{method} argument of the \code{systemfit()} function. If \code{TRUE},
-then the \code{method} will be \code{"SUR"}. If \code{FALSE}, then the
-\code{method} will be \code{"OLS"}. These two methods only differ when
-constraints are applied. When a saturated model is fit, both methods
+\code{method} argument of the
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function. If
+\code{TRUE}, then the \code{method} will be \code{"SUR"}. If \code{FALSE},
+then the \code{method} will be \code{"OLS"}. These two methods only differ
+when constraints are applied. When a saturated model is fit, both methods
 produce the same results.}
 
 \item{center}{Determines whether to mean-center variables or not.}
@@ -125,7 +127,7 @@ matrix to compute for SUR models. Options include \code{"res", "dfres",
 the \code{systemfits} package. \code{"res"} and \code{"dfres"} compute the
 matrix based directly on the residual values. \code{"dfres"} is the sample
 estimator that uses \code{N - 1} in the denominator, while \code{"res"}
-just uses \code{N}. Input for \code{SURnet()} function.}
+just uses \code{N}. Input for \code{\link{SURnet}} function.}
 
 \item{medges}{DEPRECATED.}
 
@@ -140,16 +142,16 @@ with model results. Recommended to keep \code{TRUE}.}
 
 \item{saveMods}{Logical. Determines whether to save the \code{fitobj} element
 of the output, which contains the nodewise models, or the SUR model output
-of \code{systemfit()}.}
+of \code{\link[systemfit:systemfit]{systemfit::systemfit}}.}
 
 \item{binarize}{Logical. Determines whether to convert the output to a
 binary, unweighted network. Only relevant for GGMs.}
 
-\item{fitCoefs}{Determines whether to use the \code{getFitCIs()} function on
-the output. Not recommended to use. The downside is that this will
-overwrite the \code{fitobj} element of the output which contains the actual
-models. Better to leave this as \code{FALSE}, and then use the
-\code{getFitCIs()} function on the object separately.}
+\item{fitCoefs}{Determines whether to use the \code{\link{getFitCIs}}
+function on the output. Not recommended to use. The downside is that this
+will overwrite the \code{fitobj} element of the output which contains the
+actual models. Better to leave this as \code{FALSE}, and then use the
+\code{\link{getFitCIs}} function on the object separately.}
 
 \item{detrend}{Logical. Determines whether to remove linear trends from time
 series variables. Only applies to temporal networks.}
@@ -158,8 +160,8 @@ series variables. Only applies to temporal networks.}
 (if any) encodes the survey number within a single day. Must be used in
 conjunction with \code{dayno} argument. Only relevant to temporal data.}
 
-\item{dayno}{Character string or numeric value to indiciate which variable
-(if any) encodes the survey number within a single day. Must be used in
+\item{dayno}{Character string or numeric value to indicate which variable (if
+any) encodes the survey number within a single day. Must be used in
 conjunction with \code{beepno} argument. Only relevant to temporal data.}
 
 \item{...}{Additional arguments.}
@@ -176,7 +178,8 @@ Details to be provided on the estimation procedures soon. Also incorporates
 the variable selection functions to integrate model selection and estimation.
 Nodewise estimation is used for all GGMs, and SUR estimation is used for
 temporal networks. See \code{systemfit} package for more information on the
-latter, particularly via the \code{systemfit()} function.
+latter, particularly via the
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
 }
 \examples{
 \dontrun{

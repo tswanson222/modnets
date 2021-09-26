@@ -16,11 +16,11 @@
 #'   automatically become \code{FALSE}.
 #' @param selectFUN Choose a variable selection function. Can specify either
 #'   \code{"varSelect"} or \code{"resample"} to use the corresponding functions.
-#'   If you want to use the \code{resample()} algorithm though, then it is
+#'   If you want to use the \code{\link{resample}} function though, then it is
 #'   recommended to specify \code{selectFUN} as one of: \code{"stability",
 #'   "split", "bootstrap"} in order to identify the specific method. If
 #'   \code{selectFUN = "resample"}, then it is recommended to add the
-#'   \code{sampMethod} argument to the call to \code{mlGVAR()}.
+#'   \code{sampMethod} argument to the call to \code{\link{mlGVAR}}.
 #' @param subjectNets If \code{TRUE}, then subject-specific networks are fit for
 #'   all subjects and returned in the final output. Otherwise, can specify a
 #'   single value or a vector of values to represent which subjects to return
@@ -39,12 +39,12 @@
 #' @param fixedType If logical, then any variable selection procedure specified
 #'   by \code{selectFUN} will not be applied to the SUR network. Alternatively,
 #'   a variable selection result, such as the output from either
-#'   \code{varSelect()} or \code{moSelect(resample(...))}, can be supplied to
+#'   \code{\link{varSelect}} or \code{\link{modSelect}}, can be supplied to
 #'   choose a specific constrained model in advance.
 #' @param betweenType If logical, then any variable selection procedure
 #'   specified by \code{selectFUN} will not be applied to the SUR network.
 #'   Alternatively, a variable selection result, such as the output from either
-#'   \code{varSelect()} or \code{moSelect(resample(...))}, can be supplied to
+#'   \code{\link{varSelect}} or \code{\link{modSelect}}, can be supplied to
 #'   choose a specific constrained model in advance.
 #' @param centerWithin Following the application of \code{center} and
 #'   \code{scale}, this determines whether to center variables within individual
@@ -63,7 +63,8 @@
 #'   researcher.
 #' @param verbose Logical. Determines whether to output progress bars and
 #'   messages in the console during the fitting process.
-#' @param pcor See corresponding argument in the \code{fitNetwork()} function
+#' @param pcor See corresponding argument in the \code{\link{fitNetwork}}
+#'   function
 #' @param fixedArgs A named list of arguments for the variable selection
 #'   function can be provided here, specifically those that are meant to be
 #'   applied to the SUR network estimation.
@@ -88,6 +89,10 @@
 #' @references Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
 #'   The gaussian graphical model in cross-sectional and time-series data.
 #'   Multivariate Behavioral Research. 53, 453-580.
+#'
+#' @seealso \code{\link{mlGVARsim}, \link{lmerVAR}, \link{fitNetwork},
+#'   \link{varSelect}, \link{resample}, \link{net}, \link{netInts},
+#'   \link{plotNet}}
 #'
 #' @examples
 #' \dontrun{
@@ -381,7 +386,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 #'
 #' Made to simulate data based on pre-specified parameters, possibly for power
 #' simulations or other analyses. Output can be used to fit models with either
-#' \code{mlGVAR()} or \code{lmerVAR()}.
+#' \code{\link{mlGVAR}} or \code{\link{lmerVAR}}.
 #'
 #' @param nTime Numeric value. The number of timepoints to simulate for each
 #'   individual.
@@ -444,7 +449,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 #'   length \code{nNode} can be provided to specify the skewness of each
 #'   variable.
 #' @param skewErr The skewness parameter for the \code{alpha} argument in the
-#'   \code{rmsn()} function in the \code{sn} package.
+#'   \code{\link[sn:rmsn]{sn::rmsn}} function.
 #' @param ordinal Logical. Determines whether to sample ordinal variables. If a
 #'   numeric value is provided, then this will automatically be assigned to the
 #'   \code{nLevels} argument.
@@ -465,6 +470,9 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 #'
 #' @return Simulated mlGVAR or VAR data.
 #' @export
+#'
+#' @seealso \code{\link{mlGVAR}, \link{lmerVAR}, \link{simNet}, \link{plotNet},
+#'   \link{net}, \link{netInts}}
 #'
 #' @examples
 #' set.seed(1)

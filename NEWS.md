@@ -1,3 +1,3 @@
-# modnets (developmental version)
+# modnets 0.9.0
 
-Version 0.1.0: First version to be submitted to CRAN
+Version 0.9.0: First version submitted to CRAN

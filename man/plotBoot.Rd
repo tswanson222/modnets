@@ -58,7 +58,7 @@ plotBoot(
 )
 }
 \arguments{
-\item{x}{Output from \code{bootNet()}. Also some compatiblity with
+\item{x}{Output from \code{\link{bootNet}}. Also some compatablity with
 \code{resample} objects (when sampMethod != 'stability').}
 
 \item{type}{The outcome measure to plot. Options include: \code{"edges",
@@ -113,14 +113,14 @@ produce a symmetric confidence band, whereas for \code{"quantile"} argument
 this is not necessary. Not relevant to outputs for the case-drop bootstrap.}
 
 \item{true}{Defaults to \code{NULL}, not relevant for the case-drop
-bootstrap. Can supply another output from \code{fitNetwork()}, or an
+bootstrap. Can supply another output from \code{\link{fitNetwork}}, or an
 adjacency matrix, to serve as the true network in the plot. If there are
-interactions in the model, then a \code{fitNetwork()} object is
+interactions in the model, then a \code{\link{fitNetwork}} object is
 recommended. Alternatively, this argument can be extremely useful for
-simulated data -- especially anything created with \code{simNet()}. For
-whatever outcome (e.g., \code{edges, strength, EI}) is plotted, supplying
-another object to \code{true} will plot the values related to the true
-network, i.e., the data-generating model.}
+simulated data -- especially anything created with \code{\link{simNet}}.
+For whatever outcome (e.g., \code{edges, strength, EI}) is plotted,
+supplying another object to \code{true} will plot the values related to the
+true network, i.e., the data-generating model.}
 
 \item{errbars}{Logical. Not relevant to the case-drop bootstrap. If
 \code{TRUE}, then error bars are used rather than confidence bands. Can be
@@ -133,7 +133,7 @@ then the line will be plotted at the supplied intercept on the x-axis.}
 \item{threshold}{Numeric or logical. Not relevant to the case-drop bootstrap.
 Has a significant effect on the bootstrapped coefficient distributions. If
 \code{TRUE}, then the default p-value threshold is set to .05. A numeric
-value can specify a different threshold. Causes the \code{bootNet()}
+value can specify a different threshold. Causes the \code{\link{bootNet}}
 function to run the object again, only to re-compute the bootstrapped
 distributions after applying a p-value threshold to the results of each
 model iteration. If \code{NULL}, all coefficient estimates are used in
@@ -159,9 +159,9 @@ coefficient plots, setting this to \code{TRUE} will plot a label for each
 variable to reflect the proportion of times that it was selected across all
 bootstrapped iterations. Only relevant if a threshold was set for the
 fitted bootstrap models, either specified in the current function or was
-specified in creating the \code{bootNet} object. If a numeric value is
-provided, this will determine the size of the text label. Defaults to 1.2
-when \code{text = TRUE}.}
+specified in creating the \code{\link{bootNet}} object. If a numeric value
+is provided, this will determine the size of the text label. Defaults to
+1.2 when \code{text = TRUE}.}
 
 \item{textPos}{Supports the \code{text} argument for coefficient plots.
 Indicates the x-axis position of where to plot the coefficient labels.
@@ -176,7 +176,7 @@ interactions (such as \code{text}) are plotted. This argument will
 eventually be expanded to allow one to plot combinations of edge and
 centrality plots.}
 
-\item{directedDiag}{See corresponding argument in the \code{bootNet()}.
+\item{directedDiag}{See corresponding argument in the \code{\link{bootNet}}.
 function.}
 
 \item{...}{Additional arguments.}
@@ -197,4 +197,7 @@ plot(x)
 
 plot(x, difference = TRUE)
 }
+}
+\seealso{
+\code{\link{bootNet}, \link{resample}}
 }

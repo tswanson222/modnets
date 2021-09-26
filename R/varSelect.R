@@ -6,10 +6,10 @@
 #' moderated networks. Can be used for both GGMs and SUR networks.
 #'
 #' The primary value of the output is to be used as input when fitting the
-#' selected model with the \code{fitNetwork()} function. Specifically, the
-#' output of \code{varSelect()} can be assigned to the \code{type} arugment of
-#' \code{fitNetwork()} in order to fit the constrained models that were selected
-#' across nodes.
+#' selected model with the \code{\link{fitNetwork}} function. Specifically, the
+#' output of \code{\link{varSelect}} can be assigned to the \code{type} argument
+#' of \code{\link{fitNetwork}} in order to fit the constrained models that were
+#' selected across nodes.
 #'
 #' @param data \code{n x k} dataframe or matrix.
 #' @param m Character vector or numeric vector indicating the moderator(s), if
@@ -29,13 +29,18 @@
 #'   \code{"Cp", "BIC", "RSS", "adjR2", "R2"} are available.
 #' @param method Character string to indicate which method to use for variable
 #'   selection. Options include \code{"lasso"} and \code{"glmnet"}, both of
-#'   which use the LASSO via the \code{glmnet} package. \code{"subset",
-#'   "backward", "forward", "seqrep"}, all call different types of subset
-#'   selection using the \code{regsubsets()} function of the \code{leaps}
-#'   package. Finally \code{"glinternet"} is used for applying the hierarchical
-#'   lasso, and is the only method available for moderated network estimation.
-#'   If one or more moderators are specified, then \code{method} will
-#'   automatically default to \code{"glinternet"}.
+#'   which use the LASSO via the \code{glmnet} package (either with
+#'   \code{\link[glmnet:glmnet]{glmnet::glmnet}} or
+#'   \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}, depending upon the
+#'   criterion). \code{"subset", "backward", "forward", "seqrep"}, all call
+#'   different types of subset selection using the
+#'   \code{\link[leaps:regsubsets]{leaps::regsubsets}} function. Finally
+#'   \code{"glinternet"} is used for applying the hierarchical lasso, and is the
+#'   only method available for moderated network estimation (either with
+#'   \code{\link[glinternet:glinternet]{glinternet::glinternet}} or
+#'   \code{\link[glinternet:glinternet.cv]{glinternet::glinternet.cv}},
+#'   depending upon the criterion). If one or more moderators are specified,
+#'   then \code{method} will automatically default to \code{"glinternet"}.
 #' @param lags Numeric or logical. Can only be 0, 1 or \code{TRUE} or
 #'   \code{FALSE}. \code{NULL} is interpreted as \code{FALSE}. Indicates whether
 #'   to fit a time-lagged network or a GGM.
@@ -72,15 +77,22 @@
 #' @param beepno Character string or numeric value to indicate which variable
 #'   (if any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{dayno} argument.
-#' @param dayno Character string or numeric value to indiciate which variable
-#'   (if any) encodes the survey number within a single day. Must be used in
+#' @param dayno Character string or numeric value to indicate which variable (if
+#'   any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{beepno} argument.
 #'
 #' @return List of all models, with the selected variables for each along with
 #'   model coefficients and the variable selection models themselves. Primarily
-#'   for use as input to the \code{type} argument of the \code{fitNetwork()}
-#'   function.
+#'   for use as input to the \code{type} argument of the
+#'   \code{\link{fitNetwork}} function.
 #' @export
+#'
+#' @seealso \code{\link{resample}, \link{fitNetwork}, \link{bootNet},
+#'   \link{mlGVAR}, \link[glinternet:glinternet]{glinternet::glinternet},
+#'   \link[glinternet:glinternet.cv]{glinternet::glinternet.cv},
+#'   \link[glmnet:glmnet]{glmnet::glmnet},
+#'   \link[glmnet:cv.glmnet]{glmnet::cv.glmnet},
+#'   \link[leaps:regsubsets]{leaps::regsubsets}}
 #'
 #' @examples
 #' \dontrun{

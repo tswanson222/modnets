@@ -16,13 +16,13 @@ plotNet3(
 )
 }
 \arguments{
-\item{object}{Output from \code{mlGVAR()} or \code{lmerVAR()}.}
+\item{object}{Output from \code{\link{mlGVAR}} or \code{\link{lmerVAR}}.}
 
 \item{...}{Additional arguments.}
 
 \item{nets}{Character vector of length 3 indicating which networks to plot,
 and in what order. Same options as for \code{which.net} in
-\code{plotNet()}.}
+\code{\link{plotNet}}.}
 
 \item{titles}{If \code{TRUE}, then uses default titles for temporal,
 contemporaneous, and between-subject networks. If \code{FALSE}, then no
@@ -43,13 +43,16 @@ Between 0 and 1.}
 Returns 3 network plots.
 }
 \description{
-Quick, easy plotting for \code{mlGVAR()} and \code{lmerVAR()} output. Allows
-one to plot three networks in the same window: temporal, contemporaneous, and
-between-subject.
+Quick, easy plotting for \code{\link{mlGVAR}} and \code{\link{lmerVAR}}
+output. Allows one to plot three networks in the same window: temporal,
+contemporaneous, and between-subject.
 }
 \examples{
 \dontrun{
 x <- mlGVAR(data)
 plotNet3(x)
 }
+}
+\seealso{
+\code{\link{mlGVAR}, \link{lmerVAR}}
 }

@@ -1,34 +1,36 @@
 #' Fit SUR models with or without constraints
 #'
-#' A wrapper for the \code{systemfit()} function of the \code{systemfit} package
-#' that will construct formulas for all equations based on specified moderators.
-#' This function was NOT designed for user-level functionality, but rather
-#' exists to be embedded within \code{fitNetwork()}. The purpose for making it
-#' available to the user is for allowing the exact fitted model to be highly
-#' customizable.
+#' A wrapper for the \code{\link[systemfit:systemfit]{systemfit::systemfit}}
+#' function that will construct formulas for all equations based on specified
+#' moderators. This function was NOT designed for user-level functionality, but
+#' rather exists to be embedded within \code{\link{fitNetwork}}. The purpose for
+#' making it available to the user is for allowing the exact fitted model to be
+#' highly customizable.
 #'
-#' See the \code{systemfit} package for details on customizing \code{systemfit}
-#' objects. Constraints can be applied via the \code{varMods} argument, which is
-#' intended to facilitate the output of the \code{varSelect()} and
-#' \code{resample()} functions. These objects can be further edited to apply
-#' constraints not specified by these automated functions. Moreover, there are a
-#' variety of additional arguments that can be supplied to the
-#' \code{systemfit()} function if desired.
+#' See the \code{systemfit} package for details on customizing
+#' \code{\link[systemfit:systemfit]{systemfit::systemfit}} objects. Constraints
+#' can be applied via the \code{varMods} argument, which is intended to
+#' facilitate the output of the \code{\link{varSelect}} and
+#' \code{\link{resample}} functions. These objects can be further edited to
+#' apply constraints not specified by these automated functions. Moreover, there
+#' are a variety of additional arguments that can be supplied to the
+#' \code{\link[systemfit:systemfit]{systemfit::systemfit}} function if desired.
 #'
-#' If the variable selection results from \code{resample()} are intended to be
-#' used as input for the \code{varMods} argument, then these results must be fed
-#' into the \code{modSelect()} function.
+#' If the variable selection results from \code{\link{resample}} are intended to
+#' be used as input for the \code{varMods} argument, then these results must be
+#' fed into the \code{\link{modSelect}} function.
 #'
 #' @param data Dataframe or matrix containing idiographic temporal data.
-#' @param varMods Output of \code{varSelect()} or \code{modSelect()}. The latter
-#'   must be applied to \code{resample()} results in order for it to work as
-#'   input for this argument.
-#' @param mod Character string. Only applies if output from \code{varSelect()}
-#'   or \code{modSelect()} is used to constrain the model, and cross-validation
-#'   \code{"CV"} was set as the criterion for model/variable selection. Options
-#'   include \code{"min"}, which uses the lambda value that minimizes the
-#'   objective function, or \code{"1se"} which uses the lambda value at 1
-#'   standard error above the value that minimizes the objective function.
+#' @param varMods Output of \code{\link{varSelect}} or \code{\link{modSelect}}.
+#'   The latter must be applied to \code{\link{resample}} results in order for
+#'   it to work as input for this argument.
+#' @param mod Character string. Only applies if output from
+#'   \code{\link{varSelect}} or \code{\link{modSelect}} is used to constrain the
+#'   model, and cross-validation \code{"CV"} was set as the criterion for
+#'   model/variable selection. Options include \code{"min"}, which uses the
+#'   lambda value that minimizes the objective function, or \code{"1se"} which
+#'   uses the lambda value at 1 standard error above the value that minimizes
+#'   the objective function.
 #' @param maxiter Numeric. The maximum number of iterations to attempt before
 #'   stopping the function.
 #' @param m Character string or numeric value to specify the moderator (if any).
@@ -38,22 +40,25 @@
 #'   automatically be detected.
 #' @param center Logical. Determines whether to mean-center the variables.
 #' @param scale Logical. Determines whether to standardize the variables.
-#' @param exogenous Logical. See \code{fitNetwork()} function for details.
+#' @param exogenous Logical. See \code{\link{fitNetwork}} function for details.
 #' @param covs something
 #' @param sur Logical. Provides input to the \code{method} argument of the
-#'   \code{systemfit()} function. If \code{TRUE}, then the \code{method} will be
-#'   \code{"SUR"}. If \code{FALSE}, then the \code{method} will be
-#'   \code{"OLS"}. These two methods only differ when constraints are applied.
-#'   When a saturated model is fit, both methods produce the same results.
+#'   \code{\link[systemfit:systemfit]{systemfit::systemfit}} function. If
+#'   \code{TRUE}, then the \code{method} will be \code{"SUR"}. If \code{FALSE},
+#'   then the \code{method} will be \code{"OLS"}. These two methods only differ
+#'   when constraints are applied. When a saturated model is fit, both methods
+#'   produce the same results.
 #' @param consec A logical vector that identifies which values to include in
 #'   accordance with the \code{beepno} and \code{dayno} arguments in the
-#'   \code{fitNetwork()} function.
+#'   \code{\link{fitNetwork}} function.
 #' @param ... Additional arguments.
 #'
-#' @return A SUR model, as fit with the \code{systemfit()} function.
+#' @return A SUR model, as fit with the
+#'   \code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
 #' @export
 #'
-#' @family SUR functions
+#' @seealso \code{\link{SURnet}, \link{fitNetwork},
+#'   \link[systemfit:systemfit]{systemfit::systemfit}}
 #'
 #' @examples
 #' \dontrun{
@@ -82,37 +87,40 @@ SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL,
 
 #' Creates temporal and contemporaneous network of SUR results
 #'
-#' A method for converting outputs from the \code{systemfit()} function of the
-#' \code{systemfit} package into temporal and contemporaneous networks. Intended
-#' as an internal function of \code{fitNetwork()}. Not intended for use by the
-#' user. The only purpose of making it available is to allow for extreme
-#' customization, and the capacity to convert any \code{systemfit()} output into
-#' a pair of network models compatible with the \code{modnets} package.
+#' A method for converting outputs from the
+#' \code{\link[systemfit:systemfit]{systemfit::systemfit}} function into
+#' temporal and contemporaneous networks. Intended as an internal function of
+#' \code{\link{fitNetwork}}. Not intended for use by the user. The only purpose
+#' of making it available is to allow for extreme customization, and the
+#' capacity to convert any
+#' \code{\link[systemfit:systemfit]{systemfit::systemfit}} output into a pair of
+#' network models compatible with the \code{modnets} package.
 #'
-#' @param fit Output from \code{SURfit()}
+#' @param fit Output from \code{\link{SURfit}}
 #' @param dat A list containing elements \code{"Y"} and \code{"X"} elements, to
 #'   reflect the outcome and predictor matrices. These are lagged data matrices,
 #'   and can be automatically created through the internal
-#'   \code{modnets:::lagMat()} function. These transformed matrices must be
-#'   supplied in conjunction with the \code{SURfit()} output in order to
+#'   \code{modnets:::lagMat} function. These transformed matrices must be
+#'   supplied in conjunction with the \code{\link{SURfit}} output in order to
 #'   construct network models.
 #' @param s Character string indicating which type of residual covariance matrix
 #'   to compute for SUR models. Options include \code{"res", "dfres", "sigma"}.
 #'   \code{"sigma"} uses the residual covariance matrix as computed by the
-#'   \code{systemfits} package. \code{"res"} and \code{"dfres"} compute the
-#'   matrix based directly on the residual values. \code{"dfres"} is the sample
-#'   estimator that uses \code{N - 1} in the denominator, while \code{"res"}
-#'   just uses \code{N}.
+#'   \code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
+#'   \code{"res"} and \code{"dfres"} compute the matrix based directly on the
+#'   residual values. \code{"dfres"} is the sample estimator that uses \code{N -
+#'   1} in the denominator, while \code{"res"} just uses \code{N}.
 #' @param m Character string or numeric value to specify the moderator (if any).
-#' @param threshold See corresponding argument of \code{fitNetwork()}
-#' @param mval Numeric. See corresponding argument of \code{fitNetwork()}
-#' @param medges Numeric. See corresponding argument of \code{fitNetwork()}
-#' @param pcor See corresponding argument of \code{fitNetwork()}
+#' @param threshold See corresponding argument of \code{\link{fitNetwork}}
+#' @param mval Numeric. See corresponding argument of \code{\link{fitNetwork}}
+#' @param medges Numeric. See corresponding argument of \code{\link{fitNetwork}}
+#' @param pcor See corresponding argument of \code{\link{fitNetwork}}
 #'
 #' @return Temporal and contemporaneous networks
 #' @export
 #'
-#' @family SUR functions
+#' @seealso \code{\link{SURfit}, \link{fitNetwork},
+#'   \link[systemfit:systemfit]{systemfit::systemfit}}
 #'
 #' @examples
 #' \dontrun{

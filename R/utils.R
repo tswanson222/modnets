@@ -9,8 +9,8 @@
 #' @param data An \code{n x k} dataframe or matrix containing only numeric
 #'   values. Can also be a numeric vector.
 #' @param m The column number or name of the moderator variable, if applicable.
-#'   Leave as \code{NULL} if there is no moderator, and set to \code{TRUE} if the moderator is
-#'   the last column in the matrix or dataframe.
+#'   Leave as \code{NULL} if there is no moderator, and set to \code{TRUE} if
+#'   the moderator is the last column in the matrix or dataframe.
 #' @param nLevels Number of levels for the ordinal variables.
 #' @param thresholds List of length \code{k}, where each element is a numeric
 #'   vector of length \code{(nLevels - 1)} containing the splitpoints for
@@ -821,9 +821,9 @@ onnela <- function(x, threshON = 0){
   return(out)
 }
 
-### ----------------------- DIRECTLY FROM BOOTNET -------------------------- ###
+### ---------------------------  FROM BOOTNET ------------------------------ ###
 
-##### netsimulator: stolen bootnet:::plot.netSimulator
+##### netsimulator is adapted from bootnet:::plot.netSimulator
 netsimulator <- function(x, xvar = "factor(nCases)", yvar = c("sensitivity", "specificity", "correlation"),
                          xfacet = "measure", yfacet = ".", color = NULL, ylim = c(0, 1), print = TRUE,
                          xlab = "Number of cases", ylab, outlier.size = 0.5, boxplot.lwd = 0.5,
@@ -870,7 +870,7 @@ netsimulator <- function(x, xvar = "factor(nCases)", yvar = c("sensitivity", "sp
 
 ### ------------------------------- FROM MGM ------------------------------- ###
 
-##### makeConsec: equal to beepday2consec
+##### makeConsec: adapted from mgm:::beepday2consec
 makeConsec <- function(beepvar, dayvar){
   if(!all(dayvar == round(dayvar))){stop('dayno has to be a vector of non-negative integers')}
   if(!all(beepvar == round(beepvar))){stop('beepno has to be a vector of non-negative integers')}
@@ -888,7 +888,7 @@ makeConsec <- function(beepvar, dayvar){
   return(consec)
 }
 
-##### ladData: literally just stole lagData
+##### lagData: adapted from mgm:::lagData
 lagData <- function(data, lags, consec = NULL){
   data <- as.matrix(data)
   max_lag <- max(lags)

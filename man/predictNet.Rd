@@ -7,9 +7,9 @@
 predictNet(object, data = NULL, all = FALSE, scale = FALSE)
 }
 \arguments{
-\item{object}{Output from \code{fitNetwork()} or from \code{mlGVAR()}. If
-using output from \code{mlGVAR()}, then one of the two networks must be
-provided (i.e., either \code{fixedNets} or \code{betweenNet}).}
+\item{object}{Output from \code{\link{fitNetwork}} or \code{\link{mlGVAR}}.
+If using output from \code{\link{mlGVAR}}, then one of the two networks
+must be provided (i.e., either \code{fixedNets} or \code{betweenNet}).}
 
 \item{data}{The dataset used to fit the network model, or another network of
 the same type and size to be compared with the network specified in the
@@ -31,12 +31,11 @@ that shows the difference in prediction error for each node across the two
 networks. Specifically, this is computed by taking the statistics for
 \code{data} and subtracting them from those for \code{object}.
 
-If \code{all = TRUE}, then the following output is returned:
-\describe{
-\item{Y}{The observed values of the outcome variables based on the data provided.}
-\item{preds}{The predicted values of the outcomes based on the models provided.}
-\item{errors}{Table containing prediction error statistics for each node.}
-}
+If \code{all = TRUE}, then the following output is returned: \describe{
+\item{Y}{The observed values of the outcome variables based on the data
+provided.} \item{preds}{The predicted values of the outcomes based on the
+models provided.} \item{errors}{Table containing prediction error
+statistics for each node.} }
 }
 \description{
 See the prediction error based on different statistics for either GGMs or
@@ -53,4 +52,7 @@ predictNet(out1, all = TRUE)
 
 predictNet(out1, out2)
 }
+}
+\seealso{
+\code{\link{fitNetwork}}
 }

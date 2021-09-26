@@ -29,8 +29,8 @@
 #'   increased based on expected range of values. If a datapoint is larger than
 #'   \code{div}, then the sampler will stop.
 #' @param gibbs If \code{TRUE}, then Gibbs sampling will be used. Otherwise,
-#'   data are generated from the \code{rmvnorm()} function in the \code{mvtnorm}
-#'   package based on the partial correlation matrix that is created.
+#'   data are generated from the \code{\link[mvtnorm:rmvnorm]{mvtnorm::rmvnorm}}
+#'   function based on the partial correlation matrix that is created.
 #' @param ordinal Logical. Determines whether to generate ordinal values or not.
 #' @param nLevels Number of levels for the ordinal variables. Only relevant if
 #'   \code{ordinal} is not \code{FALSE}.
@@ -51,7 +51,7 @@
 #' @param modType Determines the type of moderation to employ, such as
 #'   \code{"none", "full", "partial"}
 #' @param lags If \code{TRUE} or 1, then arguments are rerouted to the
-#'   \code{mlGVARsim()} function to simulate temporal data for a single
+#'   \code{\link{mlGVARsim}} function to simulate temporal data for a single
 #'   individual.
 #' @param V Numeric, either 1 or 2. Determines whether to randomize the order of
 #'   simulating node values at each iteration of the Gibbs sampler. If \code{V =
@@ -59,23 +59,24 @@
 #'   the sampler moves through the nodes from the first to the last in order at
 #'   each iteration.
 #' @param skewErr The skewness parameter for the \code{alpha} argument in the
-#'   \code{rmsn()} function in the \code{sn} package.
+#'   \code{\link[sn:rmsn]{sn::rmsn}} function.
 #' @param onlyNets If \code{TRUE} then only the network models are returned,
 #'   without the data. Could be used to create random models and then simulate
 #'   data by another method.
-#' @param netArgs Only for use by the internal function \code{simNet2}, which
-#'   serves as a wrapper for the current function to prevent it from failing.
+#' @param netArgs Only for use by the internal function
+#'   \code{modnets:::simNet2}, which serves as a wrapper for the current
+#'   function to prevent it from failing.
 #' @param nCores Numeric value indicating the number of CPU cores to use for the
-#'   resampling. If \code{TRUE}, then the \code{detectCores()} function from the
-#'   \code{parallel} package will be used to maximize the number of cores
-#'   available.
+#'   resampling. If \code{TRUE}, then the
+#'   \code{\link[parallel:detectCores]{parallel::detectCores}} function will be
+#'   used to maximize the number of cores available.
 #' @param cluster Character vector indicating which type of parallelization to
 #'   use, if \code{nCores > 1}. Options include \code{"mclapply"} and
 #'   \code{"SOCK"}.
 #' @param getChains Logical. Determines whether to return the data-generating
 #'   chains from the Gibbs sampler.
-#' @param const Numeric. The constant to be used in the \code{simPcor()}
-#'   function.
+#' @param const Numeric. The constant to be used by the internal
+#'   \code{modnets:::simPcor} function.
 #' @param fixedPar Numeric. If provided, then this will be set as the
 #'   coefficient value for all edges in the network. Provides a way to
 #'   standardize the parameter values while varying the sparsity of the network.
@@ -87,6 +88,9 @@
 #'
 #' @return Simulated network models as well as data generated from those models.
 #' @export
+#'
+#' @seealso \code{\link{mlGVARsim}, \link{mnetPowerSim}, \link{plotNet},
+#'   \link{net}, \link{netInts}, \link{plotBoot}, \link{plotCoefs}}
 #'
 #' @examples
 #' \dontrun{
@@ -366,7 +370,7 @@ simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL,
     }
     attributes(out)[c('m2', 'modType')] <- list(m2, modType)
   }
-  class(out) <- c(ifelse(onlyDat, 'data.frame', 'list'), 'mgmSim')
+  class(out) <- c(ifelse(onlyDat, 'data.frame', 'list'), 'ggmSim')
   attr(out, 'time') <- t2 <- Sys.time() - t1
   if(time){print(Sys.time() - t1)}
   return(out)

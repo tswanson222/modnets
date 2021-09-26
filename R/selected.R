@@ -3,24 +3,27 @@
 #' Provides a quick representation showing which variables were selected as
 #' predictors of each node in a network, both for unmoderated and moderated
 #' networks. Especially useful as a way to see which variables were selected in
-#' a variable selection procedure, such as through the \code{varSelect()} and
-#' \code{resample()} functions.
+#' a variable selection procedure, such as through the \code{\link{varSelect}}
+#' and \code{\link{resample}} functions.
 #'
 #' The \code{threshold} argument allows the user to set a threshold for
 #' p-values, such that the output only reflects the predictors that are
 #' significant at that threshold. This argument can be utilized whether or not a
 #' variable selection procedure has been employed.
 #'
-#' @param object Output from either \code{fitNetwork()} or \code{mlGVAR()}
+#' @param object Output from either \code{\link{fitNetwork}} or
+#'   \code{\link{mlGVAR}}
 #' @param threshold Can be a numeric value between \code{0} and \code{1}, or
 #'   defaults to \code{.05} when set to \code{TRUE}
-#' @param mod Only relevant to models fit with \code{mlGVAR()}
+#' @param mod Only relevant to models fit with \code{\link{mlGVAR}}
 #'
 #' @return A table where the columns represent nodes, and the rows show which
 #'   variables were selected in predicting each node. For moderated networks,
 #'   the output is a list that separates main effects (\code{mods}) from
 #'   interaction effects (\code{ints}).
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{mlGVAR}}
 #'
 #' @examples
 #' \dontrun{

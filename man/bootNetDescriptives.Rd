@@ -4,14 +4,14 @@
 \alias{bootNetDescriptives}
 \alias{summary.bootNet}
 \alias{cscoef}
-\title{Descriptive statistics for \code{bootNet} objects}
+\title{Descriptive statistics for \code{\link{bootNet}} objects}
 \usage{
 \method{summary}{bootNet}(object, centrality = TRUE, ...)
 
 cscoef(object, cor = 0.7, ci = 0.95, first = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{object}{\code{bootNet} object}
+\item{object}{\code{\link{bootNet}} output}
 
 \item{centrality}{Logical. Determines whether or not strength centrality and
 expected influence should be computed for output.}
@@ -33,12 +33,12 @@ coefficient in output. Set to \code{FALSE} if you want the details about
 the CS coefficient saved as attributes on the output.}
 }
 \value{
-A table of descriptives for bootNet objects, or correlation-stability
-coefficients for the case-drop bootstrap.
+A table of descriptives for \code{\link{bootNet}} objects, or
+correlation-stability coefficients for the case-drop bootstrap.
 }
 \description{
 Currently only works for GGMs, including the between-subjects network
-returned in the \code{mlGVAR()} output.
+returned in the \code{\link{mlGVAR}} output.
 }
 \details{
 Outputs correlation-stability (CS) coefficients for the case-drop bootstrap.
@@ -51,4 +51,7 @@ summary(x)
 x <- bootNet(data, m = 5)
 summary(x, cor = .7)
 }
+}
+\seealso{
+\code{\link{bootNet}}
 }

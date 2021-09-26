@@ -23,16 +23,17 @@ SURfit(
 \arguments{
 \item{data}{Dataframe or matrix containing idiographic temporal data.}
 
-\item{varMods}{Output of \code{varSelect()} or \code{modSelect()}. The latter
-must be applied to \code{resample()} results in order for it to work as
-input for this argument.}
+\item{varMods}{Output of \code{\link{varSelect}} or \code{\link{modSelect}}.
+The latter must be applied to \code{\link{resample}} results in order for
+it to work as input for this argument.}
 
-\item{mod}{Character string. Only applies if output from \code{varSelect()}
-or \code{modSelect()} is used to constrain the model, and cross-validation
-\code{"CV"} was set as the criterion for model/variable selection. Options
-include \code{"min"}, which uses the lambda value that minimizes the
-objective function, or \code{"1se"} which uses the lambda value at 1
-standard error above the value that minimizes the objective function.}
+\item{mod}{Character string. Only applies if output from
+\code{\link{varSelect}} or \code{\link{modSelect}} is used to constrain the
+model, and cross-validation \code{"CV"} was set as the criterion for
+model/variable selection. Options include \code{"min"}, which uses the
+lambda value that minimizes the objective function, or \code{"1se"} which
+uses the lambda value at 1 standard error above the value that minimizes
+the objective function.}
 
 \item{maxiter}{Numeric. The maximum number of iterations to attempt before
 stopping the function.}
@@ -48,45 +49,48 @@ automatically be detected.}
 
 \item{scale}{Logical. Determines whether to standardize the variables.}
 
-\item{exogenous}{Logical. See \code{fitNetwork()} function for details.}
+\item{exogenous}{Logical. See \code{\link{fitNetwork}} function for details.}
 
 \item{covs}{something}
 
 \item{sur}{Logical. Provides input to the \code{method} argument of the
-\code{systemfit()} function. If \code{TRUE}, then the \code{method} will be
-\code{"SUR"}. If \code{FALSE}, then the \code{method} will be
-\code{"OLS"}. These two methods only differ when constraints are applied.
-When a saturated model is fit, both methods produce the same results.}
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function. If
+\code{TRUE}, then the \code{method} will be \code{"SUR"}. If \code{FALSE},
+then the \code{method} will be \code{"OLS"}. These two methods only differ
+when constraints are applied. When a saturated model is fit, both methods
+produce the same results.}
 
 \item{consec}{A logical vector that identifies which values to include in
 accordance with the \code{beepno} and \code{dayno} arguments in the
-\code{fitNetwork()} function.}
+\code{\link{fitNetwork}} function.}
 
 \item{...}{Additional arguments.}
 }
 \value{
-A SUR model, as fit with the \code{systemfit()} function.
+A SUR model, as fit with the
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
 }
 \description{
-A wrapper for the \code{systemfit()} function of the \code{systemfit} package
-that will construct formulas for all equations based on specified moderators.
-This function was NOT designed for user-level functionality, but rather
-exists to be embedded within \code{fitNetwork()}. The purpose for making it
-available to the user is for allowing the exact fitted model to be highly
-customizable.
+A wrapper for the \code{\link[systemfit:systemfit]{systemfit::systemfit}}
+function that will construct formulas for all equations based on specified
+moderators. This function was NOT designed for user-level functionality, but
+rather exists to be embedded within \code{\link{fitNetwork}}. The purpose for
+making it available to the user is for allowing the exact fitted model to be
+highly customizable.
 }
 \details{
-See the \code{systemfit} package for details on customizing \code{systemfit}
-objects. Constraints can be applied via the \code{varMods} argument, which is
-intended to facilitate the output of the \code{varSelect()} and
-\code{resample()} functions. These objects can be further edited to apply
-constraints not specified by these automated functions. Moreover, there are a
-variety of additional arguments that can be supplied to the
-\code{systemfit()} function if desired.
+See the \code{systemfit} package for details on customizing
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} objects. Constraints
+can be applied via the \code{varMods} argument, which is intended to
+facilitate the output of the \code{\link{varSelect}} and
+\code{\link{resample}} functions. These objects can be further edited to
+apply constraints not specified by these automated functions. Moreover, there
+are a variety of additional arguments that can be supplied to the
+\code{\link[systemfit:systemfit]{systemfit::systemfit}} function if desired.
 
-If the variable selection results from \code{resample()} are intended to be
-used as input for the \code{varMods} argument, then these results must be fed
-into the \code{modSelect()} function.
+If the variable selection results from \code{\link{resample}} are intended to
+be used as input for the \code{varMods} argument, then these results must be
+fed into the \code{\link{modSelect}} function.
 }
 \examples{
 \dontrun{
@@ -94,7 +98,6 @@ SURfit(data)
 }
 }
 \seealso{
-Other SUR functions: 
-\code{\link{SURnet}()}
+\code{\link{SURnet}, \link{fitNetwork},
+  \link[systemfit:systemfit]{systemfit::systemfit}}
 }
-\concept{SUR functions}

@@ -17,10 +17,10 @@ plotMods(
 )
 }
 \arguments{
-\item{nets}{List of network models fit with \code{fitNetwork()}, where
+\item{nets}{List of network models fit with \code{\link{fitNetwork}}, where
 \code{mval} has been specified.}
 
-\item{nodewise}{See corresponding argument in \code{plotNet()}.}
+\item{nodewise}{See corresponding argument in \code{\link{plotNet}}.}
 
 \item{elsize}{Numeric value to indicate the size of the edge labels.}
 
@@ -31,14 +31,16 @@ network.}
 \item{elabs}{If \code{TRUE}, then edges will be labeled with their numeric
 values.}
 
-\item{predict}{See corresponding argument in \code{plotNet()}.}
+\item{predict}{See corresponding argument in \code{\link{plotNet}}.}
 
 \item{layout}{Can be a character string, corresponding to the options in
-\code{qgraph()}, or can be a matrix that defines the layout (e.g., based on
-the \code{averageLayout()} function). Recommended to leave as \code{NULL},
-so that the layout will be based on the list of networks provided.}
+\code{\link[qgraph:qgraph]{qgraph::qgraph}}, or can be a matrix that
+defines the layout (e.g., based on the
+\code{\link[qgraph:averageLayout]{qgraph::averageLayout}} function).
+Recommended to leave as \code{NULL}, so that the layout will be based on
+the list of networks provided.}
 
-\item{which.net}{See corresponding argument in \code{plotNet()}.}
+\item{which.net}{See corresponding argument in \code{\link{plotNet}}.}
 
 \item{...}{Additional arguments.}
 }
@@ -48,7 +50,7 @@ by side.
 }
 \description{
 An easy wrapper for plotting the same network at different levels of a
-moderator. Using the \code{mval} argument of the \code{fitNetwork()}
+moderator. Using the \code{mval} argument of the \code{\link{fitNetwork}}
 function, you can create multiple models---conditional networks---wherein the
 same model is fit at different values of the moderator.
 }
@@ -66,4 +68,7 @@ fit2 <- fitNetwork(data, moderators = 'depressed', mval = 2)
 
 fits <- list(fit0, fit1, fit2)
 plotMods(fits)
+}
+\seealso{
+\code{\link{fitNetwork}}
 }

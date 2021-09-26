@@ -36,13 +36,13 @@
 #' procedure is employed for creating adjusted confidence intervals.
 #'
 #' A key distinguishing feature of the bootstrapping procedure implemented in
-#' this function versus the \code{bootNet()} function is that the latter is
+#' this function versus the \code{\link{bootNet}} function is that the latter is
 #' designed to estimate the parameter distributions of a single model, whereas
 #' the version here is aimed at using the bootstrapped resamples to select a
-#' final model. In a practical sense, this boils down to the bootstrapping in
-#' the \code{resample()} function to perform variable selection at each
-#' iteration of the resampling, rather than taking a single constrained model
-#' and applying it equally at all iterations.
+#' final model. In a practical sense, this boils down to using the bootstrapping
+#' method in the \code{\link{resample}} function to perform variable selection
+#' at each iteration of the resampling, rather than taking a single constrained
+#' model and applying it equally at all iterations.
 #'
 #' @param data \code{n x k} dataframe. Cannot supply a matrix as input.
 #' @param m Character vector or numeric vector indicating the moderator(s), if
@@ -72,13 +72,18 @@
 #'   \code{"Cp", "BIC", "RSS", "adjR2", "R2"} are available.
 #' @param method Character string to indicate which method to use for variable
 #'   selection. Options include \code{"lasso"} and \code{"glmnet"}, both of
-#'   which use the LASSO via the \code{glmnet} package. \code{"subset",
-#'   "backward", "forward", "seqrep"}, all call different types of subset
-#'   selection using the \code{regsubsets()} function of the \code{leaps}
-#'   package. Finally \code{"glinternet"} is used for applying the hierarchical
-#'   lasso, and is the only method available for moderated network estimation.
-#'   If one or more moderators are specified, then \code{method} will
-#'   automatically default to \code{"glinternet"}.
+#'   which use the LASSO via the \code{glmnet} package (either with
+#'   \code{\link[glmnet:glmnet]{glmnet::glmnet}} or
+#'   \code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}, depending upon the
+#'   criterion). \code{"subset", "backward", "forward", "seqrep"}, all call
+#'   different types of subset selection using the
+#'   \code{\link[leaps:regsubsets]{leaps::regsubsets}} function. Finally
+#'   \code{"glinternet"} is used for applying the hierarchical lasso, and is the
+#'   only method available for moderated network estimation (either with
+#'   \code{\link[glinternet:glinternet]{glinternet::glinternet}} or
+#'   \code{\link[glinternet:glinternet.cv]{glinternet::glinternet.cv}},
+#'   depending upon the criterion). If one or more moderators are specified,
+#'   then \code{method} will automatically default to \code{"glinternet"}.
 #' @param rule Only applies to GGMs (including between-subjects networks) when a
 #'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
 #'   both corresponding coefficients have p-values below the threshold, while
@@ -145,11 +150,11 @@
 #'   models at each iteration.
 #' @param fitit Logical. Determines whether to fit the final selected model on
 #'   the original sample. If \code{FALSE}, then this can still be done with
-#'   \code{fitNetwork()} and \code{modSelect()}.
+#'   \code{\link{fitNetwork}} and \code{\link{modSelect}}.
 #' @param nCores Numeric value indicating the number of CPU cores to use for the
-#'   resampling. If \code{TRUE}, then the \code{detectCores()} function from the
-#'   \code{parallel} package will be used to maximize the number of cores
-#'   available.
+#'   resampling. If \code{TRUE}, then the
+#'   \code{\link[parallel:detectCores]{parallel::detectCores}} function will be
+#'   used to maximize the number of cores available.
 #' @param cluster Character vector indicating which type of parallelization to
 #'   use, if \code{nCores > 1}. Options include \code{"mclapply"} and
 #'   \code{"SOCK"}.
@@ -169,13 +174,20 @@
 #' @return \code{resample} output
 #' @export
 #' @references Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
-#' high-dimensional regression. Journal of the American Statistical Association.
-#' 104, 1671-1681.
+#'   high-dimensional regression. Journal of the American Statistical
+#'   Association. 104, 1671-1681.
 #'
-#' Meinshausen, N., & Buhlmann, P. (2010). Stability selection. Journal of the
-#' Royal Statistical Society: Series B (Statistical Methodology). 72, 417-423
+#'   Meinshausen, N., & Buhlmann, P. (2010). Stability selection. Journal of the
+#'   Royal Statistical Society: Series B (Statistical Methodology). 72, 417-423
 #'
-#' @seealso \code{\link{plot.resample}, \link{modSelect}}
+#' @seealso \code{\link{plot.resample}, \link{modSelect}, \link{fitNetwork},
+#'   \link{bootNet}, \link{mlGVAR}, \link{plotNet}, \link{plotCoefs},
+#'   \link{plotBoot}, \link{plotPvals}, \link{plotStability}, \link{net},
+#'   \link{netInts}, \link[glinternet:glinternet]{glinternet::glinternet},
+#'   \link[glinternet:glinternet.cv]{glinternet::glinternet.cv},
+#'   \link[glmnet:glmnet]{glmnet::glmnet},
+#'   \link[glmnet:cv.glmnet]{glmnet::cv.glmnet},
+#'   \link[leaps:regsubsets]{leaps::regsubsets}}
 #'
 #' @examples
 #' \dontrun{
@@ -803,15 +815,15 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
   out
 }
 
-#' Select a model based on output from \code{resample()}
+#' Select a model based on output from \code{\link{resample}}
 #'
 #' Creates the necessary input for fitNetwork when selecting variables based on
-#' the \code{resample()} function. The purpose of making this function available
-#' to the user is to that different decisions can be made about how exactly to
-#' use the \code{resample()} output to select a model, as sometimes there is
-#' more than one option for choosing a final model.
+#' the \code{\link{resample}} function. The purpose of making this function
+#' available to the user is to that different decisions can be made about how
+#' exactly to use the \code{\link{resample}} output to select a model, as
+#' sometimes there is more than one option for choosing a final model.
 #'
-#' @param obj \code{resample} object
+#' @param obj \code{\link{resample}} output
 #' @param data The dataframe used to create the \code{resample} object. Necesary
 #'   if \code{ascall = TRUE} or \code{fit = TRUE}.
 #' @param fit Logical. Determines whether to fit the selected model to the data
@@ -832,33 +844,33 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
 #'
 #'   When the resampling method was \code{"stability"}, the default option of
 #'   \code{select = "select"} chooses variables based on the original threshold
-#'   provided to the \code{resample()} function, and relies on the simultaneous
-#'   selection proportion (the \code{"freq"} column in the \code{"results"}
-#'   element). Alternatively, if \code{select} is a numeric value, or a value
-#'   for \code{thresh} is provided, that new frequency selection threshold will
-#'   determine the choice of variables. Alternatively, one can specify
-#'   \code{select = "split1"} or \code{select = "split2"} to base the threshold
-#'   on the selection frequency in one of the two splits rather than on the
-#'   simultaneous selection frequency which is likely to be the most
-#'   conservative.
+#'   provided to the \code{\link{resample}} function, and relies on the
+#'   simultaneous selection proportion (the \code{"freq"} column in the
+#'   \code{"results"} element). Alternatively, if \code{select} is a numeric
+#'   value, or a value for \code{thresh} is provided, that new frequency
+#'   selection threshold will determine the choice of variables. Alternatively,
+#'   one can specify \code{select = "split1"} or \code{select = "split2"} to
+#'   base the threshold on the selection frequency in one of the two splits
+#'   rather than on the simultaneous selection frequency which is likely to be
+#'   the most conservative.
 #'
 #'   For all types of \code{resample} objects, when \code{select = "Pvalue"}
 #'   then \code{thresh} can be set to a numeric value in order to select
 #'   variables based on aggregated p-values. For the \code{"bootstrapping"} and
 #'   \code{"split"} methods this allows one to override the original threshold
-#'   (set as part of \code{resample()}) if desired.
+#'   (set as part of \code{\link{resample}}) if desired.
 #' @param thresh Numeric value. If \code{select = "Pvalue"}, then this value
 #'   will be the p-value threshold. Otherwise, this value will determine the
 #'   minimum frequency selection threshold.
 #' @param ascall Logical. Determines whether to return a list with arguments
-#'   necessary for fitting the model with \code{do.call} to \code{fitNetwork()}.
-#'   Only possible if a dataset is supplied.
+#'   necessary for fitting the model with \code{do.call} to
+#'   \code{\link{fitNetwork}}. Only possible if a dataset is supplied.
 #' @param type Should just leave as-is. Automatically taken from the
 #'   \code{resample} object.
 #' @param ... Additional arguments.
 #'
-#' @return A call ready for \code{fitNetwork()}, a fitted network model, or a
-#'   list of selected variables for each node along with relevant attributes.
+#' @return A call ready for \code{\link{fitNetwork}}, a fitted network model, or
+#'   a list of selected variables for each node along with relevant attributes.
 #'   Essentially, the output is either the selected model itself or a list of
 #'   the necessary parameters to fit it.
 #' @export
@@ -950,34 +962,34 @@ modSelect <- function(obj, data = NULL, fit = FALSE, select = "select",
 
 #' Plot method for output of resample function
 #'
-#' Allows one to plot results from the \code{resample()} function based on a few
-#' different options.
+#' Allows one to plot results from the \code{\link{resample}} function based on
+#' a few different options.
 #'
 #' For the \code{what} argument, the options correspond with calls to the
-#' following functions: \itemize{ \item{\code{"network": \link{plotNet}()}}
-#' \item{\code{"bootstrap": \link{plotBoot}()}} \item{\code{"coefs":
-#' \link{plotCoefs}()}} \item{\code{"stability": \link{plotStability}()}}
-#' \item{\code{"pvals": \link{plotPvals}()}} }
+#' following functions: \itemize{ \item{\code{"network": \link{plotNet}}}
+#' \item{\code{"bootstrap": \link{plotBoot}}} \item{\code{"coefs":
+#' \link{plotCoefs}}} \item{\code{"stability": \link{plotStability}}}
+#' \item{\code{"pvals": \link{plotPvals}}} }
 #'
 #' \code{"bootstrap"} and \code{"pvals"} only available for bootstrapped and
 #' multi-sample split resampling. \code{"stability"} only available for
 #' stability selection.
 #'
-#' @param x Output from the \code{resample()} function.
-#' @param what Can be one of three options for all \code{resample()} outputs:
-#'   \code{what = "network"} will plot the final network model selected from
-#'   resampling. \code{what = "bootstrap"} will run \code{bootNet()} based on
-#'   the final model to create bootstrapped estimates of confidence bands around
-#'   each edge estimate. \code{what = "coefs"} will plot the confidence
-#'   intervals based on the model parameters in the final network. Additionally,
-#'   if the object was fit with \code{sampMethod = "stability"}, a stability
-#'   plot can be created with the \code{"stability"} option. Otherwise, if
-#'   \code{sampMethod = "bootstrap"} or \code{sampMethod = "split"}, a plot of
-#'   the empirical distribution function of p-values can be displayed with the
-#'   \code{"pvals"} option.
+#' @param x Output from the \code{\link{resample}} function.
+#' @param what Can be one of three options for all \code{\link{resample}}
+#'   outputs: \code{what = "network"} will plot the final network model selected
+#'   from resampling. \code{what = "bootstrap"} will run \code{\link{bootNet}}
+#'   based on the final model to create bootstrapped estimates of confidence
+#'   bands around each edge estimate. \code{what = "coefs"} will plot the
+#'   confidence intervals based on the model parameters in the final network.
+#'   Additionally, if the object was fit with \code{sampMethod = "stability"}, a
+#'   stability plot can be created with the \code{"stability"} option.
+#'   Otherwise, if \code{sampMethod = "bootstrap"} or \code{sampMethod =
+#'   "split"}, a plot of the empirical distribution function of p-values can be
+#'   displayed with the \code{"pvals"} option.
 #' @param ... Additional arguments.
 #'
-#' @return Plots various aspects of output from the \code{\link{resample}()}
+#' @return Plots various aspects of output from the \code{\link{resample}}
 #'   function.
 #' @export
 #'
@@ -1013,7 +1025,7 @@ plot.resample <- function(x, what = 'network', ...){
   do.call(FUN, args)
 }
 
-##### adjustedCI: uses the union-bound approach for obtaining adjCIs -- STOLEN FROM hdi PACKAGE!!!
+##### adjustedCI: uses the union-bound approach for obtaining adjCIs. Adapted from hdi package
 adjustedCI <- function(lci, rci, centers, ses, df.res, gamma.min, ci.level, var,
                        multi.corr = FALSE, verbose = FALSE, s0 = list(s0 = NA)){
   findInsideGamma <- function(low, high, ci.info, verbose){

@@ -1,72 +1,77 @@
 #' Log-likelihood functions and Likelihood Ratio Tests for moderated networks
 #'
-#' Computes log-likelihood, AIC, and BIC for a whole network. Also compares two
-#' or more networks using a likelihood ratio test (LRT).
+#' Computes log-likelihood, AIC, and BIC for a whole network, or for each node
+#' in the network. Also compares two or more networks using a likelihood ratio
+#' test (LRT).
 #'
 #' Fits LRT to a list of network models to compare them all against each other.
 #' Obtain all possible LRTs comparing a list of SUR models. Can include tests
-#' comparing RMSEA values.
+#' comparing RMSEA values. The \code{nodes} argument determines whether to
+#' perform these computations in an omnibus or nodewise fashion.
 #'
-#' One key thing to note is that when using
-#' \code{modTable()} or \code{SURtable()}, the LRT column indicates the number
-#' of times that each network was selected over others with respect to the
-#' pairwise LRTs.
+#' One key thing to note is that when using \code{\link{modTable}} or
+#' \code{\link{SURtable}}, the LRT column indicates the number of times that
+#' each network was selected over others with respect to the pairwise LRTs.
 #'
 #' @param net0 Output from one of the main \code{modnets} functions.
 #'   Alternatively, a list of network models can be provided. This list should
 #'   be named for the easiest interpretation of results.
-#' @param net1 For \code{modLL()} and \code{SURll()}, can be used to supply a
-#'   second network to compare to \code{net0} via an LRT. Or if \code{lrt =
-#'   FALSE}, then relevant statistics will be returned for both \code{net0} and
-#'   \code{net1}. Importantly, if one network is provided for \code{net0}, and
-#'   another is provided for \code{net1}, then the names in the output will
-#'   reflect these argument names. This can be somewhat confusing at times, so
-#'   ultimately it is not recommended to use this argument. Instead, try
-#'   supplying both networks (or more) as a named list to the \code{net0}
+#' @param net1 For \code{\link{modLL}} and \code{\link{SURll}}, can be used to
+#'   supply a second network to compare to \code{net0} via an LRT. Or if
+#'   \code{lrt = FALSE}, then relevant statistics will be returned for both
+#'   \code{net0} and \code{net1}. Importantly, if one network is provided for
+#'   \code{net0}, and another is provided for \code{net1}, then the names in the
+#'   output will reflect these argument names. This can be somewhat confusing at
+#'   times, so ultimately it is not recommended to use this argument. Instead,
+#'   try supplying both networks (or more) as a named list to the \code{net0}
 #'   argument for the most customization.
 #' @param nodes Logical. Determines whether to compute omnibus or nodewise
 #'   statistics and tests. If \code{TRUE}, then LL values for nodewise models
 #'   will be returned, and any LRTs requested will reflect nodewise tests.
 #' @param lrt Logical. Determines whether to conduct an LRT or not. If
 #'   \code{FALSE}, then only LL-related statistics will be returned for all
-#'   models supplied. Only relevant for \code{modLL()} and \code{SURll()}
+#'   models supplied. Only relevant for \code{\link{modLL}} and
+#'   \code{\link{SURll}}
 #' @param all Logical. If \code{TRUE}, then omnibus LL statistics as well as
 #'   nodewise statistics are returned for either LL function.
 #' @param d Number of decimal places to round outputted statistics to.
 #' @param alpha Alpha level for LRTs. Defaults to .05.
 #' @param orderBy Can be one of \code{"LL", "df", "AIC", "BIC"} to indicate
-#'   which statistic to order the table by. If using \code{modTable()} or
-#'   \code{SURtable()}, then a value of \code{TRUE} will organize the output by
-#'   the LRT column, which indicates the number of times that a particular model
-#'   performed better than another based on the pairwise LRTs. Higher values
-#'   indicate that the model was selected more often in comparison with other
-#'   models in the list.
+#'   which statistic to order the table by. If using \code{\link{modTable}} or
+#'   \code{\link{SURtable}}, then a value of \code{TRUE} will organize the
+#'   output by the LRT column, which indicates the number of times that a
+#'   particular model performed better than another based on the pairwise LRTs.
+#'   Higher values indicate that the model was selected more often in comparison
+#'   with other models in the list.
 #' @param decreasing Logical. Determines whether to organize output from highest
 #'   to lowest, or vice versa, in accordance with the value of \code{orderBy}.
 #' @param s Character string indicating which type of residual covariance matrix
 #'   to compute for SUR models. Options include \code{"res", "dfres", "sigma"}.
 #'   \code{"sigma"} uses the residual covariance matrix as computed by the
-#'   \code{systemfits} package. \code{"res"} and \code{"dfres"} compute the
-#'   matrix based directly on the residual values. \code{"dfres"} is the sample
-#'   estimator that uses \code{N - 1} in the denominator, while \code{"res"}
-#'   just uses \code{N}.
-#' @param sysfits Logical, only relevant to \code{SURll()} when multiple
+#'   \code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
+#'   \code{"res"} and \code{"dfres"} compute the matrix based directly on the
+#'   residual values. \code{"dfres"} is the sample estimator that uses \code{N -
+#'   1} in the denominator, while \code{"res"} just uses \code{N}.
+#' @param sysfits Logical, only relevant to \code{\link{SURll}} when multiple
 #'   networks are included in a list. Does not currently work when there are two
 #'   networks in the list, but does work with 3 or more. Returns the omnibus
-#'   model statistics based on functions in the \code{systemfit} package. This
+#'   model statistics based on functions available to output from the
+#'   \code{\link[systemfit:systemfit]{systemfit::systemfit}} function. This
 #'   allows for some additional statistics such as \code{SSR, detSigma, OLS.R2,
 #'   McElroy.R2}.
 #' @param names Character vector containing the names of the models being
-#'   compared. Only relevant to the \code{modTable()} and \code{SURtable()}.
-#'   Alternatively, models can be named by supplying a named list to the
-#'   \code{net0} argument.
-#' @param rmsea Logical. Relevant to \code{modTable()} and \code{SURtable()}.
-#'   Determines whether to return RMSEA values, as well as tests comparing RMSEA
-#'   across each pair of models.
+#'   compared. Only relevant to the \code{\link{modTable}} and
+#'   \code{\link{SURtable}}. Alternatively, models can be named by supplying a
+#'   named list to the \code{net0} argument.
+#' @param rmsea Logical. Relevant to \code{\link{modTable}} and
+#'   \code{\link{SURtable}}. Determines whether to return RMSEA values, as well
+#'   as tests comparing RMSEA across each pair of models.
 #'
 #' @return A table or list of results depending on which function is used.
 #' @export
 #' @name LogLikelihood
+#'
+#' @seealso \code{\link{fitNetwork}, \link{mlGVAR}}
 #'
 #' @examples
 #' data <- na.omit(psychTools::msq[, c('hostile', 'lonely', 'nervous', 'sleepy', 'depressed')])

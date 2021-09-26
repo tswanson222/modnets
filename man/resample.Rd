@@ -75,13 +75,18 @@ ignored. For methods based on the LASSO, only \code{"CV", "AIC", "BIC",
 
 \item{method}{Character string to indicate which method to use for variable
 selection. Options include \code{"lasso"} and \code{"glmnet"}, both of
-which use the LASSO via the \code{glmnet} package. \code{"subset",
-  "backward", "forward", "seqrep"}, all call different types of subset
-selection using the \code{regsubsets()} function of the \code{leaps}
-package. Finally \code{"glinternet"} is used for applying the hierarchical
-lasso, and is the only method available for moderated network estimation.
-If one or more moderators are specified, then \code{method} will
-automatically default to \code{"glinternet"}.}
+which use the LASSO via the \code{glmnet} package (either with
+\code{\link[glmnet:glmnet]{glmnet::glmnet}} or
+\code{\link[glmnet:cv.glmnet]{glmnet::cv.glmnet}}, depending upon the
+criterion). \code{"subset", "backward", "forward", "seqrep"}, all call
+different types of subset selection using the
+\code{\link[leaps:regsubsets]{leaps::regsubsets}} function. Finally
+\code{"glinternet"} is used for applying the hierarchical lasso, and is the
+only method available for moderated network estimation (either with
+\code{\link[glinternet:glinternet]{glinternet::glinternet}} or
+\code{\link[glinternet:glinternet.cv]{glinternet::glinternet.cv}},
+depending upon the criterion). If one or more moderators are specified,
+then \code{method} will automatically default to \code{"glinternet"}.}
 
 \item{rule}{Only applies to GGMs (including between-subjects networks) when a
 threshold is supplied. The \code{"AND"} rule will only preserve edges when
@@ -170,12 +175,12 @@ models at each iteration.}
 
 \item{fitit}{Logical. Determines whether to fit the final selected model on
 the original sample. If \code{FALSE}, then this can still be done with
-\code{fitNetwork()} and \code{modSelect()}.}
+\code{\link{fitNetwork}} and \code{\link{modSelect}}.}
 
 \item{nCores}{Numeric value indicating the number of CPU cores to use for the
-resampling. If \code{TRUE}, then the \code{detectCores()} function from the
-\code{parallel} package will be used to maximize the number of cores
-available.}
+resampling. If \code{TRUE}, then the
+\code{\link[parallel:detectCores]{parallel::detectCores}} function will be
+used to maximize the number of cores available.}
 
 \item{cluster}{Character vector indicating which type of parallelization to
 use, if \code{nCores > 1}. Options include \code{"mclapply"} and
@@ -238,13 +243,13 @@ for each parameter using a method developed by Meinshausen, Meier, & Buhlmann
 procedure is employed for creating adjusted confidence intervals.
 
 A key distinguishing feature of the bootstrapping procedure implemented in
-this function versus the \code{bootNet()} function is that the latter is
+this function versus the \code{\link{bootNet}} function is that the latter is
 designed to estimate the parameter distributions of a single model, whereas
 the version here is aimed at using the bootstrapped resamples to select a
-final model. In a practical sense, this boils down to the bootstrapping in
-the \code{resample()} function to perform variable selection at each
-iteration of the resampling, rather than taking a single constrained model
-and applying it equally at all iterations.
+final model. In a practical sense, this boils down to using the bootstrapping
+method in the \code{\link{resample}} function to perform variable selection
+at each iteration of the resampling, rather than taking a single constrained
+model and applying it equally at all iterations.
 }
 \examples{
 \dontrun{
@@ -253,12 +258,19 @@ x <- resample(data)
 }
 \references{
 Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for
-high-dimensional regression. Journal of the American Statistical Association.
-104, 1671-1681.
+high-dimensional regression. Journal of the American Statistical
+Association. 104, 1671-1681.
 
 Meinshausen, N., & Buhlmann, P. (2010). Stability selection. Journal of the
 Royal Statistical Society: Series B (Statistical Methodology). 72, 417-423
 }
 \seealso{
-\code{\link{plot.resample}, \link{modSelect}}
+\code{\link{plot.resample}, \link{modSelect}, \link{fitNetwork},
+  \link{bootNet}, \link{mlGVAR}, \link{plotNet}, \link{plotCoefs},
+  \link{plotBoot}, \link{plotPvals}, \link{plotStability}, \link{net},
+  \link{netInts}, \link[glinternet:glinternet]{glinternet::glinternet},
+  \link[glinternet:glinternet.cv]{glinternet::glinternet.cv},
+  \link[glmnet:glmnet]{glmnet::glmnet},
+  \link[glmnet:cv.glmnet]{glmnet::cv.glmnet},
+  \link[leaps:regsubsets]{leaps::regsubsets}}
 }

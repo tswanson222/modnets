@@ -13,7 +13,8 @@ plotNet2(
 )
 }
 \arguments{
-\item{object}{Output from \code{fitNetwork()}, specifically with a SUR model.}
+\item{object}{Output from \code{\link{fitNetwork}}, specifically with a SUR
+model.}
 
 \item{whichNets}{Vector of length 2 indicating which networks to plot.
 \code{"beta"} and \code{"temporal"} both refer to the unstandardized
@@ -21,8 +22,8 @@ temporal network coefficients, while \code{"PDC"} refers to the
 standardized temporal network. \code{"PCC"} and \code{"contemporaneous"}
 both refer to the standardized residual covariance matrix (the
 contemporaneous network). If the \code{object} is fitted with
-\code{mlGVAR()} or \code{lmerVAR()}, then \code{"between"} is also an
-option for plotting the between-subjects network.}
+\code{\link{mlGVAR}} or \code{\link{lmerVAR}}, then \code{"between"} is
+also an option for plotting the between-subjects network.}
 
 \item{whichTemp}{Which version of the temporal network should be plotted,
 either \code{"temporal"} or \code{"PDC"}. This argument is ignored if
@@ -38,16 +39,19 @@ Returns two network plots side by side.
 }
 \description{
 Designed for easy-to-use plotting with temporal networks. Essentially just a
-wrapper for running \code{plotNet()} twice---once for a temporal network, and
-again for a contemporaneous network---and plotting the two networks in the
-same window. Good for a quick glance at results from a SUR network. Also
-compatible with \code{mlGVAR()} and \code{lmerVAR()} outputs, although can
-only plot two networks in the same window. \code{plotNet3()} can be used to
-plot 3 networks.
+wrapper for running \code{\link{plotNet}} twice---once for a temporal
+network, and again for a contemporaneous network---and plotting the two
+networks in the same window. Good for a quick glance at results from a SUR
+network. Also compatible with \code{\link{mlGVAR}} and \code{\link{lmerVAR}}
+outputs, although can only plot two networks in the same window.
+\code{\link{plotNet3}} can be used to plot 3 networks.
 }
 \examples{
 \dontrun{
 x <- fitNetwork(data, lags = TRUE)
 plotNet2(x)
 }
+}
+\seealso{
+\code{\link{fitNetwork}}
 }

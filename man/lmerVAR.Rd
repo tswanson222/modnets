@@ -91,9 +91,9 @@ modeled as outcomes/nodes in the network. If the number of moderators
 reaches \code{k - 1} or \code{k}, then \code{exogenous} will automatically
 be \code{FALSE}.}
 
-\item{covariates}{See corresponding argument in \code{fitNetwork()} function.
-Can supply a numeric value or vector to indicate which variables are
-covariates, or can supply a list containing the individual covariates
+\item{covariates}{See corresponding argument in \code{\link{fitNetwork}}
+function. Can supply a numeric value or vector to indicate which variables
+are covariates, or can supply a list containing the individual covariates
 separately from the dataset.}
 
 \item{fix}{Character vector to indicate which variables to only create fixed
@@ -122,9 +122,9 @@ A \code{lmerVAR} mixed-effects model with corresponding networks.
 }
 \description{
 Proper estimation of mixed-effects GVAR models. This is an alternative
-fitting procedure to that provided by the \code{mlGVAR()} function. The key
-differences are that this function can take significantly longer to fit, and
-it may fail when trying to fit especially large models.
+fitting procedure to that provided by the \code{\link{mlGVAR}} function. The
+key differences are that this function can take significantly longer to fit,
+and it may fail when trying to fit especially large models.
 }
 \details{
 In the process of adding further documentation. More details to come. The
@@ -142,5 +142,5 @@ The gaussian graphical model in cross-sectional and time-series data.
 Multivariate Behavioral Research. 53, 453-580.
 }
 \seealso{
-\code{\link{compareVAR}}
+\code{\link{compareVAR}, \link{mlGVAR}, \link{mlGVARsim}}
 }

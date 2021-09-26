@@ -4,7 +4,7 @@
 \alias{CentClust}
 \alias{centAuto}
 \alias{clustAuto}
-\title{Node centrality and shortest path lengths}
+\title{Node centrality, clustering coefficients, and shortest path lengths}
 \usage{
 centAuto(x, which.net = "temporal", weighted = TRUE, signed = TRUE)
 
@@ -16,7 +16,7 @@ supply a list of network models, and the function will be applied to all
 models in the list.}
 
 \item{which.net}{Only applies to SUR networks, as well as those fit with the
-\code{mlGVAR()} function. Character string to indicate which type of
+\code{\link{mlGVAR}} function. Character string to indicate which type of
 network to compute centrality values for. Options are \code{"temporal"} for
 the temporal network, \code{"contemporaneous"} for the contemporaneous
 network, \code{"PDC"} for the partial directed correlation network, and
@@ -37,10 +37,12 @@ A list containing node centrality statistics, edge-betweenness
 values, and shortest path lengths.
 }
 \description{
-Mimics the \code{centrality_auto()} function from the \code{qgraph} package.
-The purpose of amending this function was to make it compatible with outputs
-from the \code{modnets} package. The main use of this function is as the
-engine for the \code{centTable()} function.
+Mimics the \code{\link[qgraph:centrality_auto]{qgraph::centrality_auto}} and
+\code{\link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}} functions. The
+purpose of amending these functions was to make them compatible with outputs
+from the \code{modnets} package. The main use of these functions is as the
+engines for the \code{\link{centTable}} and \code{\link{clustTable}}
+functions.
 }
 \details{
 Returns several node centrality statistics, edge-betweenness centrality, and
@@ -50,9 +52,11 @@ lengths. For GGMs, Strength centrality and Expected Influence are also
 computed. For SUR networks, InStrength, OutStrength, InExpectedInfluence, and
 OutExpectedInfluence are computed instead.
 
-The key distinction between this function and \code{centrality_auto()} is
-that centrality values can be computed for the matrix of interactions within
-a temporal network.
+The key distinction between these functions and the
+\code{\link[qgraph:centrality_auto]{qgraph::centrality_auto}} and
+\code{\link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}} functions is that
+centrality and clustering values can be computed for the matrix of
+interactions within a temporal network.
 }
 \examples{
 \dontrun{
@@ -60,4 +64,10 @@ x <- fitNetwork(data)
 
 centAuto(x)
 }
+}
+\seealso{
+\code{\link{centTable}, \link{clustTable}, \link{centPlot},
+  \link{clustPlot}, \link{plotCentrality},
+  \link[qgraph:centrality_auto]{qgraph::centrality_auto},
+  \link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}}
 }

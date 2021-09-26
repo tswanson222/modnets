@@ -19,8 +19,8 @@ ordinalize(
 values. Can also be a numeric vector.}
 
 \item{m}{The column number or name of the moderator variable, if applicable.
-Leave as \code{NULL} if there is no moderator, and set to \code{TRUE} if the moderator is
-the last column in the matrix or dataframe.}
+Leave as \code{NULL} if there is no moderator, and set to \code{TRUE} if
+the moderator is the last column in the matrix or dataframe.}
 
 \item{nLevels}{Number of levels for the ordinal variables.}
 

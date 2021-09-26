@@ -7,13 +7,14 @@
 #' the variable selection functions to integrate model selection and estimation.
 #' Nodewise estimation is used for all GGMs, and SUR estimation is used for
 #' temporal networks. See \code{systemfit} package for more information on the
-#' latter, particularly via the \code{systemfit()} function.
+#' latter, particularly via the
+#' \code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
 #'
 #' @param data \code{n x k} dataframe or matrix.
 #' @param moderators Numeric or character vector indicating which variables (if
 #'   any) to use as moderators.
 #' @param type Primarily used to supply a variable selection object, such as
-#'   those created with \code{varSelect()} or \code{modSelect(resample())}, or
+#'   those created with \code{\link{varSelect}} or \code{\link{modSelect}}, or
 #'   to indicate that a variable selection method should be employed by setting
 #'   the value to \code{"varSelect"}. Currently doesn't support setting the
 #'   value to \code{"resample"}, although this will be implemented in the
@@ -21,8 +22,9 @@
 #'   each node. In this case it should be either a single value --
 #'   \code{"gaussian"} or \code{"binomial"} -- or can be a vector of length
 #'   \code{k} to specify which of those two types apply to each variable. These
-#'   dictate which family to use for the call to \code{glm()}. Cannot use
-#'   binomial models for SUR networks.
+#'   dictate which family to use for the call to
+#'   \code{\link[stats:glm]{stats::glm}}. Cannot use binomial models for SUR
+#'   networks.
 #' @param lags Logical or numeric, to indicate whether to fit a SUR model or
 #'   not. Set to \code{TRUE} or 1 for a SUR model fit to temporal data for a
 #'   single subject.
@@ -37,22 +39,23 @@
 #'   Options include \code{"min"}, which uses the lambda value that minimizes
 #'   the objective function, or \code{"1se"} which uses the lambda value at 1
 #'   standard error above the value that minimizes the objective function.
-#' @param rule #' @param rule Only applies to GGMs (including between-subjects
-#'   networks) when a threshold is supplied. The \code{"AND"} rule will only
-#'   preserve edges when both corresponding coefficients have p-values below the
-#'   threshold, while the \code{"OR"} rule will preserve an edge so long as one
-#'   of the two coefficients have a p-value below the supplied threshold.
+#' @param rule Only applies to GGMs (including between-subjects networks) when a
+#'   threshold is supplied. The \code{"AND"} rule will only preserve edges when
+#'   both corresponding coefficients have p-values below the threshold, while
+#'   the \code{"OR"} rule will preserve an edge so long as one of the two
+#'   coefficients have a p-value below the supplied threshold.
 #' @param threshold Determines whether to employ a p-value threshold on the
 #'   model. If \code{TRUE} then this defaults to .05. Not recommended, as
 #'   thresholds can be applied post-hoc through the plotting functions, or via
-#'   the \code{net()} and \code{netInts()} functions. Recommended to leave as
-#'   \code{FALSE}.
+#'   the \code{\link{net}} and \code{\link{netInts}} functions. Recommended to
+#'   leave as \code{FALSE}.
 #' @param scale Determines whether to standardize all variables or not.
 #' @param std Only applies to SUR networks. Logical. Provides input to the
-#'   \code{method} argument of the \code{systemfit()} function. If \code{TRUE},
-#'   then the \code{method} will be \code{"SUR"}. If \code{FALSE}, then the
-#'   \code{method} will be \code{"OLS"}. These two methods only differ when
-#'   constraints are applied. When a saturated model is fit, both methods
+#'   \code{method} argument of the
+#'   \code{\link[systemfit:systemfit]{systemfit::systemfit}} function. If
+#'   \code{TRUE}, then the \code{method} will be \code{"SUR"}. If \code{FALSE},
+#'   then the \code{method} will be \code{"OLS"}. These two methods only differ
+#'   when constraints are applied. When a saturated model is fit, both methods
 #'   produce the same results.
 #' @param center Determines whether to mean-center variables or not.
 #' @param covariates Either a numeric value or character string -- this could
@@ -80,7 +83,7 @@
 #'   the \code{systemfits} package. \code{"res"} and \code{"dfres"} compute the
 #'   matrix based directly on the residual values. \code{"dfres"} is the sample
 #'   estimator that uses \code{N - 1} in the denominator, while \code{"res"}
-#'   just uses \code{N}. Input for \code{SURnet()} function.
+#'   just uses \code{N}. Input for \code{\link{SURnet}} function.
 #' @param medges DEPRECATED.
 #' @param pcor Logical. Determines whether to operationalize the adjacency
 #'   matrix as the partial correlation matrix of the data, or to use nodewise
@@ -90,21 +93,21 @@
 #'   with model results. Recommended to keep \code{TRUE}.
 #' @param saveMods Logical. Determines whether to save the \code{fitobj} element
 #'   of the output, which contains the nodewise models, or the SUR model output
-#'   of \code{systemfit()}.
+#'   of \code{\link[systemfit:systemfit]{systemfit::systemfit}}.
 #' @param binarize Logical. Determines whether to convert the output to a
 #'   binary, unweighted network. Only relevant for GGMs.
-#' @param fitCoefs Determines whether to use the \code{getFitCIs()} function on
-#'   the output. Not recommended to use. The downside is that this will
-#'   overwrite the \code{fitobj} element of the output which contains the actual
-#'   models. Better to leave this as \code{FALSE}, and then use the
-#'   \code{getFitCIs()} function on the object separately.
+#' @param fitCoefs Determines whether to use the \code{\link{getFitCIs}}
+#'   function on the output. Not recommended to use. The downside is that this
+#'   will overwrite the \code{fitobj} element of the output which contains the
+#'   actual models. Better to leave this as \code{FALSE}, and then use the
+#'   \code{\link{getFitCIs}} function on the object separately.
 #' @param detrend Logical. Determines whether to remove linear trends from time
 #'   series variables. Only applies to temporal networks.
 #' @param beepno Character string or numeric value to indicate which variable
 #'   (if any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{dayno} argument. Only relevant to temporal data.
-#' @param dayno Character string or numeric value to indiciate which variable
-#'   (if any) encodes the survey number within a single day. Must be used in
+#' @param dayno Character string or numeric value to indicate which variable (if
+#'   any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{beepno} argument. Only relevant to temporal data.
 #' @param ... Additional arguments.
 #'
@@ -116,7 +119,7 @@
 #' x <- fitNetwork(data)
 #' }
 fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
-                       seed = NULL, folds = 10, gamma = 0.5, which.lam = 'lambda.min',
+                       seed = NULL, folds = 10, gamma = 0.5, which.lam = 'min',
                        rule = "OR", threshold = FALSE, scale = FALSE, std = TRUE,
                        center = TRUE, covariates = NULL, verbose = FALSE, exogenous = TRUE,
                        mval = NULL, residMat = "sigma", medges = 1, pcor = FALSE, maxiter = 100,
@@ -1072,14 +1075,15 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
 #' Provides model coefficients with confidence intervals
 #'
 #' Requires that either 'fitobj' or 'SURfit' is included in the object from
-#' \code{fitNetwork()}. Returns a list of nodewise model coefficients, including
-#' confidence intervals computed from the estimated standard errors.
+#' \code{\link{fitNetwork}}. Returns a list of nodewise model coefficients,
+#' including confidence intervals computed from the estimated standard errors.
 #'
 #' The \code{select} column in the output indicates whether the variable would
 #' be selected given the supplied alpha level.
 #'
-#' @param fit Output from \code{fitNetwork()}, or either the \code{fixedNets} or
-#'   \code{betweenNet} element of the output from \code{mlGVAR()}
+#' @param fit Output from \code{\link{fitNetwork}}, or either the
+#'   \code{fixedNets} or \code{betweenNet} element of the output from
+#'   \code{\link{mlGVAR}}
 #' @param allNames Character vector containing all the predictor names. Do not
 #'   change, as these are automatically detected.
 #' @param alpha Type 1 error rate. The complement of the confidence level.
@@ -1087,6 +1091,8 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
 #' @return List of tables containing model coefficients along with confidence
 #'   intervals
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{plotCoefs}}
 #'
 #' @examples
 #' \dontrun{

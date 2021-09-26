@@ -29,8 +29,9 @@ netInts(
 }
 \arguments{
 \item{fit}{A fitted network model. Can be the output from
-\code{fitNetwork()}, \code{mlGVAR()}, \code{lmerVAR()}, \code{bootNet()},
-\code{resample()}, \code{simNet()}, or \code{mlGVARsim()}.}
+\code{\link{fitNetwork}}, \code{\link{mlGVAR}}, \code{\link{lmerVAR}},
+\code{\link{bootNet}}, \code{\link{resample}}, \code{\link{simNet}}, or
+\code{\link{mlGVARsim}}.}
 
 \item{n}{When multiple networks exist for a single object, this allows the
 user to indicate which adjacency matrix to return. For a GGM, all values of
@@ -64,40 +65,40 @@ networks). If \code{TRUE} then the adjacency matrix will retain all
 coefficients in their original form. In this case, values in rows represent
 the coefficients predicting the columns.}
 
-\item{d}{Numeric. Only used for output of \code{mlGVARsim()} in relation to
-the contemporaneous network. Sets the number of decimal places to round the
-output to. DEPRECATED!}
+\item{d}{Numeric. Only used for output of \code{\link{mlGVARsim}} in relation
+to the contemporaneous network. Sets the number of decimal places to round
+the output to. DEPRECATED!}
 
 \item{r}{Numeric. Chooses which rows/columns to remove from the output, if
 desired.}
 
-\item{avg}{Logical. For \code{netInts()}, determines whether to take the
+\item{avg}{Logical. For \code{\link{netInts}}, determines whether to take the
 average two corresponding interaction terms.}
 
-\item{empty}{Logical. Determines the output of \code{netInts()} when
+\item{empty}{Logical. Determines the output of \code{\link{netInts}} when
 \code{fit} is not a moderated network. If \code{TRUE} then an empty list
 will be returned. If \code{FALSE} then a matrix of zeros will be returned.}
 
-\item{mselect}{Only used for \code{netInts()} when there is more than one
-exogenous moderator. Allows the user to indicate which moderator should be
-used to construct the interaction matrix.}
+\item{mselect}{Only used for \code{\link{netInts}} when there is more than
+one exogenous moderator. Allows the user to indicate which moderator should
+be used to construct the interaction matrix.}
 }
 \value{
 An adjacency matrix representing a network or a matrix of interaction
 terms.
 }
 \description{
-\code{net} returns the adjacency matrix for any network model fit using
-functions from the \code{modnets} package. \code{netInts} returns a matrix of
-interaction terms associated with a moderated network.
+\code{\link{net}} returns the adjacency matrix for any network model fit
+using functions from the \code{modnets} package. \code{\link{netInts}}
+returns a matrix of interaction terms associated with a moderated network.
 }
 \details{
 For GGMs when a non-symmetric matrix is requested, columns will represent
 outcomes and rows will represent predictors. For temporal networks, columns
 represent predictors and rows represent outcomes.
 
-Can also be used with output from the \code{resample()} and \code{bootNet()}
-functions.
+Can also be used with output from the \code{\link{resample}} and
+\code{\link{bootNet}} functions.
 }
 \examples{
 \dontrun{
@@ -111,4 +112,8 @@ net(y, n = 'beta')
 net(y, n = 'pcc')
 net(y, n = 'between')
 }
+}
+\seealso{
+\code{\link{fitNetwork}, \link{mlGVAR}, \link{lmerVAR},
+  \link{bootNet}, \link{resample}, \link{simNet}, \link{mlGVARsim}}
 }

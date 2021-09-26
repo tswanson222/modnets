@@ -1,19 +1,20 @@
 #' Get adjacency matrices from fit objects
 #'
-#' \code{net} returns the adjacency matrix for any network model fit using
-#' functions from the \code{modnets} package. \code{netInts} returns a matrix of
-#' interaction terms associated with a moderated network.
+#' \code{\link{net}} returns the adjacency matrix for any network model fit
+#' using functions from the \code{modnets} package. \code{\link{netInts}}
+#' returns a matrix of interaction terms associated with a moderated network.
 #'
 #' For GGMs when a non-symmetric matrix is requested, columns will represent
 #' outcomes and rows will represent predictors. For temporal networks, columns
 #' represent predictors and rows represent outcomes.
 #'
-#' Can also be used with output from the \code{resample()} and \code{bootNet()}
-#' functions.
+#' Can also be used with output from the \code{\link{resample}} and
+#' \code{\link{bootNet}} functions.
 #'
 #' @param fit A fitted network model. Can be the output from
-#'   \code{fitNetwork()}, \code{mlGVAR()}, \code{lmerVAR()}, \code{bootNet()},
-#'   \code{resample()}, \code{simNet()}, or \code{mlGVARsim()}.
+#'   \code{\link{fitNetwork}}, \code{\link{mlGVAR}}, \code{\link{lmerVAR}},
+#'   \code{\link{bootNet}}, \code{\link{resample}}, \code{\link{simNet}}, or
+#'   \code{\link{mlGVARsim}}.
 #' @param n When multiple networks exist for a single object, this allows the
 #'   user to indicate which adjacency matrix to return. For a GGM, all values of
 #'   this argument return the same adjacency matrix. For a SUR network,
@@ -41,23 +42,26 @@
 #'   networks). If \code{TRUE} then the adjacency matrix will retain all
 #'   coefficients in their original form. In this case, values in rows represent
 #'   the coefficients predicting the columns.
-#' @param d Numeric. Only used for output of \code{mlGVARsim()} in relation to
-#'   the contemporaneous network. Sets the number of decimal places to round the
-#'   output to. DEPRECATED!
+#' @param d Numeric. Only used for output of \code{\link{mlGVARsim}} in relation
+#'   to the contemporaneous network. Sets the number of decimal places to round
+#'   the output to. DEPRECATED!
 #' @param r Numeric. Chooses which rows/columns to remove from the output, if
 #'   desired.
-#' @param avg Logical. For \code{netInts()}, determines whether to take the
+#' @param avg Logical. For \code{\link{netInts}}, determines whether to take the
 #'   average two corresponding interaction terms.
-#' @param empty Logical. Determines the output of \code{netInts()} when
+#' @param empty Logical. Determines the output of \code{\link{netInts}} when
 #'   \code{fit} is not a moderated network. If \code{TRUE} then an empty list
 #'   will be returned. If \code{FALSE} then a matrix of zeros will be returned.
-#' @param mselect Only used for \code{netInts()} when there is more than one
-#'   exogenous moderator. Allows the user to indicate which moderator should be
-#'   used to construct the interaction matrix.
+#' @param mselect Only used for \code{\link{netInts}} when there is more than
+#'   one exogenous moderator. Allows the user to indicate which moderator should
+#'   be used to construct the interaction matrix.
 #'
 #' @return An adjacency matrix representing a network or a matrix of interaction
 #'   terms.
 #' @export
+#'
+#' @seealso \code{\link{fitNetwork}, \link{mlGVAR}, \link{lmerVAR},
+#'   \link{bootNet}, \link{resample}, \link{simNet}, \link{mlGVARsim}}
 #'
 #' @examples
 #' \dontrun{
@@ -75,7 +79,7 @@ net <- function(fit, n = "beta", threshold = FALSE, rule = "OR",
                 binary = FALSE, nodewise = FALSE, d = 14, r = NULL){
   if(inherits(fit, c('splitNets', 'try-error'))){return(NULL)}
   if(is(fit, 'bootNet') | (isTRUE(attr(fit, 'resample')) & 'fit0' %in% names(fit))){fit <- fit$fit0}
-  if(is(fit, 'mgmSim')){return(fit[[grep('^trueNet$|^b1$|^adjMat$', names(fit))]])}
+  if(is(fit, 'ggmSim')){return(fit[[grep('^trueNet$|^b1$|^adjMat$', names(fit))]])}
   if(is(fit, "matrix")){return(fit)}
   if(is(fit, "mgm")){
     out <- fit$pairwise$wadj * replace(fit$pairwise$signs, is.na(fit$pairwise$signs), 0)
@@ -175,7 +179,7 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
     if(!is.null(r) & !is(out, 'list')){out <- out[-r, -r]}
     if(is(out, 'list')){return(eout(fit, empty))} else {return(out)}
   }
-  if(is(fit, 'mgmSim')){if('b2' %in% names(fit)){return(fit$b2)} else {return(eout(fit, empty))}}
+  if(is(fit, 'ggmSim')){if('b2' %in% names(fit)){return(fit$b2)} else {return(eout(fit, empty))}}
   if(is(fit, 'bootNet') | (isTRUE(attr(fit, 'resample')) & 'fit0' %in% names(fit))){fit <- fit$fit0}
   if(isTRUE(n) & isTRUE(threshold)){avg <- TRUE}
   if(isTRUE(n) | is.numeric(n)){

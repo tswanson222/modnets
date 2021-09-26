@@ -69,10 +69,10 @@ sampled network matrices.}
 not. If simulating a temporal network, set to \code{TRUE} or 1.}
 
 \item{trueNet}{The adjacency matrix of the data-generating network model, or
-a list containing the adjancency matrix as the first element, and the
+a list containing the adjacency matrix as the first element, and the
 interaction matrix as the second element.}
 
-\item{threshold}{See corresponding argument in \code{fitNetwork()}.
+\item{threshold}{See corresponding argument in \code{\link{fitNetwork}}.
 Automatically set to \code{TRUE} if \code{select} is not \code{NULL}.}
 
 \item{rule}{Only applies to GGMs (including between-subjects networks) when a
@@ -81,7 +81,7 @@ both corresponding coefficients have p-values below the threshold, while
 the \code{"OR"} rule will preserve an edge so long as one of the two
 coefficients have a p-value below the supplied threshold.}
 
-\item{avg}{See corresponding argument of \code{netInts()}}
+\item{avg}{See corresponding argument of \code{\link{netInts}}}
 
 \item{maxiter}{If a model fails to be fit, this determines the maximum number
 of iterations to re-try it before giving up. Will also simulate new
@@ -99,8 +99,8 @@ each iteration.}
 variable.}
 
 \item{select}{Identifies a variable selection function -- either
-\code{varSelect()} or \code{resample()} -- to use for introducing variable
-selection at each iteration. The usefulness of this is to mimic a
+\code{\link{varSelect}} or \code{\link{resample}} -- to use for introducing
+variable selection at each iteration. The usefulness of this is to mimic a
 real-world situation, wherein the researcher may be interested in seeing
 how well datasets of different sizes afford models that approximate a true
 model after employing iterated variable selection. If \code{TRUE} then this
@@ -113,15 +113,15 @@ etc.}
 procedure specified by the \code{select} argument.}
 
 \item{type}{Can supply a variable selection object, such as the output from
-either \code{varSelect()} or \code{moSelect(resample(...))}, can be
-supplied to choose a specific constrained model to fit on all iterations.
-This is essentially an alternative to \code{select}, in that \code{select}
-performs variable selection at each iteration, whereas this argument
-defines a constrained model that is applied at every iteration.}
+either \code{\link{varSelect}} or \code{\link{modSelect}}, can be supplied
+to choose a specific constrained model to fit on all iterations. This is
+essentially an alternative to \code{select}, in that \code{select} performs
+variable selection at each iteration, whereas this argument defines a
+constrained model that is applied at every iteration.}
 
 \item{gibbs}{If \code{TRUE}, then Gibbs sampling will be used. Otherwise,
-data are generated from the \code{rmvnorm()} function in the \code{mvtnorm}
-package based on the partial correlation matrix that is created.}
+data are generated from the \code{\link[mvtnorm:rmvnorm]{mvtnorm::rmvnorm}}
+function based on the partial correlation matrix that is created.}
 
 \item{ordinal}{Logical. Determines whether to generate ordinal values or not.}
 
@@ -150,12 +150,12 @@ interaction effect coefficients.}
 printed to screen at the end of the sampling.}
 
 \item{skewErr}{The skewness parameter for the \code{alpha} argument in the
-\code{rmsn()} function in the \code{sn} package.}
+\code{\link[sn:rmsn]{sn::rmsn}} function.}
 
 \item{nCores}{Numeric value indicating the number of CPU cores to use for the
-resampling. If \code{TRUE}, then the \code{detectCores()} function from the
-\code{parallel} package will be used to maximize the number of cores
-available.}
+resampling. If \code{TRUE}, then the
+\code{\link[parallel:detectCores]{parallel::detectCores}} function will be
+used to maximize the number of cores available.}
 
 \item{cluster}{Character vector indicating which type of parallelization to
 use, if \code{nCores > 1}. Options include \code{"mclapply"} and
@@ -192,5 +192,6 @@ x <- mnetPowerSim()
 }
 }
 \seealso{
-\code{\link{summary.mnetPower}, \link{plotPower}}
+\code{\link{summary.mnetPower}, \link{plotPower}, \link{simNet},
+  \link{mlGVARsim}}
 }

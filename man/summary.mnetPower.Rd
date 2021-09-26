@@ -7,7 +7,7 @@
 \method{summary}{mnetPower}(object, ind = "all", order = NULL, decreasing = FALSE, ...)
 }
 \arguments{
-\item{object}{Output from \code{mnetPowerSim()} function.}
+\item{object}{Output from \code{\link{mnetPowerSim}} function.}
 
 \item{ind}{Character string or vector to indicate which aspects of the
 results to view. If \code{"means"}, then only the means will be returned
@@ -33,7 +33,7 @@ Summary table, or list of summary tables.
 }
 \description{
 A quick way to view the results of power simulations conducted with
-\code{mnetPowerSim()}.
+\code{\link{mnetPowerSim}}.
 }
 \examples{
 \dontrun{

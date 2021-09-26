@@ -25,7 +25,7 @@ clustTable(Wmats, scale = TRUE, labels = NULL, relative = FALSE, signed = TRUE)
 measure (i.e., convert to z-scores).}
 
 \item{which.net}{Only applies to SUR networks, as well as those fit with the
-\code{mlGVAR()} function. Character string to indicate which type of
+\code{\link{mlGVAR}} function. Character string to indicate which type of
 network to compute centrality values for. Options are \code{"temporal"} for
 the temporal network, \code{"contemporaneous"} for the contemporaneous
 network, \code{"PDC"} for the partial directed correlation network, and
@@ -49,14 +49,15 @@ A table containing the names of nodes, measures of node centrality,
 and their corresponding centrality values or clustering coefficients.
 }
 \description{
-Mimics the output of the \code{centralityTable()} and
-\code{clusteringTable()} functions in the \code{qgraph} package. The purpose
-of revising these function was to make them compatible with outputs from the
-\code{modnets} package.
+Mimics the output of the
+\code{\link[qgraph:centralityTable]{qgraph::centralityTable}} and
+\code{\link[qgraph:clusteringTable]{qgraph::clusteringTable}} functions. The
+purpose of revising these function was to make them compatible with outputs
+from the \code{modnets} package.
 }
 \details{
-For \code{centTable()}, centrality values can be computed for the matrix of
-interactions within a temporal network.
+For \code{\link{centTable}}, centrality values can be computed for the matrix
+of interactions within a temporal network.
 }
 \examples{
 \dontrun{
@@ -65,4 +66,10 @@ x <- fitNetwork(data)
 centTable(x)
 clustTable(x)
 }
+}
+\seealso{
+\code{\link{centAuto}, \link{clustAuto}, \link{centPlot},
+  \link{clustPlot}, \link{plotCentrality},
+  \link[qgraph:centralityTable]{qgraph::centralityTable},
+  \link[qgraph:clusteringTable]{qgraph::clusteringTable}}
 }

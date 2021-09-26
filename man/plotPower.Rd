@@ -28,7 +28,7 @@ plotPower(
 )
 }
 \arguments{
-\item{x}{\code{mnetPowerSim()} output}
+\item{x}{\code{\link{mnetPowerSim}} output}
 
 \item{by}{In development. Currently only supports \code{"type"} for creating
 different facets for Pairwise and Interaction effects. \code{"network"} for
@@ -60,7 +60,7 @@ Plots the results of a power simulation according to a variety of
 performance metrics.
 }
 \description{
-Plots the output from the \code{mnetPowerSim()} function.
+Plots the output from the \code{\link{mnetPowerSim}} function.
 }
 \details{
 The options of what performance metrics to plot include: \itemize{
@@ -73,4 +73,7 @@ Rate)} }
 x <- mnetPowerSim(niter = 100, N = c(100, 200))
 plot(x)
 }
+}
+\seealso{
+\code{\link{mnetPowerSim}}
 }

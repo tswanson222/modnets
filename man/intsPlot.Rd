@@ -7,9 +7,9 @@
 intsPlot(out, y = "all", nsims = 500, alpha = 0.05)
 }
 \arguments{
-\item{out}{GGM moderated network output from \code{fitNetwork()}, or output
-from a moderated between-subjects network fit with \code{mlGVAR()} (e.g.,
-when \code{bm = TRUE}).}
+\item{out}{GGM moderated network output from \code{\link{fitNetwork}}, or
+output from a moderated between-subjects network fit with
+\code{\link{mlGVAR}} (e.g., when \code{bm = TRUE}).}
 
 \item{y}{Character string. The name of the outcome variable for which to
 create the plot. If \code{y = "all"}, then all interaction terms associated
@@ -47,4 +47,7 @@ that moderator to predict the outcome.
 x <- fitNetwork(data, moderators = 'moderator')
 plot(x, which.net = 'ints')
 }
+}
+\seealso{
+\code{\link{fitNetwork}, \link{plotNet}, \link{mlGVAR}}
 }
