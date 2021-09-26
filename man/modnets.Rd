@@ -3,7 +3,7 @@
 \docType{package}
 \name{modnets}
 \alias{modnets}
-\title{modnets: A package for fitting and analyzing moderated network models}
+\title{modnets: Modeling Moderated Networks}
 \description{
 The modnets package is all about fitting and analyzing moderated network
 models. Currently in development -- more updates and details to come.
@@ -13,7 +13,7 @@ models. Currently in development -- more updates and details to come.
 
 \tabular{ll}{
 Package: \tab modnets \cr
-Title: \tab Moderated Network Models \cr
+Title: \tab Modeling Moderated Networks \cr
 Version: \tab 0.9.0 \cr
 Author: \tab Trevor Swanson \cr
 Maintainer: \tab \href{mailto:trevorswanson222@gmail.com}{trevorswanson222@gmail.com} \cr

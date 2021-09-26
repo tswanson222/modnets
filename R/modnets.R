@@ -1,4 +1,4 @@
-#' modnets: A package for fitting and analyzing moderated network models
+#' modnets: Modeling Moderated Networks
 #'
 #' The modnets package is all about fitting and analyzing moderated network
 #' models. Currently in development -- more updates and details to come.
@@ -7,7 +7,7 @@
 #'
 #' \tabular{ll}{
 #' Package: \tab modnets \cr
-#' Title: \tab Moderated Network Models \cr
+#' Title: \tab Modeling Moderated Networks \cr
 #' Version: \tab 0.9.0 \cr
 #' Author: \tab Trevor Swanson \cr
 #' Maintainer: \tab <trevorswanson222@gmail.com> \cr

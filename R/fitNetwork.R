@@ -1074,8 +1074,8 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
 
 #' Provides model coefficients with confidence intervals
 #'
-#' Requires that either 'fitobj' or 'SURfit' is included in the object from
-#' \code{\link{fitNetwork}}. Returns a list of nodewise model coefficients,
+#' Requires that either \code{fitobj} or \code{SURfit} is included in the object
+#' from \code{\link{fitNetwork}}. Returns a list of nodewise model coefficients,
 #' including confidence intervals computed from the estimated standard errors.
 #'
 #' The \code{select} column in the output indicates whether the variable would

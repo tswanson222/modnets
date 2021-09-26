@@ -21,8 +21,8 @@ List of tables containing model coefficients along with confidence
 intervals
 }
 \description{
-Requires that either 'fitobj' or 'SURfit' is included in the object from
-\code{\link{fitNetwork}}. Returns a list of nodewise model coefficients,
+Requires that either \code{fitobj} or \code{SURfit} is included in the object
+from \code{\link{fitNetwork}}. Returns a list of nodewise model coefficients,
 including confidence intervals computed from the estimated standard errors.
 }
 \details{

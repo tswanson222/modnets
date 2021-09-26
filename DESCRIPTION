@@ -1,5 +1,5 @@
 Package: modnets
-Title: Moderated Network Models
+Title: Modeling Moderated Networks
 Version: 0.9.0
 Authors@R: 
     person(given = "Trevor",
