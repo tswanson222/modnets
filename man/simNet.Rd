@@ -174,7 +174,11 @@ chains from the Gibbs sampler.}
 
 \item{fixedPar}{Numeric. If provided, then this will be set as the
 coefficient value for all edges in the network. Provides a way to
-standardize the parameter values while varying the sparsity of the network.}
+standardize the parameter values while varying the sparsity of the network.
+If \code{length(fixedPar) == 1}, then the same value will be used for all
+parameters. If \code{length(fixedPar) == 2}, then the first value will be
+for pairwise relationships, and the second value will be for interaction
+terms.}
 
 \item{V2}{If \code{V2 = 1} and \code{m2} is between 0 and 1, the number of
 interaction terms in the model will be determined by multiplying \code{m2}
@@ -185,13 +189,15 @@ with the number of elements in the interaction matrix and taking the
 }
 \value{
 Simulated network models as well as data generated from those models.
+For GGMs, model matrices are always symmetric. For temporal networks (when
+\code{lags = 1}), columns predict rows.
 }
 \description{
 Used for generating moderated and unmoderated adjacency matrices, along with
 data based on those model structures.
 }
 \details{
-If no moderator is requested then data can be generated directly from a
+If no moderator is specified then data can be generated directly from a
 partial correlation matrix by setting \code{gibbs = FALSE}, which produces
 fast simulation results. Alternatively, a Gibbs sampler is used to generate
 data, which is the default option. For moderated networks, Gibbs sampling is
@@ -219,7 +225,9 @@ to specify fewer interactions}. \item{Try reducing a range with a smaller
 maximum for \code{m2_range}, to adjust the range of interaction
 coefficients}. \item{Try adjusting the corresponding main effect parameters
 for the moderator, \code{m1} and \code{m1_range}}. \item{Try setting
-\code{modType = "full"} to reduce the number of main effect parameters}. }
+\code{modType = "full"} to reduce the number of main effect parameters}.
+\item{Try setting a low value(s) for \code{fixedPar}, in order to provde
+parameter values that are known to be lower} }
 
 An alternative approach could be to use the internal function
 \code{simNet2}, which is a wrapper designed to re-run \code{simNet} when it
@@ -232,9 +240,8 @@ function.
 }
 
 \examples{
-\dontrun{
-x <- simNet(N = 100, p = 5, m = TRUE)
-}
+set.seed(1)
+x <- simNet(N = 100, p = 3, m = TRUE)
 }
 \seealso{
 \code{\link{mlGVARsim}, \link{mnetPowerSim}, \link{plotNet},

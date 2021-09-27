@@ -466,7 +466,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 #'   without the data. Could be used to create random models and then simulate
 #'   data by another method.
 #' @param modType Determines the type of moderation to employ, such as
-#'   \code{"none", "full", "partial"}
+#'   \code{"none", "full", "partial"}. See \code{\link{simNet}}
 #'
 #' @return Simulated mlGVAR or VAR data.
 #' @export
@@ -777,16 +777,21 @@ mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m
     dat2 <- data.frame(Data[, 1:nNode], M = unlist(mm), ID = Data[, "ID"])
     mb1 <- if(any(c("fixed", "mixed1") %in% m)){mmb1[[1]]} else {Reduce("+", mmb1)/nPerson}
     mb2 <- if(any(c("fixed", "mixed2") %in% m)){mmb2[[1]]} else {Reduce("+", mmb2)/nPerson}
-    Results$mm <- list(data = dat2, m = m, subjects = list(mb1 = mmb1, mb2 = mmb2), mb1 = mb1, mb2 = mb2)
-    if(nPerson == 1){Results$mm$data <- Results$mm$data[, -ncol(Results$mm$data)]}
+    Results$data <- dat2 # NEW
+    Results$interactions <- list(m = m, subjects = list(mb1 = mmb1, mb2 = mmb2), mb1 = mb1, mb2 = mb2) # NEW
+    #Results$mm <- list(data = dat2, m = m, subjects = list(mb1 = mmb1, mb2 = mmb2), mb1 = mb1, mb2 = mb2)
+    #if(nPerson == 1){Results$mm$data <- Results$mm$data[, -ncol(Results$mm$data)]}
   }
   if(nPerson == 1){
     Results$data <- Results$data[, -ncol(Results$data)]
     Results$between <- NULL
-    attr(Results, "simMLgvar") <- TRUE
-    class(Results) <- c('list', 'simMLgvar')
+    #attr(Results, "simMLgvar") <- TRUE
+    #class(Results) <- c('list', 'simMLgvar')
+    attr(Results, 'GVARsim') <- TRUE # NEW
+    class(Results) <- c('list', 'GVARsim') # NEW
   } else {
-    class(Results) <- attr(Results, "mlVARsim") <- "mlVARsim"
+    #class(Results) <- attr(Results, "mlVARsim") <- "mlVARsim"
+    class(Results) <- attr(Results, "mlGVARsim") <- "mlGVARsim" # NEW
   }
   return(Results)
 }

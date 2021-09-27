@@ -199,9 +199,12 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
     stopifnot("ints" %in% names(fit$coefs))
     out <- fit$coefs$ints$coefs
     pvals <- fit$coefs$ints$Pvals
-  } else if(any(c('mlVARsim', 'simMLgvar') %in% atts)){
-    stopifnot("mm" %in% names(fit))
-    out <- fit$mm$mb2
+  } else if(any(c('mlGVARsim', 'GVARsim') %in% atts)){ # NEW
+  #} else if(any(c('mlVARsim', 'simMLgvar') %in% atts)){
+    #stopifnot("mm" %in% names(fit))
+    #out <- fit$mm$mb2
+    stopifnot('interactions' %in% names(fit)) # NEW
+    out <- fit$interactions$mb2 # NEW
   } else if(!'interactions' %in% names(fit)){
     out <- tryCatch({mmat(fit = fit, m = mselect)}, error = function(e){TRUE})
     if(isTRUE(out)){return(eout(fit, empty))}
@@ -229,7 +232,8 @@ netInts <- function(fit, n = 'temporal', threshold = FALSE, avg = FALSE,
       }
     }
   }
-  if(threshold != FALSE & !"mlVARsim" %in% atts){
+  if(threshold != FALSE & !"mlGVARsim" %in% atts){ # NEW
+  #if(threshold != FALSE & !"mlVARsim" %in% atts){
     rule <- match.arg(tolower(rule), rules)
     if(isTRUE(attr(fit, 'ggm')) & rule == 'none'){rule <- 'or'}
     if(!is.numeric(threshold)){threshold <- .05}

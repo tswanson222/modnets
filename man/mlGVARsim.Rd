@@ -151,7 +151,7 @@ without the data. Could be used to create random models and then simulate
 data by another method.}
 
 \item{modType}{Determines the type of moderation to employ, such as
-\code{"none", "full", "partial"}}
+\code{"none", "full", "partial"}. See \code{\link{simNet}}}
 }
 \value{
 Simulated mlGVAR or VAR data.

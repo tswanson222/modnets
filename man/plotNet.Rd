@@ -7,8 +7,8 @@
 \alias{plot.mlGVAR}
 \alias{plot.lmerVAR}
 \alias{plot.ggmSim}
-\alias{plot.mlVARsim}
-\alias{plot.simMLgvar}
+\alias{plot.mlGVARsim}
+\alias{plot.GVARsim}
 \title{Plot moderated and unmoderated network models}
 \usage{
 plotNet(
@@ -155,7 +155,7 @@ plotNet(
   ...
 )
 
-\method{plot}{mlVARsim}(
+\method{plot}{mlGVARsim}(
   x,
   which.net = "temporal",
   threshold = FALSE,
@@ -179,7 +179,7 @@ plotNet(
   ...
 )
 
-\method{plot}{simMLgvar}(
+\method{plot}{GVARsim}(
   x,
   which.net = "temporal",
   threshold = FALSE,
@@ -235,9 +235,10 @@ will set a threshold of .05.}
 node will be plotted as a pie graph around the nodes. For continuous
 variables, the type of prediction error is determined by the \code{con}
 argument. For categorical variables, the type of error is determined by the
-\code{cat} argument. Alternatively, another network model constituted by
-the same nodes can be supplied in order to plot the difference in
-prediction error, such as R-squared change.}
+\code{cat} argument. The desired value of \code{con} or \code{can} can be
+supplied directly into the present argument as well. Alternatively, another
+network model constituted by the same nodes can be supplied in order to
+plot the difference in prediction error, such as R-squared change.}
 
 \item{mnet}{Logical. If \code{TRUE}, the moderator will be plotted as a
 square "node" in the network, along with main effects represented as

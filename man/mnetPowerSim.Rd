@@ -165,7 +165,11 @@ use, if \code{nCores > 1}. Options include \code{"mclapply"} and
 
 \item{fixedPar}{Numeric. If provided, then this will be set as the
 coefficient value for all edges in the network. Provides a way to
-standardize the parameter values while varying the sparsity of the network.}
+standardize the parameter values while varying the sparsity of the network.
+If \code{length(fixedPar) == 1}, then the same value will be used for all
+parameters. If \code{length(fixedPar) == 2}, then the first value will be
+for pairwise relationships, and the second value will be for interaction
+terms.}
 
 \item{V2}{If \code{V2 = 1} and \code{m2} is between 0 and 1, the number of
 interaction terms in the model will be determined by multiplying \code{m2}

@@ -93,7 +93,7 @@ x <- simNet(N = 500, p = 5, m = TRUE, m1 = .5, m2 = .2, nCores = TRUE)
 str(x)
 
 ### Contents:
-# x$data -------- 100x6 dataset, where 'M' is the moderator
+# x$data -------- 500x6 dataset, where 'M' is the moderator
 # x$b1 ---------- true regression coefficients, where columns --> rows
 # x$b2 ---------- true interaction coefficients, where (M * columns) --> rows
 # x$intercepts -- true intercepts; defaults to 0
@@ -154,7 +154,7 @@ predictNet(fit2)
 predictNet(fit2, fit0)
 # We can extract these values using this function
 # And can take the differences by supplying two networks
-# Values for the second model are substracted by those from the first
+# Values for the second model are subtracted from those for the first
 
 plot(fit2, mnet = TRUE)
 plot(fit2, threshold = TRUE, mnet = TRUE)

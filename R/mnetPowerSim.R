@@ -100,6 +100,10 @@
 #' @param fixedPar Numeric. If provided, then this will be set as the
 #'   coefficient value for all edges in the network. Provides a way to
 #'   standardize the parameter values while varying the sparsity of the network.
+#'   If \code{length(fixedPar) == 1}, then the same value will be used for all
+#'   parameters. If \code{length(fixedPar) == 2}, then the first value will be
+#'   for pairwise relationships, and the second value will be for interaction
+#'   terms.
 #' @param V2 If \code{V2 = 1} and \code{m2} is between 0 and 1, the number of
 #'   interaction terms in the model will be determined by multiplying \code{m2}
 #'   with the number of elements in the interaction matrix and taking the
@@ -852,7 +856,8 @@ performance <- function(est, trueMod, threshold = FALSE, combine = FALSE,
   if(any(grepl('^p', inds))){inds[grepl('^p', inds)] <- toupper(inds[grepl('^p', inds)])}
   tt <- FALSE
   if(length(inds) > 1){
-    if(isTRUE(attr(trueMod, "simMLgvar")) | is(trueMod, "simMLgvar")){
+    if(isTRUE(attr(trueMod, "GVARsim")) | is(trueMod, "GVARsim")){ # NEW
+    #if(isTRUE(attr(trueMod, "simMLgvar")) | is(trueMod, "simMLgvar")){
       trueMod <- setNames(lapply(inds, function(z){
         n2 <- as.matrix(net(trueMod, z))
         if(z == "between"){diag(n2) <- 0}
@@ -860,7 +865,8 @@ performance <- function(est, trueMod, threshold = FALSE, combine = FALSE,
         return(n2)
       }), inds)
       #tt <- !is(est, "mlGraphicalVAR")
-    } else if(is(trueMod, "mlVARsim")){
+    } else if(is(trueMod, "mlGVARsim")){ # NEW
+    #} else if(is(trueMod, "mlVARsim")){
       inds <- c("temporal", "contemporaneous", "between")
       trueMod <- setNames(lapply(inds, function(z){
         #n2 <- t(as.matrix(mlVAR::getNet(trueMod, z)))

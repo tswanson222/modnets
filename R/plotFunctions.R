@@ -30,9 +30,10 @@
 #'   node will be plotted as a pie graph around the nodes. For continuous
 #'   variables, the type of prediction error is determined by the \code{con}
 #'   argument. For categorical variables, the type of error is determined by the
-#'   \code{cat} argument. Alternatively, another network model constituted by
-#'   the same nodes can be supplied in order to plot the difference in
-#'   prediction error, such as R-squared change.
+#'   \code{cat} argument. The desired value of \code{con} or \code{can} can be
+#'   supplied directly into the present argument as well. Alternatively, another
+#'   network model constituted by the same nodes can be supplied in order to
+#'   plot the difference in prediction error, such as R-squared change.
 #' @param mnet Logical. If \code{TRUE}, the moderator will be plotted as a
 #'   square "node" in the network, along with main effects represented as
 #'   directed edges.
@@ -154,12 +155,16 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
   }
   if(is(x, 'mgm')){x <- net(x, which.net, threshold)}
   atts <- names(attributes(x))
-  if(!is(x, 'list') | 'simMLgvar' %in% atts){
+  if(!is(x, 'list') | 'GVARsim' %in% atts){ # NEW
+  #if(!is(x, 'list') | 'simMLgvar' %in% atts){
     predict <- NULL; nodewise <- FALSE
-    if(is(x, "mlVARsim") | 'simMLgvar' %in% atts){
-      if('mm' %in% names(x) & which.net %in% c('temporal', 'beta')){
+    if(is(x, "mlGVARsim") | 'GVARsim' %in% atts){ # NEW
+    #if(is(x, "mlVARsim") | 'simMLgvar' %in% atts){
+      if('interactions' %in% names(x) & which.net %in% c('temporal', 'beta')){ # NEW
+      #if('mm' %in% names(x) & which.net %in% c('temporal', 'beta')){
         nodewise <- TRUE
-        modEdges <- t(1 * (x$mm$mb2 != 0) + 1)
+        #modEdges <- t(1 * (x$mm$mb2 != 0) + 1)
+        modEdges <- t(1 * (x$interactions$mb2 != 0) + 1) # NEW
       }
       x <- t(net(x, which.net))
     }
@@ -453,22 +458,22 @@ plot.ggmSim <- function(x, which.net = 'temporal', threshold = FALSE, layout = '
 
 #' @rdname plotNet
 #' @export
-plot.mlVARsim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
-                          predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                          scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
-                          plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
-                          binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+plot.mlGVARsim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                           predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                           scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                           plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                           binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
   do.call(plotNet, args)
 }
 
 #' @rdname plotNet
 #' @export
-plot.simMLgvar <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
-                           predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
-                           scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
-                           plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
-                           binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
+plot.GVARsim <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
+                         predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
+                         scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
+                         plot = TRUE, elabs = FALSE, elsize = 1, rule = 'OR',
+                         binarize = FALSE, mlty = TRUE, mselect = NULL, ...){
   args <- as.list(match.call())[-1]
   do.call(plotNet, args)
 }
