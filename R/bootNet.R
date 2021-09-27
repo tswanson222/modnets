@@ -1,14 +1,12 @@
 #' Bootstrapping network estimation for moderated networks
 #'
-#' Follows closely to the methods of bootstrapping found in the
-#' \code{\link[bootnet:bootnet]{bootnet::bootnet}} function. An essential goal
-#' behind this function is to expand
-#' \code{\link[bootnet:bootnet]{bootnet::bootnet}} to encompass moderated
-#' networks.
+#' Follows closely to the methods of bootstrapping found in the \code{bootnet}
+#' package. An essential goal behind this function is to expand the methods in
+#' \code{bootnet} to encompass moderated networks.
 #'
 #' Can be used to perform bootstrapped network estimation, as well as perform a
 #' case-drop bootstrap. Details on these two methods can be found in the help
-#' page for the \code{\link[bootnet:bootnet]{bootnet::bootnet}} function.
+#' page for the \code{bootnet::bootnet} function.
 #'
 #' The defining feature of \code{\link{bootNet}} that differentiates it from the
 #' \code{\link{resample}} function when \code{sampMethod = "bootstrap"} is that
@@ -22,11 +20,10 @@
 #' this function provides a way to estimate the posterior distributions of the
 #' nodes based on a constrained model.
 #'
-#' In addition to expanding \code{\link[bootnet:bootnet]{bootnet::bootnet}} to
-#' moderated networks, there are also some additional features such as the
-#' capacity to perform the block bootstrap for temporal networks via the
-#' \code{block} argument. The block bootstrap is \strong{highly} recommended for
-#' resampling temporal networks.
+#' In addition to expanding \code{bootnet} to handle moderated networks, there
+#' are also some additional features such as the capacity to perform the block
+#' bootstrap for temporal networks via the \code{block} argument. The block
+#' bootstrap is \strong{highly} recommended for resampling temporal networks.
 #'
 #' Another feature of this function is that it can be used on outputs from the
 #' \code{\link{resample}} function. This can be used as a way to evaluate the
@@ -113,8 +110,8 @@
 #' @param beepno Character string or numeric value to indicate which variable
 #'   (if any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{dayno} argument.
-#' @param dayno Character string or numeric value to indicate which variable
-#'   (if any) encodes the survey number within a single day. Must be used in
+#' @param dayno Character string or numeric value to indicate which variable (if
+#'   any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{beepno} argument.
 #' @param ... Additional arguments.
 #'
@@ -123,7 +120,7 @@
 #'
 #' @seealso \code{\link{summary.bootNet}, \link{fitNetwork}, \link{varSelect},
 #'   \link{resample}, \link{plotBoot}, \link{plotNet}, \link{net},
-#'   \link{netInts}, \link[bootnet:bootnet]{bootnet::bootnet}}
+#'   \link{netInts}}
 #'
 #' @examples
 #' \dontrun{
