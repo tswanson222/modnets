@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "trevorswanson222@gmail.com")
 Maintainer: Trevor Swanson <trevorswanson222@gmail.com>
-Description: What the package does (one paragraph).
+Description: Methods for modeling moderator variables in cross-sectional, temporal, and multi-level networks. Includes model selection techniques and a variety of plotting functions.
 License: GPL (>= 3)
 URL: https://github.com/tswanson222/modnets
 BugReports: https://github.com/tswanson222/modnets/issues

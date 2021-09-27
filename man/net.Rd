@@ -65,9 +65,9 @@ networks). If \code{TRUE} then the adjacency matrix will retain all
 coefficients in their original form. In this case, values in rows represent
 the coefficients predicting the columns.}
 
-\item{d}{Numeric. Only used for output of \code{\link{mlGVARsim}} in relation
-to the contemporaneous network. Sets the number of decimal places to round
-the output to. DEPRECATED!}
+\item{d}{Numeric. Only used for output of \code{\link{mlGVARsim}}, or
+\code{\link{simNet}} when \code{lags = 1}. Sets the number of decimal
+places to round the output to.}
 
 \item{r}{Numeric. Chooses which rows/columns to remove from the output, if
 desired.}

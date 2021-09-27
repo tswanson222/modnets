@@ -62,7 +62,9 @@ single subject.}
 \item{seed}{Only useful if \code{type = "varSelect"}, and if the
 \code{varSeed} argument is not specified in the \code{...}}
 
-\item{folds}{DEPRECATED}
+\item{folds}{Can be used to specify the number of folds in cross-validation
+when \code{type = "varSelect"} and \code{criterion = "CV"}. Overwritten if
+\code{nfolds} argument is provided.}
 
 \item{gamma}{Only useful if \code{type = "varSelect"} and the criterion is
 set to \code{"EBIC"}. This is the hyperparameter for the calculation of
@@ -129,7 +131,9 @@ matrix based directly on the residual values. \code{"dfres"} is the sample
 estimator that uses \code{N - 1} in the denominator, while \code{"res"}
 just uses \code{N}. Input for \code{\link{SURnet}} function.}
 
-\item{medges}{DEPRECATED.}
+\item{medges}{Only relevant when \code{lags = 1} and \code{exogenous =
+  FALSE}. Determines the linetype of moderated edges (corresponds to the lty
+argument of \code{plot()}).}
 
 \item{pcor}{Logical. Determines whether to operationalize the adjacency
 matrix as the partial correlation matrix of the data, or to use nodewise

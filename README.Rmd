@@ -87,10 +87,11 @@ library(modnets)
 ### ======= SIMULATE MODERATED NETWORK DATA ======== ###
 ### ================================================ ###
 # Can simulate data with no moderators, or with one exogenous moderator
-set.seed(999)
-x <- simNet(N = 100, p = 5, m = TRUE, sparsity = .5)
+set.seed(1)
+x <- simNet(N = 500, p = 5, m = TRUE, sparsity = .5, nCores = TRUE, modType = 'full')
 
 str(x)
+
 ### Contents:
 # x$data -------- 100x6 dataset, where 'M' is the moderator
 # x$b1 ---------- true regression coefficients, where columns --> rows

@@ -44,8 +44,9 @@
 #'   will be plotted rather than the undirected averages of corresponding edges.
 #' @param scale Logical. Only applies when \code{predict} does not equal
 #'   \code{FALSE}. The value of this argument is sent to the
-#'   \code{\link{predictNet}} function.
-#' @param lag DEPRECATED!
+#'   \code{\link{predictNet}} function. This argument will be removed.
+#' @param lag This argument will be removed. The function will automatically
+#'   detect whether the network is based on time-lagged data.
 #' @param con Character string indicating which type of prediction error to plot
 #'   for continuous variables, if \code{predict} does not equal \code{FALSE}.
 #'   Options are: \code{"R2", "adjR2", "MSE", "RMSE"}
@@ -248,8 +249,8 @@ plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spri
     names <- 1:nrow(x$adjMat)
   }
   names <- names[1:nrow(x$adjMat)]
-  if(!is.null(lag)){warning('Argument lag is deprecated. Lagged networks are automatically detected.')}
-  lag <- NULL ### FUNCTION ARGUMENT DEPRECATED
+  if(!is.null(lag)){warning('Lagged networks are automatically detected.')}
+  lag <- NULL ### FUNCTION ARGUMENT WILL BE REMOVED
   if(is.null(lag) & "adjMats" %in% names(x)){
     stop("More than one lag modeled; need to specify which to plot")
   } else if(!"adjMats" %in% names(x)){
@@ -1393,7 +1394,8 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 #' @param hist Logical. Determines whether to show a histogram of the data
 #'   distribution at the bottom of the plot.
 #' @param xlab Character string for labeling the x-axis.
-#' @param mods DEPRECATED!
+#' @param mods This argument will be removed. Model output is automatically
+#'   detected based on \code{fit} argument.
 #' @param nsims Number of iterations to simulate the posterior distribution.
 #' @param xn Numeric value to indicate how many values of the moderator should
 #'   be evaluated.

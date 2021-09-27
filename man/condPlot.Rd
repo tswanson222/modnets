@@ -47,7 +47,8 @@ distribution at the bottom of the plot.}
 
 \item{xlab}{Character string for labeling the x-axis.}
 
-\item{mods}{DEPRECATED!}
+\item{mods}{This argument will be removed. Model output is automatically
+detected based on \code{fit} argument.}
 
 \item{nsims}{Number of iterations to simulate the posterior distribution.}
 

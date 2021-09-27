@@ -165,10 +165,32 @@ with the number of elements in the interaction matrix and taking the
 Simulated network models as well as data generated from those models.
 }
 \description{
-Used for generating moderated and unmoderated adjancency matrices, along with
-data based on those model structures. Uses a Gibbs sampler for moderated
-networks.
+Used for generating moderated and unmoderated adjacency matrices, along with
+data based on those model structures.
 }
+\details{
+If no moderator is requested then data can be generated directly from a
+partial correlation matrix by setting \code{gibbs = FALSE}, which produces
+fast simulation results. Alternatively, a Gibbs sampler is used to generate
+data, which is the default option. For moderated networks, Gibbs sampling is
+the only method available.
+}
+\section{Warning}{
+
+
+Importantly, the Gibbs sampler can easily diverge to infinity given certain
+model parameters. Generating network data based on moderator variables can
+produce values that quickly take on large values due to the presence of
+multiplicative terms. This leads to the following recommendations:
+\enumerate{ \item{It is not productive to specify interaction terms that
+take on large values (e.g., > .3)} \item{It is useful to use empirical data
+as guides for specifying parameter values} \item{Reducing both the values
+of interactions and the proportion of interactions can help to reduce the
+likelihood of divergence} \item{If reasonable parameter values are
+provided, often a successful simulation can be achieved by simply setting a
+different initial seed} }
+}
+
 \examples{
 \dontrun{
 x <- simNet(N = 100, p = 5, m = TRUE)

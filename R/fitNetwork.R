@@ -30,7 +30,9 @@
 #'   single subject.
 #' @param seed Only useful if \code{type = "varSelect"}, and if the
 #'   \code{varSeed} argument is not specified in the \code{...}
-#' @param folds DEPRECATED
+#' @param folds Can be used to specify the number of folds in cross-validation
+#'   when \code{type = "varSelect"} and \code{criterion = "CV"}. Overwritten if
+#'   \code{nfolds} argument is provided.
 #' @param gamma Only useful if \code{type = "varSelect"} and the criterion is
 #'   set to \code{"EBIC"}. This is the hyperparameter for the calculation of
 #'   EBIC.
@@ -84,7 +86,9 @@
 #'   matrix based directly on the residual values. \code{"dfres"} is the sample
 #'   estimator that uses \code{N - 1} in the denominator, while \code{"res"}
 #'   just uses \code{N}. Input for \code{\link{SURnet}} function.
-#' @param medges DEPRECATED.
+#' @param medges Only relevant when \code{lags = 1} and \code{exogenous =
+#'   FALSE}. Determines the linetype of moderated edges (corresponds to the lty
+#'   argument of \code{plot()}).
 #' @param pcor Logical. Determines whether to operationalize the adjacency
 #'   matrix as the partial correlation matrix of the data, or to use nodewise
 #'   estimation. Only relevant for unmoderated networks.
@@ -163,6 +167,11 @@ fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                            ifelse('method' %in% names(args), args$method, 'glmnet'))
     otherargs <- c('criterion', 'nfolds', 'varSeed', 'useSE', 'nlam')
     if(any(otherargs %in% names(args))){
+      if('criterion' %in% names(args)){ # This conditional is new
+        if(toupper(args$criterion) == 'CV'){
+          if(!'nfolds' %in% names(args)){args$nfolds <- folds}
+        }
+      }
       vargs <- append(vargs, args[intersect(names(args), otherargs)])
     }
     if(!is.null(seed)){vargs$varSeed <- seed}

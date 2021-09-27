@@ -253,9 +253,10 @@ will be plotted rather than the undirected averages of corresponding edges.}
 
 \item{scale}{Logical. Only applies when \code{predict} does not equal
 \code{FALSE}. The value of this argument is sent to the
-\code{\link{predictNet}} function.}
+\code{\link{predictNet}} function. This argument will be removed.}
 
-\item{lag}{DEPRECATED!}
+\item{lag}{This argument will be removed. The function will automatically
+detect whether the network is based on time-lagged data.}
 
 \item{con}{Character string indicating which type of prediction error to plot
 for continuous variables, if \code{predict} does not equal \code{FALSE}.

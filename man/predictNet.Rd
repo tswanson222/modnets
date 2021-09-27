@@ -22,7 +22,7 @@ outcomes used to fit the models, their predicted values, and the prediction
 error for each outcome.}
 
 \item{scale}{Logical; determines whether or not to standardize the data
-before computing prediction error. DEPRECATED!}
+before computing prediction error. This argument will be removed.}
 }
 \value{
 A table showing different measures of prediction error associated

@@ -16,7 +16,7 @@
 #'   outcomes used to fit the models, their predicted values, and the prediction
 #'   error for each outcome.
 #' @param scale Logical; determines whether or not to standardize the data
-#'   before computing prediction error. DEPRECATED!
+#'   before computing prediction error. This argument will be removed.
 #'
 #' @return A table showing different measures of prediction error associated
 #'   with each node of the network. Or, if two networks are provided, a table
