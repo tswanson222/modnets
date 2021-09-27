@@ -11,6 +11,14 @@
 #' of \code{\link{fitNetwork}} in order to fit the constrained models that were
 #' selected across nodes.
 #'
+#' For moderated networks, the only variable selection approach available is
+#' through the \code{glinternet} package, which implements the hierarchical
+#' LASSO. The criterion for model selection dictates which function from the
+#' package is used, where information criteria use the
+#' \code{\link[glinternet:glinternet]{glinternet::glinternet}} function to
+#' compute models, and cross-validation calls the
+#' \code{\link[glinternet:glinternet.cv]{glinternet::glinternet.cv}} function.
+#'
 #' @param data \code{n x k} dataframe or matrix.
 #' @param m Character vector or numeric vector indicating the moderator(s), if
 #'   any. Can also specify \code{"all"} to make every variable serve as a
@@ -141,7 +149,8 @@ varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
           if(exogenous & length(m) < ncol(dat$Y)){
             dat$Y <- dat$Y[, -m]
             dat$full <- dat$full[, -m]
-            if(class(dat$Y) != "matrix"){
+            if(!is(dat$Y, 'matrix')){ # NEW
+            #if(class(dat$Y) != "matrix"){
               dat$Y <- as.matrix(dat$Y, ncol = 1)
               colnames(dat$Y) <- colnames(dat$full)[1]
             }

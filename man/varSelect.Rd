@@ -131,6 +131,14 @@ selected model with the \code{\link{fitNetwork}} function. Specifically, the
 output of \code{\link{varSelect}} can be assigned to the \code{type} argument
 of \code{\link{fitNetwork}} in order to fit the constrained models that were
 selected across nodes.
+
+For moderated networks, the only variable selection approach available is
+through the \code{glinternet} package, which implements the hierarchical
+LASSO. The criterion for model selection dictates which function from the
+package is used, where information criteria use the
+\code{\link[glinternet:glinternet]{glinternet::glinternet}} function to
+compute models, and cross-validation calls the
+\code{\link[glinternet:glinternet.cv]{glinternet::glinternet.cv}} function.
 }
 \examples{
 \dontrun{

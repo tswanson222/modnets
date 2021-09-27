@@ -40,8 +40,7 @@
 #'   thoroughly test a given parameterization scheme. This function can be
 #'   accessed via \code{modnets:::simNet2}. There is not documentation for this
 #'   function, so it is recommended to look at the source code if one wishes to
-#'   use the function. This wrapper is also used inside the \code{mnetPowerSim}
-#'   function.
+#'   use it This wrapper is also used inside the \code{mnetPowerSim} function.
 #'
 #' @param N Numeric value. Total number of subjects.
 #' @param p Numeric value. Total number of nodes (excluding moderator).

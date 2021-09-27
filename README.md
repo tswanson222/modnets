@@ -31,14 +31,12 @@ R package designed to afford exploratory and confirmatory estimation of
         are estimated separately from between-subject effects
     -   The other uses a formal multilevel moderated vector
         autoregressive model with `lmer`
-    -   Only works for continous variables, although exogenous
+    -   Only works for continuous variables, although exogenous
         moderators can be binary.
 
-Penalized estimators for each of these models are also available, such
-as the LASSO, ridge regression, elastic net, the (overlapping) group
-LASSO, and the hierarchical LASSO. Hyperparameter selection will be
-performed automatically based on either the AIC, BIC, EBIC, or
-cross-validation depending upon user input.
+Additionally, model selection techniques based on penalized regression
+and iterative resampling are implemented alongside a variety of plotting
+and data-generating functions.
 
 ## Installation
 
@@ -102,6 +100,14 @@ plot(fit, threshold = TRUE)
 -   For power analysis, you can use: `mnetPowerSim` to simulate data
     based on expected network structure(s).
 
+See the package description for an overview of these and other core
+functions.
+
+``` r
+library(modnets)
+?modnets
+```
+
 ## Examples
 
 ### Cross-sectional moderated network
@@ -116,16 +122,16 @@ library(modnets)
 # Can simulate data with no moderators, or with one exogenous moderator
 set.seed(123)
 x <- simNet(N = 500, p = 5, m = TRUE, m1 = .5, m2 = .2, nCores = TRUE)
-#> Time difference of 15.09191 secs
+#> Time difference of 19.52364 secs
 str(x)
 #> List of 6
 #>  $ data      :'data.frame':  500 obs. of  6 variables:
-#>   ..$ V1: num [1:500] -1.762 0.123 -1.099 -0.653 0.964 ...
-#>   ..$ V2: num [1:500] 1.13 -0.081 0.211 -0.71 1.279 ...
-#>   ..$ V3: num [1:500] 0.814 -1.958 -0.982 0.145 -2.079 ...
-#>   ..$ V4: num [1:500] -0.1808 -0.83 0.4635 -0.0994 -2.3544 ...
-#>   ..$ V5: num [1:500] -0.5963 1.0929 -0.0837 0.0816 1.3479 ...
-#>   ..$ M : num [1:500] -1.091 -0.168 0.267 -2.032 -0.662 ...
+#>   ..$ V1: num [1:500] 0.326 -1.323 1.367 -0.271 -1.713 ...
+#>   ..$ V2: num [1:500] 0.185 0.597 -0.51 2.419 0.853 ...
+#>   ..$ V3: num [1:500] -0.144 0.869 -0.246 1.919 -0.772 ...
+#>   ..$ V4: num [1:500] 1.558 1.147 -0.602 1.287 -2.371 ...
+#>   ..$ V5: num [1:500] -0.1574 0.9102 1.2682 0.7331 -0.0415 ...
+#>   ..$ M : num [1:500] 0.19 -0.393 1.694 -1.472 -0.231 ...
 #>  $ b1        : num [1:5, 1:5] 0 0 -0.445 0 0 ...
 #>   ..- attr(*, "dimnames")=List of 2
 #>   .. ..$ : NULL
@@ -140,7 +146,7 @@ str(x)
 #>  - attr(*, "m2")= num 2
 #>  - attr(*, "modType")= chr "none"
 #>  - attr(*, "class")= chr [1:2] "list" "ggmSim"
-#>  - attr(*, "time")= 'difftime' num 15.0916137695312
+#>  - attr(*, "time")= 'difftime' num 19.5232479572296
 #>   ..- attr(*, "units")= chr "secs"
 ### Contents:
 # x$data -------- 500x6 dataset, where 'M' is the moderator
@@ -151,13 +157,13 @@ str(x)
 # x$m1 ---------- coefficents for main effects of M on outcomes; default to 0
 
 head(x$data)
-#>           V1          V2            V3          V4          V5          M
-#> 1 -1.7617490  1.13049203  0.8141074184 -0.18076301 -0.59631580 -1.0909959
-#> 2  0.1227934 -0.08103882 -1.9584490429 -0.83000946  1.09285186 -0.1678799
-#> 3 -1.0986199  0.21101203 -0.9815222251  0.46346755 -0.08373201  0.2673578
-#> 4 -0.6528195 -0.71001090  0.1452445349 -0.09944813  0.08159889 -2.0322138
-#> 5  0.9643925  1.27903168 -2.0792635467 -2.35441826  1.34794661 -0.6623027
-#> 6  1.0923543  0.97280073  0.0004884396 -0.37929142  1.31508130 -0.2515930
+#>           V1         V2         V3         V4          V5          M
+#> 1  0.3260922  0.1849679 -0.1437791  1.5577303 -0.15738491  0.1901201
+#> 2 -1.3228519  0.5973905  0.8689006  1.1472617  0.91024329 -0.3933698
+#> 3  1.3666089 -0.5102097 -0.2461312 -0.6022788  1.26820364  1.6944774
+#> 4 -0.2705904  2.4190012  1.9192734  1.2874252  0.73312936 -1.4722145
+#> 5 -1.7127122  0.8531956 -0.7722504 -2.3711898 -0.04150314 -0.2311334
+#> 6 -0.8362232 -2.2612296 -0.8060215 -1.4655291  0.71547576  0.8467195
 print(x$b1)
 #>           [,1]      [,2]       [,3]       [,4]       [,5]
 #> [1,]  0.000000 0.0000000 -0.4449240  0.0000000  0.0000000
@@ -273,18 +279,18 @@ plot(fit2, threshold = TRUE, predict = fit0)
 
 predictNet(fit2)
 #>   Variable    R2 adjR2   MSE  RMSE
-#> 1       V1 0.350 0.338 0.956 0.978
-#> 2       V2 0.310 0.298 0.939 0.969
-#> 3       V3 0.533 0.524 0.891 0.944
-#> 4       V4 0.295 0.283 0.992 0.996
-#> 5       V5 0.353 0.341 0.966 0.983
+#> 1       V1 0.306 0.293 1.015 1.007
+#> 2       V2 0.311 0.298 1.067 1.033
+#> 3       V3 0.434 0.424 1.040 1.020
+#> 4       V4 0.255 0.241 1.050 1.024
+#> 5       V5 0.312 0.300 0.997 0.998
 predictNet(fit2, fit0)
 #>   Variable    R2 adjR2    MSE   RMSE
-#> 1       V1 0.089 0.082 -0.119 -0.059
-#> 2       V2 0.043 0.037 -0.049 -0.025
-#> 3       V3 0.063 0.058 -0.109 -0.056
-#> 4       V4 0.011 0.005 -0.005 -0.003
-#> 5       V5 0.089 0.083 -0.122 -0.060
+#> 1       V1 0.073 0.066 -0.095 -0.047
+#> 2       V2 0.069 0.062 -0.095 -0.045
+#> 3       V3 0.072 0.067 -0.120 -0.057
+#> 4       V4 0.020 0.012 -0.017 -0.009
+#> 5       V5 0.075 0.070 -0.098 -0.049
 # We can extract these values using this function
 # And can take the differences by supplying two networks
 # Values for the second model are subtracted from those for the first
@@ -330,12 +336,12 @@ vfit2 <- fitNetwork(data = dat0, type = 'varSelect', criterion = 'BIC', method =
 # We can also use best-subsets selection instead of the LASSO
 
 predictNet(vfit2, vfit1)
-#>   Variable     R2 adjR2    MSE RMSE
-#> 1       V1 -0.001 0.001 -0.001    0
-#> 2       V2 -0.001 0.000 -0.001    0
-#> 3       V3  0.000 0.000  0.000    0
-#> 4       V4  0.000 0.000  0.000    0
-#> 5       V5  0.000 0.000  0.000    0
+#>   Variable     R2  adjR2   MSE  RMSE
+#> 1       V1 -0.004 -0.002 0.003 0.001
+#> 2       V2 -0.010 -0.007 0.010 0.005
+#> 3       V3 -0.004 -0.003 0.005 0.002
+#> 4       V4 -0.007 -0.005 0.006 0.003
+#> 5       V5 -0.011 -0.007 0.011 0.005
 # In this case, we see that best-subsets produced lower R2 for three nodes
 
 vfit3 <- fitNetwork(data = dat0, type = 'varSelect', criterion = 'CV', seed = 1)
@@ -351,23 +357,23 @@ predictNet(vfit3, vfit3.1)
 #> 4       V4  0     0   0    0
 #> 5       V5  0     0   0    0
 predictNet(vfit3, vfit3.2)
-#>   Variable     R2  adjR2   MSE RMSE
-#> 1       V1  0.000  0.000 0.000    0
-#> 2       V2  0.000  0.000 0.000    0
-#> 3       V3  0.000  0.000 0.000    0
-#> 4       V4 -0.002 -0.001 0.001    0
-#> 5       V5  0.000  0.000 0.000    0
+#>   Variable R2 adjR2 MSE RMSE
+#> 1       V1  0     0   0    0
+#> 2       V2  0     0   0    0
+#> 3       V3  0     0   0    0
+#> 4       V4  0     0   0    0
+#> 5       V5  0     0   0    0
 # We see that setting a seed leads to reproducible results
 
 
 ### MODERATED NETWORKS
 vars1 <- varSelect(data = dat1, m = 6, criterion = 'BIC', method = 'glinternet')
-#> Fitting model 1/5...  Complete! (0.1 secs)
-#> Fitting model 2/5...  Complete! (0.12 secs)
-#> Fitting model 3/5...  Complete! (0.07 secs)
-#> Fitting model 4/5...  Complete! (0.06 secs)
-#> Fitting model 5/5...  Complete! (0.06 secs)
-#> ####### Total time: 0.41 secs
+#> Fitting model 1/5...  Complete! (0.08 secs)
+#> Fitting model 2/5...  Complete! (0.14 secs)
+#> Fitting model 3/5...  Complete! (0.08 secs)
+#> Fitting model 4/5...  Complete! (0.1 secs)
+#> Fitting model 5/5...  Complete! (0.08 secs)
+#> ####### Total time: 0.49 secs
 mfit1 <- fitNetwork(data = dat1, moderators = 6, type = vars1)
 mfit2 <- fitNetwork(data = dat1, moderators = 6, type = 'varSelect', criterion = 'BIC')
 predictNet(mfit1, mfit2)
@@ -395,45 +401,45 @@ fits <- list(fit0 = fit0, fit1 = fit1, fit2 = fit2,
 modTable(fits)
 #> $LRT
 #>     net0  net1    Chisq Df   pval decision
-#> 1   fit0  fit1   2.1419  5 0.8292     fit0
-#> 2   fit0  fit2 177.2748 25 0.0000     fit2
-#> 3  vfit1  fit0   2.5631  4 0.6334    vfit1
-#> 4  vfit2  fit0   3.9289  6 0.6863    vfit2
-#> 5  vfit3  fit0   2.5616  3 0.4643    vfit3
-#> 6   fit0 mfit1 166.1562  4 0.0000    mfit1
-#> 7   fit0 mfit2 170.4470 15 0.0000    mfit2
-#> 8   fit1  fit2 175.1329 20 0.0000     fit2
-#> 9  vfit1  fit1   4.7050  9 0.8592    vfit1
-#> 10 vfit2  fit1   6.0708 11 0.8686    vfit2
-#> 11 vfit3  fit1   4.7034  8 0.7888    vfit3
-#> 12 mfit1  fit1 164.0144  1 0.0000    mfit1
-#> 13  fit1 mfit2 168.3051 10 0.0000    mfit2
-#> 14 vfit1  fit2 179.8379 29 0.0000     fit2
-#> 15 vfit2  fit2 181.2037 31 0.0000     fit2
-#> 16 vfit3  fit2 179.8363 28 0.0000     fit2
-#> 17 mfit1  fit2  11.1185 21 0.9604    mfit1
-#> 18 mfit2  fit2   6.8278 10 0.7416    mfit2
-#> 19 vfit2 vfit1   1.3658  2 0.5051    vfit2
-#> 20 vfit1 vfit3   0.0015  1 0.9686    vfit1
-#> 21 vfit1 mfit1 168.7194  8 0.0000    mfit1
-#> 22 vfit1 mfit2 173.0101 19 0.0000    mfit2
-#> 23 vfit2 vfit3   1.3674  3 0.7132    vfit2
-#> 24 vfit2 mfit1 170.0852 10 0.0000    mfit1
-#> 25 vfit2 mfit2 174.3759 21 0.0000    mfit2
-#> 26 vfit3 mfit1 168.7178  7 0.0000    mfit1
-#> 27 vfit3 mfit2 173.0085 18 0.0000    mfit2
-#> 28 mfit1 mfit2   4.2907 11 0.9606    mfit1
+#> 1   fit0  fit1  30.4276  5 0.0000     fit1
+#> 2   fit0  fit2 212.5038 25 0.0000     fit2
+#> 3  vfit1  fit0   0.1737  2 0.9168    vfit1
+#> 4  vfit2  fit0  29.1382  9 0.0006     fit0
+#> 5  vfit3  fit0   0.1737  2 0.9168    vfit3
+#> 6   fit0 mfit1 156.0641  5 0.0000    mfit1
+#> 7   fit0 mfit2 213.5467 21 0.0000    mfit2
+#> 8   fit1  fit2 182.0762 20 0.0000     fit2
+#> 9  vfit1  fit1  30.6013  7 0.0001     fit1
+#> 10 vfit2  fit1  59.5658 14 0.0000     fit1
+#> 11 vfit3  fit1  30.6013  7 0.0001     fit1
+#> 12  fit1 mfit1 125.6365  0 0.0000    mfit1
+#> 13  fit1 mfit2 183.1191 16 0.0000    mfit2
+#> 14 vfit1  fit2 212.6774 27 0.0000     fit2
+#> 15 vfit2  fit2 241.6419 34 0.0000     fit2
+#> 16 vfit3  fit2 212.6774 27 0.0000     fit2
+#> 17 mfit1  fit2  56.4397 20 0.0000     fit2
+#> 18 mfit2  fit2   1.0430  4 0.9032    mfit2
+#> 19 vfit2 vfit1  28.9645  7 0.0001    vfit1
+#> 20 vfit1 vfit3   0.0000  0 1.0000       - 
+#> 21 vfit1 mfit1 156.2377  7 0.0000    mfit1
+#> 22 vfit1 mfit2 213.7204 23 0.0000    mfit2
+#> 23 vfit2 vfit3  28.9645  7 0.0001    vfit3
+#> 24 vfit2 mfit1 185.2022 14 0.0000    mfit1
+#> 25 vfit2 mfit2 242.6849 30 0.0000    mfit2
+#> 26 vfit3 mfit1 156.2377  7 0.0000    mfit1
+#> 27 vfit3 mfit2 213.7204 23 0.0000    mfit2
+#> 28 mfit1 mfit2  57.4827 16 0.0000    mfit2
 #> 
 #> $omnibus
 #>              LL df      AIC      BIC LRT
-#> mfit1 -3260.342 30 6580.685 6755.406   7
-#> mfit2 -3258.197 41 6598.394 6837.180   6
-#> fit2  -3254.783 51 6611.566 6908.593   5
-#> vfit2 -3345.385 20 6730.770 6847.251   4
-#> vfit1 -3344.702 22 6733.404 6861.533   3
-#> vfit3 -3344.701 23 6735.403 6869.356   2
-#> fit0  -3343.420 26 6738.841 6890.266   1
-#> fit1  -3342.350 31 6746.699 6927.245   0
+#> mfit2 -3384.951 47 6863.901 7137.631   7
+#> fit2  -3385.472 51 6872.944 7169.970   6
+#> mfit1 -3413.692 31 6889.384 7069.929   5
+#> fit1  -3476.510 31 7015.020 7195.566   4
+#> vfit1 -3491.811 24 7031.621 7171.399   2
+#> vfit3 -3491.811 24 7031.621 7171.399   2
+#> fit0  -3491.724 26 7035.448 7186.873   1
+#> vfit2 -3506.293 17 7046.586 7145.595   0
 #> 
 #> attr(,"alpha")
 #> [1] 0.05
@@ -441,14 +447,14 @@ modTable(fits)
 
 modTable(fits)$omnibus
 #>              LL df      AIC      BIC LRT
-#> mfit1 -3260.342 30 6580.685 6755.406   7
-#> mfit2 -3258.197 41 6598.394 6837.180   6
-#> fit2  -3254.783 51 6611.566 6908.593   5
-#> vfit2 -3345.385 20 6730.770 6847.251   4
-#> vfit1 -3344.702 22 6733.404 6861.533   3
-#> vfit3 -3344.701 23 6735.403 6869.356   2
-#> fit0  -3343.420 26 6738.841 6890.266   1
-#> fit1  -3342.350 31 6746.699 6927.245   0
+#> mfit2 -3384.951 47 6863.901 7137.631   7
+#> fit2  -3385.472 51 6872.944 7169.970   6
+#> mfit1 -3413.692 31 6889.384 7069.929   5
+#> fit1  -3476.510 31 7015.020 7195.566   4
+#> vfit1 -3491.811 24 7031.621 7171.399   2
+#> vfit3 -3491.811 24 7031.621 7171.399   2
+#> fit0  -3491.724 26 7035.448 7186.873   1
+#> vfit2 -3506.293 17 7046.586 7145.595   0
 # This shows us the final results. The 'LRT' column indicates
 # the total number of times each model was selected across all tests
 # We can see that 'fit2' (the saturated MNM) was selected across all tests
@@ -458,196 +464,196 @@ modTable(fits, nodes = TRUE)
 #> $nodes
 #> $nodes$V1
 #>              LL  df      AIC      BIC
-#> fit0  -724.9472 495 1461.894 1487.182
-#> fit1  -715.2673 494 1444.535 1474.037
-#> fit2  -693.1233 490 1408.247 1454.607
-#> vfit1 -725.5861 496 1461.172 1482.245
-#> vfit2 -725.9276 497 1459.855 1476.714
-#> vfit3 -724.9472 495 1461.894 1487.182
-#> mfit1 -697.5251 495 1407.050 1432.338
-#> mfit2 -693.1233 490 1408.247 1454.607
+#> fit0  -733.0887 495 1478.177 1503.465
+#> fit1  -727.4840 494 1468.968 1498.470
+#> fit2  -708.0251 490 1438.050 1484.411
+#> vfit1 -733.1321 496 1476.264 1497.337
+#> vfit2 -734.2967 497 1476.593 1493.452
+#> vfit3 -733.1321 496 1476.264 1497.337
+#> mfit1 -711.0706 494 1436.141 1465.643
+#> mfit2 -708.0259 491 1436.052 1478.198
 #> 
 #> $nodes$V2
 #>              LL  df      AIC      BIC
-#> fit0  -703.8815 495 1419.763 1445.051
-#> fit1  -694.5883 494 1403.177 1432.679
-#> fit2  -688.7575 490 1399.515 1445.876
-#> vfit1 -703.8833 496 1417.767 1438.840
-#> vfit2 -704.2248 497 1416.450 1433.308
-#> vfit3 -703.8833 496 1417.767 1438.840
-#> mfit1 -689.4550 494 1392.910 1422.412
-#> mfit2 -688.9775 492 1395.955 1433.886
+#> fit0  -744.4680 495 1500.936 1526.224
+#> fit1  -723.5364 494 1461.073 1490.575
+#> fit2  -720.6659 490 1463.332 1509.692
+#> vfit1 -744.4680 495 1500.936 1526.224
+#> vfit2 -747.6058 497 1503.212 1520.070
+#> vfit3 -744.4680 495 1500.936 1526.224
+#> mfit1 -723.9339 495 1459.868 1485.155
+#> mfit2 -720.6924 492 1459.385 1497.316
 #> 
 #> $nodes$V3
 #>              LL  df      AIC      BIC
-#> fit0  -706.8915 495 1425.783 1451.071
-#> fit1  -706.1066 494 1426.213 1455.715
-#> fit2  -675.4728 490 1372.946 1419.306
-#> vfit1 -706.8915 495 1425.783 1451.071
-#> vfit2 -706.8915 495 1425.783 1451.071
-#> vfit3 -706.8915 495 1425.783 1451.071
-#> mfit1 -676.0784 493 1368.157 1401.874
-#> mfit2 -676.0784 493 1368.157 1401.874
+#> fit0  -744.1465 495 1500.293 1525.581
+#> fit1  -743.3485 494 1500.697 1530.199
+#> fit2  -714.2468 490 1450.494 1496.854
+#> vfit1 -744.1465 495 1500.293 1525.581
+#> vfit2 -745.7057 496 1501.411 1522.484
+#> vfit3 -744.1465 495 1500.293 1525.581
+#> mfit1 -715.0448 492 1448.090 1486.021
+#> mfit2 -714.2653 491 1448.531 1490.677
 #> 
 #> $nodes$V4
 #>              LL  df      AIC      BIC
-#> fit0  -706.3256 495 1424.651 1449.939
-#> fit1  -705.8439 494 1425.688 1455.190
-#> fit2  -702.3519 490 1426.704 1473.065
-#> vfit1 -706.9648 497 1421.930 1438.788
-#> vfit2 -706.9648 497 1421.930 1438.788
-#> vfit3 -706.9648 497 1421.930 1438.788
-#> mfit1 -706.9648 497 1421.930 1438.788
-#> mfit2 -702.5885 493 1421.177 1454.894
+#> fit0  -723.1614 495 1458.323 1483.611
+#> fit1  -723.1086 494 1460.217 1489.719
+#> fit2  -716.5087 490 1455.017 1501.378
+#> vfit1 -723.2048 496 1456.410 1477.483
+#> vfit2 -725.2269 497 1458.454 1475.312
+#> vfit3 -723.2048 496 1456.410 1477.483
+#> mfit1 -725.2269 497 1458.454 1475.312
+#> mfit2 -716.5087 490 1455.017 1501.378
 #> 
 #> $nodes$V5
 #>              LL  df      AIC      BIC
-#> fit0  -727.9637 495 1467.927 1493.215
-#> fit1  -726.0677 494 1466.135 1495.638
-#> fit2  -695.7346 490 1413.469 1459.830
-#> vfit1 -727.9637 495 1467.927 1493.215
-#> vfit2 -727.9637 495 1467.927 1493.215
-#> vfit3 -727.9637 495 1467.927 1493.215
-#> mfit1 -695.9740 492 1409.948 1447.879
-#> mfit2 -695.9740 492 1409.948 1447.879
+#> fit0  -729.7151 495 1471.430 1496.718
+#> fit1  -727.7981 494 1469.596 1499.098
+#> fit2  -703.6311 490 1429.262 1475.623
+#> vfit1 -729.7151 495 1471.430 1496.718
+#> vfit2 -733.0740 497 1474.148 1491.006
+#> vfit3 -729.7151 495 1471.430 1496.718
+#> mfit1 -704.7362 492 1427.472 1465.404
+#> mfit2 -703.6311 490 1429.262 1475.623
 #> 
 #> 
 #> $LRT
 #> $LRT$LL_diff2
-#>     net0  net1 |         V1           V2       V3        V4         V5
-#> 1   fit0  fit1 | 19.3597839 18.586285609  1.56987 0.9634288  3.7918609
-#> 2   fit0  fit2 | 63.6476823 30.247865134 62.83751 7.9473972 64.4580263
-#> 3  vfit1  fit0 |  1.2779266  0.003637967  0.00000 1.2782694  0.0000000
-#> 4  vfit2  fit0 |  1.9608343  0.686545624  0.00000 1.2782694  0.0000000
-#> 5  vfit3  fit0 |  0.0000000  0.003637967  0.00000 1.2782694  0.0000000
-#> 6   fit0 mfit1 | 54.8440771 28.853061612 61.62617 1.2782694 63.9793488
-#> 7   fit0 mfit2 | 63.6476823 29.808016741 61.62617 7.4742321 63.9793488
-#> 8   fit1  fit2 | 44.2878984 11.661579525 61.26764 6.9839683 60.6661653
-#> 9  vfit1  fit1 | 20.6377106 18.589923576  1.56987 2.2416982  3.7918609
-#> 10 vfit2  fit1 | 21.3206182 19.272831233  1.56987 2.2416982  3.7918609
-#> 11 vfit3  fit1 | 19.3597839 18.589923576  1.56987 2.2416982  3.7918609
-#> 12 mfit1  fit1 | 35.4842932 10.266776003 60.05630 2.2416982 60.1874879
-#> 13  fit1 mfit2 | 44.2878984 11.221731132 60.05630 6.5108033 60.1874879
-#> 14 vfit1  fit2 | 64.9256090 30.251503101 62.83751 9.2256666 64.4580263
-#> 15 vfit2  fit2 | 65.6085166 30.934410758 62.83751 9.2256666 64.4580263
-#> 16 vfit3  fit2 | 63.6476823 30.251503101 62.83751 9.2256666 64.4580263
-#> 17 mfit1  fit2 |  8.8036052  1.394803522  1.21134 9.2256666  0.4786774
-#> 18 mfit2  fit2 |  0.0000000  0.439848393  1.21134 0.4731650  0.4786774
-#> 19 vfit2 vfit1 |  0.6829077  0.682907657  0.00000 0.0000000  0.0000000
-#> 20 vfit1 vfit3 |  1.2779266  0.000000000  0.00000 0.0000000  0.0000000
-#> 21 vfit1 mfit1 | 56.1220037 28.856699578 61.62617 0.0000000 63.9793488
-#> 22 vfit1 mfit2 | 64.9256090 29.811654708 61.62617 8.7525016 63.9793488
-#> 23 vfit2 vfit3 |  1.9608343  0.682907657  0.00000 0.0000000  0.0000000
-#> 24 vfit2 mfit1 | 56.8049114 29.539607236 61.62617 0.0000000 63.9793488
-#> 25 vfit2 mfit2 | 65.6085166 30.494562366 61.62617 8.7525016 63.9793488
-#> 26 vfit3 mfit1 | 54.8440771 28.856699578 61.62617 0.0000000 63.9793488
-#> 27 vfit3 mfit2 | 63.6476823 29.811654708 61.62617 8.7525016 63.9793488
-#> 28 mfit1 mfit2 |  8.8036052  0.954955130  0.00000 8.7525016  0.0000000
+#>     net0  net1 |           V1          V2          V3          V4        V5
+#> 1   fit0  fit1 | 11.209446040 41.86314124  1.59615542  0.10572426  3.834078
+#> 2   fit0  fit2 | 50.127231220 47.60423085 59.79950285 13.30552132 52.168101
+#> 3  vfit1  fit0 |  0.086834743  0.00000000  0.00000000  0.08683474  0.000000
+#> 4  vfit2  fit0 |  2.416060339  6.27553691  3.11836737  4.13091172  6.717653
+#> 5  vfit3  fit0 |  0.086834743  0.00000000  0.00000000  0.08683474  0.000000
+#> 6   fit0 mfit1 | 44.036112064 41.06817696 58.20344338  4.13091172 49.957782
+#> 7   fit0 mfit2 | 50.125510305 47.55120903 59.76248963 13.30552132 52.168101
+#> 8   fit1  fit2 | 38.917785180  5.74108961 58.20334744 13.19979705 48.334023
+#> 9  vfit1  fit1 | 11.296280782 41.86314124  1.59615542  0.19255901  3.834078
+#> 10 vfit2  fit1 | 13.625506379 48.13867816  4.71452279  4.23663598 10.551731
+#> 11 vfit3  fit1 | 11.296280782 41.86314124  1.59615542  0.19255901  3.834078
+#> 12  fit1 mfit1 | 32.826666024  0.79496428 56.60728796  4.23663598 46.123704
+#> 13  fit1 mfit2 | 38.916064266  5.68806778 58.16633422 13.19979705 48.334023
+#> 14 vfit1  fit2 | 50.214065963 47.60423085 59.79950285 13.39235606 52.168101
+#> 15 vfit2  fit2 | 52.543291559 53.87976776 62.91787023 17.43643304 58.885754
+#> 16 vfit3  fit2 | 50.214065963 47.60423085 59.79950285 13.39235606 52.168101
+#> 17 mfit1  fit2 |  6.091119156  6.53605389  1.59605947 17.43643304  2.210319
+#> 18 mfit2  fit2 |  0.001720915  0.05302183  0.03701322  0.00000000  0.000000
+#> 19 vfit2 vfit1 |  2.329225596  6.27553691  3.11836737  4.04407697  6.717653
+#> 20 vfit1 vfit3 |  0.000000000  0.00000000  0.00000000  0.00000000  0.000000
+#> 21 vfit1 mfit1 | 44.122946807 41.06817696 58.20344338  4.04407697 49.957782
+#> 22 vfit1 mfit2 | 50.212345048 47.55120903 59.76248963 13.39235606 52.168101
+#> 23 vfit2 vfit3 |  2.329225596  6.27553691  3.11836737  4.04407697  6.717653
+#> 24 vfit2 mfit1 | 46.452172403 47.34371388 61.32181075  0.00000000 56.675435
+#> 25 vfit2 mfit2 | 52.541570644 53.82674594 62.88085701 17.43643304 58.885754
+#> 26 vfit3 mfit1 | 44.122946807 41.06817696 58.20344338  4.04407697 49.957782
+#> 27 vfit3 mfit2 | 50.212345048 47.55120903 59.76248963 13.39235606 52.168101
+#> 28 mfit1 mfit2 |  6.089398241  6.48303206  1.55904625 17.43643304  2.210319
 #> 
 #> $LRT$Df_diff
 #>     net0  net1 | V1 V2 V3 V4 V5
 #> 1   fit0  fit1 |  1  1  1  1  1
 #> 2   fit0  fit2 |  5  5  5  5  5
-#> 3  vfit1  fit0 |  1  1  0  2  0
-#> 4  vfit2  fit0 |  2  2  0  2  0
-#> 5  vfit3  fit0 |  0  1  0  2  0
-#> 6   fit0 mfit1 |  0  1  2  2  3
-#> 7   fit0 mfit2 |  5  3  2  2  3
+#> 3  vfit1  fit0 |  1  0  0  1  0
+#> 4  vfit2  fit0 |  2  2  1  2  2
+#> 5  vfit3  fit0 |  1  0  0  1  0
+#> 6   fit0 mfit1 |  1  0  3  2  3
+#> 7   fit0 mfit2 |  4  3  4  5  5
 #> 8   fit1  fit2 |  4  4  4  4  4
-#> 9  vfit1  fit1 |  2  2  1  3  1
-#> 10 vfit2  fit1 |  3  3  1  3  1
-#> 11 vfit3  fit1 |  1  2  1  3  1
-#> 12 mfit1  fit1 |  1  0  1  3  2
-#> 13  fit1 mfit2 |  4  2  1  1  2
-#> 14 vfit1  fit2 |  6  6  5  7  5
-#> 15 vfit2  fit2 |  7  7  5  7  5
-#> 16 vfit3  fit2 |  5  6  5  7  5
-#> 17 mfit1  fit2 |  5  4  3  7  2
-#> 18 mfit2  fit2 |  0  2  3  3  2
-#> 19 vfit2 vfit1 |  1  1  0  0  0
-#> 20 vfit1 vfit3 |  1  0  0  0  0
-#> 21 vfit1 mfit1 |  1  2  2  0  3
-#> 22 vfit1 mfit2 |  6  4  2  4  3
-#> 23 vfit2 vfit3 |  2  1  0  0  0
-#> 24 vfit2 mfit1 |  2  3  2  0  3
-#> 25 vfit2 mfit2 |  7  5  2  4  3
-#> 26 vfit3 mfit1 |  0  2  2  0  3
-#> 27 vfit3 mfit2 |  5  4  2  4  3
-#> 28 mfit1 mfit2 |  5  2  0  4  0
+#> 9  vfit1  fit1 |  2  1  1  2  1
+#> 10 vfit2  fit1 |  3  3  2  3  3
+#> 11 vfit3  fit1 |  2  1  1  2  1
+#> 12  fit1 mfit1 |  0  1  2  3  2
+#> 13  fit1 mfit2 |  3  2  3  4  4
+#> 14 vfit1  fit2 |  6  5  5  6  5
+#> 15 vfit2  fit2 |  7  7  6  7  7
+#> 16 vfit3  fit2 |  6  5  5  6  5
+#> 17 mfit1  fit2 |  4  5  2  7  2
+#> 18 mfit2  fit2 |  1  2  1  0  0
+#> 19 vfit2 vfit1 |  1  2  1  1  2
+#> 20 vfit1 vfit3 |  0  0  0  0  0
+#> 21 vfit1 mfit1 |  2  0  3  1  3
+#> 22 vfit1 mfit2 |  5  3  4  6  5
+#> 23 vfit2 vfit3 |  1  2  1  1  2
+#> 24 vfit2 mfit1 |  3  2  4  0  5
+#> 25 vfit2 mfit2 |  6  5  5  7  7
+#> 26 vfit3 mfit1 |  2  0  3  1  3
+#> 27 vfit3 mfit2 |  5  3  4  6  5
+#> 28 mfit1 mfit2 |  3  3  1  7  2
 #> 
 #> $LRT$pval
 #>     net0  net1 |     V1     V2     V3     V4     V5
-#> 1   fit0  fit1 | 0.0000 0.0000 0.2102 0.3263 0.0515
-#> 2   fit0  fit2 | 0.0000 0.0000 0.0000 0.1592 0.0000
-#> 3  vfit1  fit0 | 0.2583 0.9519 1.0000 0.5277 1.0000
-#> 4  vfit2  fit0 | 0.3752 0.7094 1.0000 0.5277 1.0000
-#> 5  vfit3  fit0 | 1.0000 0.9519 1.0000 0.5277 1.0000
-#> 6   fit0 mfit1 | 0.0000 0.0000 0.0000 0.5277 0.0000
-#> 7   fit0 mfit2 | 0.0000 0.0000 0.0000 0.0238 0.0000
-#> 8   fit1  fit2 | 0.0000 0.0201 0.0000 0.1367 0.0000
-#> 9  vfit1  fit1 | 0.0000 0.0001 0.2102 0.5238 0.0515
-#> 10 vfit2  fit1 | 0.0001 0.0002 0.2102 0.5238 0.0515
-#> 11 vfit3  fit1 | 0.0000 0.0001 0.2102 0.5238 0.0515
-#> 12 mfit1  fit1 | 0.0000 0.0000 0.0000 0.5238 0.0000
-#> 13  fit1 mfit2 | 0.0000 0.0037 0.0000 0.0107 0.0000
-#> 14 vfit1  fit2 | 0.0000 0.0000 0.0000 0.2369 0.0000
-#> 15 vfit2  fit2 | 0.0000 0.0001 0.0000 0.2369 0.0000
-#> 16 vfit3  fit2 | 0.0000 0.0000 0.0000 0.2369 0.0000
-#> 17 mfit1  fit2 | 0.1172 0.8451 0.7503 0.2369 0.7871
-#> 18 mfit2  fit2 | 1.0000 0.8026 0.7503 0.9247 0.7871
-#> 19 vfit2 vfit1 | 0.4086 0.4086 1.0000 1.0000 1.0000
-#> 20 vfit1 vfit3 | 0.2583 1.0000 1.0000 1.0000 1.0000
-#> 21 vfit1 mfit1 | 0.0000 0.0000 0.0000 1.0000 0.0000
-#> 22 vfit1 mfit2 | 0.0000 0.0000 0.0000 0.0676 0.0000
-#> 23 vfit2 vfit3 | 0.3752 0.4086 1.0000 1.0000 1.0000
+#> 1   fit0  fit1 | 0.0008 0.0000 0.2064 0.7451 0.0502
+#> 2   fit0  fit2 | 0.0000 0.0000 0.0000 0.0207 0.0000
+#> 3  vfit1  fit0 | 0.7682 1.0000 1.0000 0.7682 1.0000
+#> 4  vfit2  fit0 | 0.2988 0.0434 0.0774 0.1268 0.0348
+#> 5  vfit3  fit0 | 0.7682 1.0000 1.0000 0.7682 1.0000
+#> 6   fit0 mfit1 | 0.0000 0.0000 0.0000 0.1268 0.0000
+#> 7   fit0 mfit2 | 0.0000 0.0000 0.0000 0.0207 0.0000
+#> 8   fit1  fit2 | 0.0000 0.2193 0.0000 0.0103 0.0000
+#> 9  vfit1  fit1 | 0.0035 0.0000 0.2064 0.9082 0.0502
+#> 10 vfit2  fit1 | 0.0035 0.0000 0.0947 0.2370 0.0144
+#> 11 vfit3  fit1 | 0.0035 0.0000 0.2064 0.9082 0.0502
+#> 12  fit1 mfit1 | 0.0000 0.3726 0.0000 0.2370 0.0000
+#> 13  fit1 mfit2 | 0.0000 0.0582 0.0000 0.0103 0.0000
+#> 14 vfit1  fit2 | 0.0000 0.0000 0.0000 0.0372 0.0000
+#> 15 vfit2  fit2 | 0.0000 0.0000 0.0000 0.0148 0.0000
+#> 16 vfit3  fit2 | 0.0000 0.0000 0.0000 0.0372 0.0000
+#> 17 mfit1  fit2 | 0.1924 0.2575 0.4502 0.0148 0.3312
+#> 18 mfit2  fit2 | 0.9669 0.9738 0.8474 1.0000 1.0000
+#> 19 vfit2 vfit1 | 0.1270 0.0434 0.0774 0.0443 0.0348
+#> 20 vfit1 vfit3 | 1.0000 1.0000 1.0000 1.0000 1.0000
+#> 21 vfit1 mfit1 | 0.0000 0.0000 0.0000 0.0443 0.0000
+#> 22 vfit1 mfit2 | 0.0000 0.0000 0.0000 0.0372 0.0000
+#> 23 vfit2 vfit3 | 0.1270 0.0434 0.0774 0.0443 0.0348
 #> 24 vfit2 mfit1 | 0.0000 0.0000 0.0000 1.0000 0.0000
-#> 25 vfit2 mfit2 | 0.0000 0.0000 0.0000 0.0676 0.0000
-#> 26 vfit3 mfit1 | 0.0000 0.0000 0.0000 1.0000 0.0000
-#> 27 vfit3 mfit2 | 0.0000 0.0000 0.0000 0.0676 0.0000
-#> 28 mfit1 mfit2 | 0.1172 0.6203 1.0000 0.0676 1.0000
+#> 25 vfit2 mfit2 | 0.0000 0.0000 0.0000 0.0148 0.0000
+#> 26 vfit3 mfit1 | 0.0000 0.0000 0.0000 0.0443 0.0000
+#> 27 vfit3 mfit2 | 0.0000 0.0000 0.0000 0.0372 0.0000
+#> 28 mfit1 mfit2 | 0.1073 0.0903 0.2118 0.0148 0.3312
 #> 
 #> $LRT$decision
 #>     net0  net1 |    V1    V2    V3    V4    V5
 #> 1   fit0  fit1 |  fit1  fit1  fit0  fit0  fit0
-#> 2   fit0  fit2 |  fit2  fit2  fit2  fit0  fit2
-#> 3  vfit1  fit0 | vfit1 vfit1    -  vfit1    - 
-#> 4  vfit2  fit0 | vfit2 vfit2    -  vfit2    - 
-#> 5  vfit3  fit0 |    -  vfit3    -  vfit3    - 
+#> 2   fit0  fit2 |  fit2  fit2  fit2  fit2  fit2
+#> 3  vfit1  fit0 | vfit1    -     -  vfit1    - 
+#> 4  vfit2  fit0 | vfit2  fit0 vfit2 vfit2  fit0
+#> 5  vfit3  fit0 | vfit3    -     -  vfit3    - 
 #> 6   fit0 mfit1 | mfit1 mfit1 mfit1 mfit1 mfit1
 #> 7   fit0 mfit2 | mfit2 mfit2 mfit2 mfit2 mfit2
-#> 8   fit1  fit2 |  fit2  fit2  fit2  fit1  fit2
+#> 8   fit1  fit2 |  fit2  fit1  fit2  fit2  fit2
 #> 9  vfit1  fit1 |  fit1  fit1 vfit1 vfit1 vfit1
-#> 10 vfit2  fit1 |  fit1  fit1 vfit2 vfit2 vfit2
+#> 10 vfit2  fit1 |  fit1  fit1 vfit2 vfit2  fit1
 #> 11 vfit3  fit1 |  fit1  fit1 vfit3 vfit3 vfit3
-#> 12 mfit1  fit1 | mfit1 mfit1 mfit1 mfit1 mfit1
-#> 13  fit1 mfit2 | mfit2 mfit2 mfit2 mfit2 mfit2
-#> 14 vfit1  fit2 |  fit2  fit2  fit2 vfit1  fit2
-#> 15 vfit2  fit2 |  fit2  fit2  fit2 vfit2  fit2
-#> 16 vfit3  fit2 |  fit2  fit2  fit2 vfit3  fit2
-#> 17 mfit1  fit2 | mfit1 mfit1 mfit1 mfit1 mfit1
-#> 18 mfit2  fit2 |    -  mfit2 mfit2 mfit2 mfit2
-#> 19 vfit2 vfit1 | vfit2 vfit2    -     -     - 
-#> 20 vfit1 vfit3 | vfit1    -     -     -     - 
-#> 21 vfit1 mfit1 | mfit1 mfit1 mfit1    -  mfit1
-#> 22 vfit1 mfit2 | mfit2 mfit2 mfit2 vfit1 mfit2
-#> 23 vfit2 vfit3 | vfit2 vfit2    -     -     - 
+#> 12  fit1 mfit1 | mfit1 mfit1 mfit1 mfit1 mfit1
+#> 13  fit1 mfit2 | mfit2  fit1 mfit2 mfit2 mfit2
+#> 14 vfit1  fit2 |  fit2  fit2  fit2  fit2  fit2
+#> 15 vfit2  fit2 |  fit2  fit2  fit2  fit2  fit2
+#> 16 vfit3  fit2 |  fit2  fit2  fit2  fit2  fit2
+#> 17 mfit1  fit2 | mfit1 mfit1 mfit1  fit2 mfit1
+#> 18 mfit2  fit2 | mfit2 mfit2 mfit2    -     - 
+#> 19 vfit2 vfit1 | vfit2 vfit1 vfit2 vfit1 vfit1
+#> 20 vfit1 vfit3 |    -     -     -     -     - 
+#> 21 vfit1 mfit1 | mfit1 mfit1 mfit1 vfit1 mfit1
+#> 22 vfit1 mfit2 | mfit2 mfit2 mfit2 mfit2 mfit2
+#> 23 vfit2 vfit3 | vfit2 vfit3 vfit2 vfit3 vfit3
 #> 24 vfit2 mfit1 | mfit1 mfit1 mfit1    -  mfit1
-#> 25 vfit2 mfit2 | mfit2 mfit2 mfit2 vfit2 mfit2
-#> 26 vfit3 mfit1 | mfit1 mfit1 mfit1    -  mfit1
-#> 27 vfit3 mfit2 | mfit2 mfit2 mfit2 vfit3 mfit2
-#> 28 mfit1 mfit2 | mfit1 mfit1    -  mfit1    - 
+#> 25 vfit2 mfit2 | mfit2 mfit2 mfit2 mfit2 mfit2
+#> 26 vfit3 mfit1 | mfit1 mfit1 mfit1 vfit3 mfit1
+#> 27 vfit3 mfit2 | mfit2 mfit2 mfit2 mfit2 mfit2
+#> 28 mfit1 mfit2 | mfit1 mfit1 mfit1 mfit2 mfit1
 #> 
 #> 
 #> $counts
 #>       V1 V2 V3 V4 V5
-#> fit0   0  0  1  2  1
-#> fit1   4  4  0  1  0
-#> fit2   5  5  5  0  5
-#> vfit1  2  1  1  4  1
-#> vfit2  3  3  1  4  1
-#> vfit3  0  1  1  4  1
-#> mfit1  7  7  6  4  6
-#> mfit2  5  6  6  3  6
+#> fit0   0  1  1  1  2
+#> fit1   4  6  0  0  1
+#> fit2   5  4  5  6  5
+#> vfit1  1  1  1  4  2
+#> vfit2  3  0  4  2  0
+#> vfit3  1  1  1  4  2
+#> mfit1  7  7  7  2  7
+#> mfit2  6  5  6  6  5
 #> 
 #> attr(,"alpha")
 #> [1] 0.05

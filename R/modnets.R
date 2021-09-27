@@ -8,6 +8,21 @@
 #' \item{Cross-section moderated networks} \item{Temporal (idiographic)
 #' moderated networks} \item{Multi-level moderated networks} }
 #'
+#' @section Core Package Functions:
+#'
+#'   \tabular{ll}{ Model fitting:  \tab \code{\link{fitNetwork}, \link{mlGVAR},
+#'   \link{lmerVAR}} \cr Variable selection:  \tab \code{\link{varSelect},
+#'   \link{resample}, \link{modSelect}} \cr Model comparison:  \tab
+#'   \code{\link{modLL}, \link{modTable}, \link{SURll}, \link{SURtable}} \cr
+#'   Simulating network data: \tab \code{\link{simNet}, \link{mlGVARsim},
+#'   \link{mnetPowerSim}} \cr Centrality and clustering: \tab
+#'   \code{\link{centTable}, \link{clustTable}} \cr Adjacency matrices:  \tab
+#'   \code{\link{net}, \link{netInts}} \cr Bootstrapping and stability:  \tab
+#'   \code{\link{bootNet}} }
+#'
+#'   Plotting functions are available for all model objects and can be accessed
+#'   through the \code{plot()} S3 generic.
+#'
 #' @section Details:
 #'
 #'   \tabular{ll}{ Package: \tab modnets \cr Title: \tab Modeling Moderated

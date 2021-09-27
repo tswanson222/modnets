@@ -178,12 +178,15 @@ The main function that ties everything together for both cross-sectional and
 idiographic (temporal) network models, moderated or otherwise.
 }
 \details{
-Details to be provided on the estimation procedures soon. Also incorporates
-the variable selection functions to integrate model selection and estimation.
-Nodewise estimation is used for all GGMs, and SUR estimation is used for
-temporal networks. See \code{systemfit} package for more information on the
-latter, particularly via the
-\code{\link[systemfit:systemfit]{systemfit::systemfit}} function.
+For GGMs, nodewise estimation is utilized to fit models to each node, and
+then aggregate results into the final network. For temporal networks that
+represent data for a single subject, SUR estimation based on feasible
+generalized least squares (FGLS) is used. Also incorporates the variable
+selection functions to integrate model selection and estimation. Nodewise
+estimation is used for all GGMs, and SUR estimation is used for temporal
+networks. See \code{systemfit} package for more information on the latter,
+particularly via the \code{\link[systemfit:systemfit]{systemfit::systemfit}}
+function.
 }
 \examples{
 \dontrun{

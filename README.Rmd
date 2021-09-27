@@ -32,9 +32,9 @@ R package designed to afford exploratory and confirmatory estimation of 3 types 
 	* Uses one of two methods for estimation.
 	* One is a two-step multilevel model, where fixed/random effects are estimated separately from between-subject effects
 	* The other uses a formal multilevel moderated vector autoregressive model with `lmer`
-	* Only works for continous variables, although exogenous moderators can be binary.
+	* Only works for continuous variables, although exogenous moderators can be binary.
 
-Penalized estimators for each of these models are also available, such as the LASSO, ridge regression, elastic net, the (overlapping) group LASSO, and the hierarchical LASSO. Hyperparameter selection will be performed automatically based on either the AIC, BIC, EBIC, or cross-validation depending upon user input.
+Additionally, model selection techniques based on penalized regression and iterative resampling are implemented alongside a variety of plotting and data-generating functions.
 
 ## Installation
 
@@ -75,6 +75,11 @@ plot(fit, threshold = TRUE)
 * For case-dropping stability analysis, you can use `bootNet` while setting `caseDrop = TRUE`.
 * For power analysis, you can use: `mnetPowerSim` to simulate data based on expected network structure(s).
 
+See the package description for an overview of these and other core functions.
+```{r descrip, eval = FALSE}
+library(modnets)
+?modnets
+```
 
 ## Examples
 
