@@ -68,7 +68,7 @@
 #'   coefficients have a p-value below the supplied threshold.
 #' @param binarize Logical. If \code{TRUE}, the network will be plotted as an
 #'   unweighted network. Only applies to GGMs.
-#' @param mlty Logial. If \code{FALSE}, then moderated edges are displayed as
+#' @param mlty Logical. If \code{FALSE}, then moderated edges are displayed as
 #'   solid lines. If \code{TRUE}, then moderated edges are shown as dashed
 #'   lines.
 #' @param mselect If the model contains more than one moderator, input the
@@ -580,7 +580,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'
 #' Creates various types of plot to visualize \code{bootNet} objects.
 #'
-#' @param x Output from \code{\link{bootNet}}. Also some compatablity with
+#' @param x Output from \code{\link{bootNet}}. Also some compatiblity with
 #'   \code{resample} objects (when sampMethod != 'stability').
 #' @param type The outcome measure to plot. Options include: \code{"edges",
 #'   "strength", "ei", "outstrength", "instrength", "outei", "inei"}. The "out-"
@@ -1557,7 +1557,7 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
 #' variable named \code{"M"} moderates the relationship between \code{"X"} and
 #' \code{"Y"}, where \code{"X"} predicts \code{"Y"}, the title of the plot will
 #' list the variable \code{"M"} as the moderator, and the label (shown on the
-#' y-axis), will read \code{"X:Y"}. When \code{y != "all"} (that is, a specifc
+#' y-axis), will read \code{"X:Y"}. When \code{y != "all"} (that is, a specific
 #' value for \code{y} is provided), then the title will still reflect the
 #' moderator, but the labels will simply show which predictor interacts with
 #' that moderator to predict the outcome.

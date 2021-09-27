@@ -134,7 +134,7 @@ listwise deletion if there are any missing values in the dataset.}
 \code{mlGVAR} objects
 }
 \description{
-Fits a graphical vector autoregressive model to data containing mutliple time
+Fits a graphical vector autoregressive model to data containing multiple time
 points measured for multiple individuals.
 }
 \details{

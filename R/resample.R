@@ -824,8 +824,8 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
 #' sometimes there is more than one option for choosing a final model.
 #'
 #' @param obj \code{\link{resample}} output
-#' @param data The dataframe used to create the \code{resample} object. Necesary
-#'   if \code{ascall = TRUE} or \code{fit = TRUE}.
+#' @param data The dataframe used to create the \code{resample} object.
+#'   Necessary if \code{ascall = TRUE} or \code{fit = TRUE}.
 #' @param fit Logical. Determines whether to fit the selected model to the data
 #'   or just return the model specifications. Must supply a dataset in the
 #'   \code{data} argument as well.

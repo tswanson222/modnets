@@ -31,7 +31,7 @@
 #'   coefficients}. \item{Try adjusting the corresponding main effect parameters
 #'   for the moderator, \code{m1} and \code{m1_range}}. \item{Try setting
 #'   \code{modType = "full"} to reduce the number of main effect parameters}.
-#'   \item{Try setting a low value(s) for \code{fixedPar}, in order to provde
+#'   \item{Try setting a low value(s) for \code{fixedPar}, in order to provide
 #'   parameter values that are known to be lower} }
 #'
 #'   An alternative approach could be to use the internal function

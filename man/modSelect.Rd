@@ -18,8 +18,8 @@ modSelect(
 \arguments{
 \item{obj}{\code{\link{resample}} output}
 
-\item{data}{The dataframe used to create the \code{resample} object. Necesary
-if \code{ascall = TRUE} or \code{fit = TRUE}.}
+\item{data}{The dataframe used to create the \code{resample} object.
+Necessary if \code{ascall = TRUE} or \code{fit = TRUE}.}
 
 \item{fit}{Logical. Determines whether to fit the selected model to the data
 or just return the model specifications. Must supply a dataset in the

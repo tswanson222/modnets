@@ -58,7 +58,7 @@ plotBoot(
 )
 }
 \arguments{
-\item{x}{Output from \code{\link{bootNet}}. Also some compatablity with
+\item{x}{Output from \code{\link{bootNet}}. Also some compatiblity with
 \code{resample} objects (when sampMethod != 'stability').}
 
 \item{type}{The outcome measure to plot. Options include: \code{"edges",

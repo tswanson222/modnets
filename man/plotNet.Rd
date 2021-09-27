@@ -287,7 +287,7 @@ coefficients have a p-value below the supplied threshold.}
 \item{binarize}{Logical. If \code{TRUE}, the network will be plotted as an
 unweighted network. Only applies to GGMs.}
 
-\item{mlty}{Logial. If \code{FALSE}, then moderated edges are displayed as
+\item{mlty}{Logical. If \code{FALSE}, then moderated edges are displayed as
 solid lines. If \code{TRUE}, then moderated edges are shown as dashed
 lines.}
 

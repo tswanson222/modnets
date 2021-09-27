@@ -37,7 +37,7 @@ title reflects the name of the moderator variable. For instance, if a
 variable named \code{"M"} moderates the relationship between \code{"X"} and
 \code{"Y"}, where \code{"X"} predicts \code{"Y"}, the title of the plot will
 list the variable \code{"M"} as the moderator, and the label (shown on the
-y-axis), will read \code{"X:Y"}. When \code{y != "all"} (that is, a specifc
+y-axis), will read \code{"X:Y"}. When \code{y != "all"} (that is, a specific
 value for \code{y} is provided), then the title will still reflect the
 moderator, but the labels will simply show which predictor interacts with
 that moderator to predict the outcome.

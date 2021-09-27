@@ -1,6 +1,6 @@
 #' Fit GVAR models with multilevel data
 #'
-#' Fits a graphical vector autoregressive model to data containing mutliple time
+#' Fits a graphical vector autoregressive model to data containing multiple time
 #' points measured for multiple individuals.
 #'
 #' Uses a pseudo-mixed effects approach, wherein fixed effects are estimated and

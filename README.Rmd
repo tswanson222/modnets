@@ -22,7 +22,7 @@ R package designed to afford exploratory and confirmatory estimation of 3 types 
 
 1. Cross-sectional moderated networks
 	* Involves nodewise estimation of a GGM with higher-order interactions
-	* Can accomodate any combination of continuous and binary variables.
+	* Can accommodate any combination of continuous and binary variables.
 	* Nodewise regressions are fit using either OLS or logistic regression, depending on variable types.
 2. Idiographic (temporal) moderated networks
 	* Involves generalized least squares (GLS) estimation of multivariate time series model, as well as the inverse-covariance structure of the residuals. 
