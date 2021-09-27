@@ -17,5 +17,5 @@ bfiDat <- structure(data.frame(
   gender = bfiDat$gender - 1
 ), row.names = 1:nrow(bfiDat))
 
-write.csv(bfiDat, 'data-raw/bfiData.csv')
+write.csv(bfiDat, 'data-raw/bfiData.csv', row.names = FALSE)
 usethis::use_data(bfiDat, overwrite = TRUE)

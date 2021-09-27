@@ -3,10 +3,10 @@
 \docType{data}
 \name{bfiDat}
 \alias{bfiDat}
-\title{BFI data}
+\title{bfi data}
 \format{
-A data frame with six variables representing composite scores for
-participants across the Big 5 personality dimensions as well as gender.
+A data frame with six variables representing composite scores
+forparticipants across the Big 5 personality dimensions as well as gender.
 \code{A} is Agreeableness, \code{C} is conscientiousness, \code{E} is
 extraversion, \code{N} is neuroticism, and \code{O} is openness to
 experience. For a given participant, each value represents the mean of 5
@@ -28,11 +28,10 @@ Composite scores on the Big 5 personality dimensions and gender. Adapted from
 the \code{bfi} data in the \code{psychTools} package.
 }
 \references{
-Goldberg, L.R. (1999) A broad-bandwidth, public domain,
-personality inventory measuring the lower-level facets of several
-five-factor models. In Mervielde, I. and Deary, I. and De Fruyt, F. and
-Ostendorf, F. (eds) Personality psychology in Europe. 7. Tilburg University
-Press. Tilburg, The Netherlands.
+Goldberg, L.R. (1999) A broad-bandwidth, public domain, personality inventory
+measuring the lower-level facets of several five-factor models. In Mervielde,
+I. and Deary, I. and De Fruyt, F. and Ostendorf, F. (eds) Personality
+psychology in Europe. 7. Tilburg University Press. Tilburg, The Netherlands.
 
 Revelle, W., Wilt, J., and Rosenthal, A. (2010) Individual Differences in
 Cognition: New Methods for examining the Personality-Cognition Link In
