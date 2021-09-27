@@ -11,22 +11,56 @@
 #'
 #' @section Warning:
 #'
-#'   Importantly, the Gibbs sampler can easily diverge to infinity given certain
-#'   model parameters. Generating network data based on moderator variables can
-#'   produce values that quickly take on large values due to the presence of
-#'   multiplicative terms. This leads to the following recommendations:
-#'   \enumerate{ \item{It is not productive to specify interaction terms that
-#'   take on large values (e.g., > .3)} \item{It is useful to use empirical data
-#'   as guides for specifying parameter values} \item{Reducing both the values
-#'   of interactions and the proportion of interactions can help to reduce the
-#'   likelihood of divergence} \item{If reasonable parameter values are
-#'   provided, often a successful simulation can be achieved by simply setting a
-#'   different initial seed} }
+#'   Importantly, the Gibbs sampler can easily diverge given certain model
+#'   parameters. Generating network data based on moderator variables can
+#'   produce data that quickly take on large values due to the presence of
+#'   multiplicative terms. If the simulation fails, first simply try re-running
+#'   the function with a different seed; this will often be sufficient to solve
+#'   the problem when default parameters are specified. Additionally, one can
+#'   increase the value of \code{div}, in case the sampler only diverges
+#'   slightly or simply produced an anomalous value. This raises the threshold
+#'   of tolerated values before the sampler stops. If supplying user-generated
+#'   model matrices (for the \code{b1} and/or \code{b2} arguments) and the
+#'   function continues to fail, you will likely need to change the parameter
+#'   values in those matrices, as it may not be possible to simulate data under
+#'   the given values. If simulating the model matrices inside the function (as
+#'   is the default) and the function continues to fail, try adjusting the
+#'   following parameters: \enumerate{ \item{Try reducing the value of \code{m2}
+#'   to specify fewer interactions}. \item{Try reducing a range with a smaller
+#'   maximum for \code{m2_range}, to adjust the range of interaction
+#'   coefficients}. \item{Try adjusting the corresponding main effect parameters
+#'   for the moderator, \code{m1} and \code{m1_range}}. \item{Try setting
+#'   \code{modType = "full"} to reduce the number of main effect parameters}. }
+#'
+#'   An alternative approach could be to use the internal function
+#'   \code{simNet2}, which is a wrapper designed to re-run \code{simNet} when it
+#'   fails and automatically adjust simulation parameters such as \code{div} to
+#'   thoroughly test a given parameterization scheme. This function can be
+#'   accessed via \code{modnets:::simNet2}. There is not documentation for this
+#'   function, so it is recommended to look at the source code if one wishes to
+#'   use the function. This wrapper is also used inside the \code{mnetPowerSim}
+#'   function.
 #'
 #' @param N Numeric value. Total number of subjects.
 #' @param p Numeric value. Total number of nodes (excluding moderator).
-#' @param m If \code{TRUE}, a moderator is generated and named \code{M} in the
-#'   resultant data.
+#' @param m If a value is provided, a moderator is generated and named \code{M}
+#'   in the resultant data. If \code{TRUE}, then a normal distribution with a
+#'   mean of 0 will be used to generate the initial value of \code{m}, which
+#'   will serve as the population mean for \code{m} throughout the simulation.
+#'   If a numeric value is provided, then this will serve as the population
+#'   mean, and all subsequent draws will be taken from a normal distribution
+#'   with that mean. If \code{m = "binary"}, then this will simply set the
+#'   argument \code{mbinary = TRUE}. If \code{m = "ordinal"}, this will set
+#'   \code{mord = TRUE}. To simulate \code{m} from a skewed distribution, there
+#'   are two options: if \code{m = "skewed"}, then the \code{alpha} parameter of
+#'   the \code{\link[sn:rmsn]{sn::rmsn}} will automatically be set to 3.
+#'   Alternatively, a vector of length two can be supplied, containing the
+#'   element \code{"skewed"} as well as the desired value of \code{alpha}.
+#'   Lastly, a function can be provided for \code{m} if the user wishes to
+#'   sample \code{m} from another distribution. The requirement is that the
+#'   function have only one argument, and only returns a single numeric value.
+#'   The input of the argument should be the location parameter of the desired
+#'   sampling distribution.
 #' @param m2 Numeric. If \code{m2 >= 1}, then this will determine the number of
 #'   interaction effects between the moderator and some node in the network. If
 #'   a value between 0 and 1 is provided, then this determines the probability
@@ -68,7 +102,12 @@
 #' @param m2_range Numeric vector of length 2. The range of values for moderator
 #'   interaction effect coefficients.
 #' @param modType Determines the type of moderation to employ, such as
-#'   \code{"none", "full", "partial"}
+#'   \code{"none", "full", "partial"}. If \code{modType = "full"}, then for any
+#'   interaction terms there will be full moderation, such that all pairwise
+#'   relationships for moderated paths will be set to zero. If \code{modType =
+#'   "partial"}, then pairwise edges for moderated paths will always be nonzero.
+#'   If \code{modType = "none"}, no constraints will be applied (e.g., could
+#'   produce a mix between full and partial moderation).
 #' @param lags If \code{TRUE} or 1, then arguments are rerouted to the
 #'   \code{\link{mlGVARsim}} function to simulate temporal data for a single
 #'   individual.
@@ -78,7 +117,8 @@
 #'   the sampler moves through the nodes from the first to the last in order at
 #'   each iteration.
 #' @param skewErr The skewness parameter for the \code{alpha} argument in the
-#'   \code{\link[sn:rmsn]{sn::rmsn}} function.
+#'   \code{\link[sn:rmsn]{sn::rmsn}} function. Only relevant when \code{gibbs =
+#'   FALSE} and no moderator is specified.
 #' @param onlyNets If \code{TRUE} then only the network models are returned,
 #'   without the data. Could be used to create random models and then simulate
 #'   data by another method.
@@ -150,11 +190,21 @@ simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL,
   } else if(length(intercepts) != p){
     intercepts <- rnorm(p)
   }
-  mfun <- switch(
-    2 - mbinary,
-    function(size = 1){sample(x = 0:1, size = size)},
-    function(mean = 0){rnorm(n = 1, mean = mean)}
-  )
+  if(is.function(m)){
+    mfun <- m
+    m <- mfun()
+  } else {
+    if(is.character(m)){
+      if('binary' %in% m){mbinary <- TRUE}
+      if('ordinal' %in% m){mord <- TRUE}
+      if(!'skewed' %in% m){m <- TRUE}
+    }
+    mfun <- switch(
+      2 - mbinary,
+      function(size = 1){sample(x = 0:1, size = size)},
+      function(mean = 0){rnorm(n = 1, mean = mean)}
+    )
+  }
   if(isTRUE(m)){m <- ifelse(mbinary, 1, mfun())}
   if('skewed' %in% m){
     if(length(m) == 1 | length(m) > 2){m <- '3'}

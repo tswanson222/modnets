@@ -2,7 +2,9 @@
 #'
 #' Samples data based on several parameters, mainly used to see how different
 #' sample sizes perform given various parameterizations when simulating from
-#' network models, especially moderated networks.
+#' network models, especially moderated networks. See \code{\link{simNet}} for
+#' more details about arguments as well as the warning about simulations that
+#' fail.
 #'
 #' Evaluates how closely an estimated network is with the true network with
 #' regards to metrics such as sensitivity, specificity, and precision, among
@@ -13,7 +15,8 @@
 #'   parameters.
 #' @param N Numeric value, or vector of sample sizes to generate data with.
 #' @param p Numeric value, or vector of network sizes.
-#' @param m If \code{TRUE} then a moderated network will be simulated.
+#' @param m If a value is provided then a moderated network will be simulated.
+#'   See \code{\link{simNet}} for details.
 #' @param m1 Functions similarly to \code{m2}, except that this argument refers
 #'   to the number/probability of main effects of the moderator on any given
 #'   node.
@@ -77,7 +80,7 @@
 #'   increased based on expected range of values. If a datapoint is larger than
 #'   \code{div}, then the sampler will stop.
 #' @param modType Determines the type of moderation to employ, such as
-#'   \code{"none", "full", "partial"}
+#'   \code{"none", "full", "partial"}. See \code{\link{simNet}} for details.
 #' @param m1_range Numeric vector of length 2. The range of values for moderator
 #'   main effect coefficients.
 #' @param m2_range Numeric vector of length 2. The range of values for moderator
@@ -85,7 +88,8 @@
 #' @param time If \code{TRUE} then the time it takes to simulate the data is
 #'   printed to screen at the end of the sampling.
 #' @param skewErr The skewness parameter for the \code{alpha} argument in the
-#'   \code{\link[sn:rmsn]{sn::rmsn}} function.
+#'   \code{\link[sn:rmsn]{sn::rmsn}} function. Only relevant when \code{gibbs =
+#'   FALSE} and no moderator is specified.
 #' @param nCores Numeric value indicating the number of CPU cores to use for the
 #'   resampling. If \code{TRUE}, then the
 #'   \code{\link[parallel:detectCores]{parallel::detectCores}} function will be

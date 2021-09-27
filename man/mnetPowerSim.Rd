@@ -51,7 +51,8 @@ parameters.}
 
 \item{p}{Numeric value, or vector of network sizes.}
 
-\item{m}{If \code{TRUE} then a moderated network will be simulated.}
+\item{m}{If a value is provided then a moderated network will be simulated.
+See \code{\link{simNet}} for details.}
 
 \item{m1}{Functions similarly to \code{m2}, except that this argument refers
 to the number/probability of main effects of the moderator on any given
@@ -138,7 +139,7 @@ increased based on expected range of values. If a datapoint is larger than
 \code{div}, then the sampler will stop.}
 
 \item{modType}{Determines the type of moderation to employ, such as
-\code{"none", "full", "partial"}}
+\code{"none", "full", "partial"}. See \code{\link{simNet}} for details.}
 
 \item{m1_range}{Numeric vector of length 2. The range of values for moderator
 main effect coefficients.}
@@ -150,7 +151,8 @@ interaction effect coefficients.}
 printed to screen at the end of the sampling.}
 
 \item{skewErr}{The skewness parameter for the \code{alpha} argument in the
-\code{\link[sn:rmsn]{sn::rmsn}} function.}
+\code{\link[sn:rmsn]{sn::rmsn}} function. Only relevant when \code{gibbs =
+  FALSE} and no moderator is specified.}
 
 \item{nCores}{Numeric value indicating the number of CPU cores to use for the
 resampling. If \code{TRUE}, then the
@@ -178,7 +180,9 @@ Power simulation results
 \description{
 Samples data based on several parameters, mainly used to see how different
 sample sizes perform given various parameterizations when simulating from
-network models, especially moderated networks.
+network models, especially moderated networks. See \code{\link{simNet}} for
+more details about arguments as well as the warning about simulations that
+fail.
 }
 \details{
 Evaluates how closely an estimated network is with the true network with

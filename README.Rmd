@@ -87,8 +87,8 @@ library(modnets)
 ### ======= SIMULATE MODERATED NETWORK DATA ======== ###
 ### ================================================ ###
 # Can simulate data with no moderators, or with one exogenous moderator
-set.seed(1)
-x <- simNet(N = 500, p = 5, m = TRUE, sparsity = .5, nCores = TRUE, modType = 'full')
+set.seed(123)
+x <- simNet(N = 500, p = 5, m = TRUE, m1 = .5, m2 = .2, nCores = TRUE)
 
 str(x)
 
@@ -151,7 +151,7 @@ plot(fit2, threshold = TRUE, predict = fit0)
 # shows the increase in R2 that we see with 'fit2'
 
 predictNet(fit2)
-predictNet(fit2, fit1)
+predictNet(fit2, fit0)
 # We can extract these values using this function
 # And can take the differences by supplying two networks
 # Values for the second model are substracted by those from the first
