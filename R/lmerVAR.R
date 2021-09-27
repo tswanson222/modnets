@@ -77,7 +77,7 @@
 #' @param beepno Character string or numeric value to indicate which variable
 #'   (if any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{dayno} argument.
-#' @param dayno Character string or numeric value to indiciate which variable
+#' @param dayno Character string or numeric value to indicate which variable
 #'   (if any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{beepno} argument.
 #' @param deleteMissing Logical. Determines whether to automatically perform

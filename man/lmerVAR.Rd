@@ -110,7 +110,7 @@ messages in the console during the fitting process.}
 (if any) encodes the survey number within a single day. Must be used in
 conjunction with \code{dayno} argument.}
 
-\item{dayno}{Character string or numeric value to indiciate which variable
+\item{dayno}{Character string or numeric value to indicate which variable
 (if any) encodes the survey number within a single day. Must be used in
 conjunction with \code{beepno} argument.}
 
