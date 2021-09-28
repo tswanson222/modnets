@@ -44,6 +44,7 @@ returned in the \code{\link{mlGVAR}} output.
 Outputs correlation-stability (CS) coefficients for the case-drop bootstrap.
 }
 \examples{
+\donttest{
 boot1 <- bootNet(ggmDat, 'M')
 summary(boot1)
 
@@ -52,6 +53,7 @@ boot2 <- bootNet(gvarDat, 'M', lags = 1)
 mod1 <- varSelect(gvarDat, 'M', lags = 1)
 boot3 <- bootNet(gvarDat, 'M', lags = 1, type = mod1, caseDrop = TRUE)
 summary(boot3)
+}
 }
 \seealso{
 \code{\link{bootNet}}

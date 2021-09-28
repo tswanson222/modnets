@@ -694,6 +694,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #' @seealso \code{\link{bootNet}, \link{resample}}
 #'
 #' @examples
+#' \donttest{
 #' boot1 <- bootNet(ggmDat, caseDrop = TRUE)
 #'
 #' plot(boot1)
@@ -703,6 +704,7 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #'
 #' plot(boot2)
 #' plot(boot2, difference = TRUE)
+#' }
 plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7,
                      order = 'mean', ci = .95, pairwise = TRUE, interactions = TRUE,
                      labels = NULL, title = NULL, cis = 'quantile', true = NULL,
@@ -1110,9 +1112,11 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 #' @seealso \code{\link{resample}}
 #'
 #' @examples
+#' \donttest{
 #' x <- resample(ggmDat, sampMethod = "bootstrap")
 #' plot(x, what = 'pvals')
 #' plot(x, 'pvals', outcome = 'V2', predictor = 'V1')
+#' }
 plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
   stopifnot("adjCIs" %in% names(x))
   pvals <- lapply(x$samples$coefs, '[[', "P")
@@ -1165,9 +1169,11 @@ plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
 #' @seealso \code{\link{resample}}
 #'
 #' @examples
+#' \donttest{
 #' x <- resample(ggmDat, sampMethod = "stability")
 #' plot(x, what = "stability")
 #' plot(x, 'stability', outcome = 'V3')
+#' }
 plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
                           thresh = .5, typeLegend = TRUE){
   if(x$call$criterion == "CV"){stop("Not possible when criterion == CV")}
@@ -1851,8 +1857,10 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
 #' @seealso \code{\link{mlGVAR}, \link{lmerVAR}}
 #'
 #' @examples
+#' \donttest{
 #' x <- mlGVAR(mlgvarDat, 'M')
 #' plotNet3(x)
+#' }
 plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'between'),
                      titles = TRUE, l = 3, label = NULL, xpos = 0, ypos = .5){
   args0 <- list(...)

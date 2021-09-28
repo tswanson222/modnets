@@ -3,6 +3,7 @@ This is a resubmission. The following changes have been made:
 * In the `lmerVAR` function, the call to `options(warn = -1)` has been removed. This also entailed removing the `warnings` argument.
 * In the internal `margCIs` function, the `set.seed` input has been edited to be an argument of the function.
 * Removed all instances of `\dontrun`, and updated examples for all functions.
+* Added `\donttest` to all components of examples that take longer than 5s to run.
 * Edited Description line of DESCRIPTION to include a link to the published article that describes the methods in this package.
 
 ## Test environments

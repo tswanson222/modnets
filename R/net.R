@@ -69,6 +69,7 @@
 #' net(x, threshold = .05)
 #' netInts(x, threshold = TRUE)
 #'
+#' \donttest{
 #' y <- mlGVAR(mlgvarDat, 'M')
 #'
 #' net(y, n = 'beta')
@@ -76,6 +77,7 @@
 #' net(y, n = 'between')
 #'
 #' netInts(y)
+#' }
 net <- function(fit, n = "beta", threshold = FALSE, rule = "OR",
                 binary = FALSE, nodewise = FALSE, d = 14, r = NULL){
   if(inherits(fit, c('splitNets', 'try-error'))){return(NULL)}

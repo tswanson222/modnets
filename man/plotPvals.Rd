@@ -35,9 +35,11 @@ to iterated resampling via bootstrapping or multi-sample splitting.
 See Meinshausen, Meier, & Buhlmann (2009) for details.
 }
 \examples{
+\donttest{
 x <- resample(ggmDat, sampMethod = "bootstrap")
 plot(x, what = 'pvals')
 plot(x, 'pvals', outcome = 'V2', predictor = 'V1')
+}
 }
 \references{
 Meinshausen, N., Meier, L., & Buhlmann, P. (2009). P-values for

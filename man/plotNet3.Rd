@@ -48,8 +48,10 @@ output. Allows one to plot three networks in the same window: temporal,
 contemporaneous, and between-subject.
 }
 \examples{
+\donttest{
 x <- mlGVAR(mlgvarDat, 'M')
 plotNet3(x)
+}
 }
 \seealso{
 \code{\link{mlGVAR}, \link{lmerVAR}}

@@ -190,6 +190,7 @@ relevant plot will be returned as output instead.
 Creates various types of plot to visualize \code{bootNet} objects.
 }
 \examples{
+\donttest{
 boot1 <- bootNet(ggmDat, caseDrop = TRUE)
 
 plot(boot1)
@@ -199,6 +200,7 @@ boot2 <- bootNet(ggmDat)
 
 plot(boot2)
 plot(boot2, difference = TRUE)
+}
 }
 \seealso{
 \code{\link{bootNet}, \link{resample}}

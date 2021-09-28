@@ -126,6 +126,12 @@ In the process of adding further documentation. More details to come. The
 method is referred to as the "two-step multilevel VAR" (Epskamp et al.,
 2018).
 }
+\examples{
+\donttest{
+# The options were chosen so that the function would take less time to run
+x <- lmerVAR(mlgvarDat, 'M', temporal = "fixed", contemp = "orthogonal")
+}
+}
 \references{
 Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
 The gaussian graphical model in cross-sectional and time-series data.

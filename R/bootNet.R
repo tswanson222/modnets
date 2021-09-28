@@ -123,6 +123,7 @@
 #'   \link{netInts}}
 #'
 #' @examples
+#' \donttest{
 #' boot1 <- bootNet(ggmDat, 'M')
 #' summary(boot1)
 #'
@@ -131,6 +132,7 @@
 #' mod1 <- varSelect(gvarDat, 'M', lags = 1)
 #' boot3 <- bootNet(gvarDat, 'M', lags = 1, type = mod1, caseDrop = TRUE)
 #' summary(boot3)
+#' }
 bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, rule = 'OR',
                     ci = .95, caseMin = .05, caseMax = .75, caseN = 10, threshold = FALSE,
                     fits = NULL, type = 'g', saveMods = TRUE, verbose = TRUE, fitCoefs = FALSE,
@@ -734,6 +736,7 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
 #' @seealso \code{\link{bootNet}}
 #'
 #' @examples
+#' \donttest{
 #' boot1 <- bootNet(ggmDat, 'M')
 #' summary(boot1)
 #'
@@ -742,6 +745,7 @@ bootNet <- function(data, m = NULL, nboots = 10, lags = NULL, caseDrop = FALSE, 
 #' mod1 <- varSelect(gvarDat, 'M', lags = 1)
 #' boot3 <- bootNet(gvarDat, 'M', lags = 1, type = mod1, caseDrop = TRUE)
 #' summary(boot3)
+#' }
 summary.bootNet <- function(object, centrality = TRUE, ...){
   if(isTRUE(attr(object, 'caseDrop'))){return(cscoef(object, ...))}
   inds1 <- c('edges', 'strength', 'EI')

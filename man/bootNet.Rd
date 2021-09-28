@@ -180,6 +180,7 @@ input for the undocumented \code{fit0} argument for the
 }
 
 \examples{
+\donttest{
 boot1 <- bootNet(ggmDat, 'M')
 summary(boot1)
 
@@ -188,6 +189,7 @@ boot2 <- bootNet(gvarDat, 'M', lags = 1)
 mod1 <- varSelect(gvarDat, 'M', lags = 1)
 boot3 <- bootNet(gvarDat, 'M', lags = 1, type = mod1, caseDrop = TRUE)
 summary(boot3)
+}
 }
 \seealso{
 \code{\link{summary.bootNet}, \link{fitNetwork}, \link{varSelect},

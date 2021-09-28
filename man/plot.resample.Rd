@@ -43,6 +43,7 @@ multi-sample split resampling. \code{"stability"} only available for
 stability selection.
 }
 \examples{
+\donttest{
 fit1 <- resample(ggmDat, m = 'M', niter = 10)
 
 net(fit1)
@@ -56,4 +57,5 @@ plot(fit1, what = 'pvals', outcome = 2, predictor = 4)
 fit2 <- resample(gvarDat, m = 'M', niter = 10, lags = 1, sampMethod = 'stability')
 
 plot(fit2, what = 'stability', outcome = 3)
+}
 }

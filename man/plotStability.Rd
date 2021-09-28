@@ -43,9 +43,11 @@ be used when the criterion for stability selection was set as
 cross-validation.
 }
 \examples{
+\donttest{
 x <- resample(ggmDat, sampMethod = "stability")
 plot(x, what = "stability")
 plot(x, 'stability', outcome = 'V3')
+}
 }
 \references{
 Meinshausen, N., & Buhlmann, P. (2010). Stability selection.

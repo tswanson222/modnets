@@ -106,6 +106,7 @@ x <- fitNetwork(ggmDat, 'M')
 net(x, threshold = .05)
 netInts(x, threshold = TRUE)
 
+\donttest{
 y <- mlGVAR(mlgvarDat, 'M')
 
 net(y, n = 'beta')
@@ -113,6 +114,7 @@ net(y, n = 'pcc')
 net(y, n = 'between')
 
 netInts(y)
+}
 }
 \seealso{
 \code{\link{fitNetwork}, \link{mlGVAR}, \link{lmerVAR},

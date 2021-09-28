@@ -91,7 +91,7 @@
 #' @examples
 #' \donttest{
 #' # The options were chosen so that the function would take less time to run
-#' x <- lmerVAR(mlgvarDat, 'M', temporal = "fixed", contemp = "orthogonal)
+#' x <- lmerVAR(mlgvarDat, 'M', temporal = "fixed", contemp = "orthogonal")
 #' }
 lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
                     idvar = "ID", intvars = NULL, center = TRUE, scale = TRUE,
