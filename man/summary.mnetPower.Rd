@@ -36,9 +36,10 @@ A quick way to view the results of power simulations conducted with
 \code{\link{mnetPowerSim}}.
 }
 \examples{
-\dontrun{
-x <- mnetPowerSim()
+\donttest{
+x <- mnetPowerSim(niter = 10, N = c(100, 200))
 summary(x)
+plot(x)
 }
 }
 \seealso{

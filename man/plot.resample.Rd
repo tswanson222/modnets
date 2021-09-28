@@ -43,11 +43,17 @@ multi-sample split resampling. \code{"stability"} only available for
 stability selection.
 }
 \examples{
-\dontrun{
-x <- resample(data)
+fit1 <- resample(ggmDat, m = 'M', niter = 10)
 
-plot(x, 'network')
-plot(x, 'bootstrap')
-plot(x, 'coefs')
-}
+net(fit1)
+netInts(fit1)
+
+plot(fit1)
+plot(fit1, what = 'coefs')
+plot(fit1, what = 'bootstrap', multi = TRUE)
+plot(fit1, what = 'pvals', outcome = 2, predictor = 4)
+
+fit2 <- resample(gvarDat, m = 'M', niter = 10, lags = 1, sampMethod = 'stability')
+
+plot(fit2, what = 'stability', outcome = 3)
 }

@@ -60,12 +60,10 @@ For \code{\link{centTable}}, centrality values can be computed for the matrix
 of interactions within a temporal network.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
+x <- fitNetwork(gvarDat, 'M', lags = TRUE)
 
-centTable(x)
 clustTable(x)
-}
+centTable(x, which.net = 'interactions')
 }
 \seealso{
 \code{\link{centAuto}, \link{clustAuto}, \link{centPlot},

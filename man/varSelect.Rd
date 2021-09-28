@@ -141,10 +141,15 @@ compute models, and cross-validation calls the
 \code{\link[glinternet:glinternet.cv]{glinternet::glinternet.cv}} function.
 }
 \examples{
-\dontrun{
-x <- varSelect(data)
-fit <- fitNetwork(data, type = x)
-}
+vars1 <- varSelect(ggmDat, criterion = 'BIC', method = 'subset')
+fit1 <- fitNetwork(ggmDat, type = vars1)
+
+vars2 <- varSelect(ggmDat, criterion = 'CV', method = 'glmnet')
+fit2 <- fitNetwork(ggmDat, type = vars2, which.lam = 'min')
+
+# Add a moderator
+vars3 <- varSelect(ggmDat, m = 'M', criterion = 'EBIC', gamma = .5)
+fit3 <- fitNetwork(ggmDat, moderators = 'M', type = vars3)
 }
 \seealso{
 \code{\link{resample}, \link{fitNetwork}, \link{bootNet},

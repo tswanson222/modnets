@@ -159,8 +159,25 @@
 #'   \link{net}, \link{netInts}, \link{plotBoot}, \link{plotCoefs}}
 #'
 #' @examples
+#'
+#' # Generate a moderated GGM along with data
 #' set.seed(1)
 #' x <- simNet(N = 100, p = 3, m = TRUE)
+#'
+#' net(x) # Get data-generating adjacency matrix
+#' netInts(x) # Get data-generating interaction matrix
+#'
+#' plot(x) # Plot the moderated network that generated the data
+#'
+#' # Generate a single-subject GVAR model with data
+#' set.seed(1)
+#' x <- simNet(N = 500, p = 3, m = TRUE, lags = 1)
+#'
+#' net(x, n = 'temporal') # Get the data-generating time-lagged adjacency matrix
+#' net(x, n = 'contemporaneous') # Get the data-generating standardized residual covariance matrix
+#'
+#' plot(x, which.net = 'beta') # 'beta' is another way of referring to the temporal network
+#' plot(x, which.net = 'pcc') # 'pcc' is another way of referring to the contemporaneous network
 simNet <- function(N = 100, p = 5, m = FALSE, m2 = .1, b1 = NULL, b2 = NULL,
                    sparsity = .5, intercepts = NULL, nIter = 250, msym = FALSE,
                    onlyDat = FALSE, pbar = TRUE, div = 10, gibbs = TRUE,

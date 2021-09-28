@@ -43,10 +43,8 @@ moderator, but the labels will simply show which predictor interacts with
 that moderator to predict the outcome.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data, moderators = 'moderator')
-plot(x, which.net = 'ints')
-}
+fit <- fitNetwork(ggmDat, 'M')
+plot(fit, 'ints', y = 'all')
 }
 \seealso{
 \code{\link{fitNetwork}, \link{plotNet}, \link{mlGVAR}}

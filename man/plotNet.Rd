@@ -307,10 +307,15 @@ Core function for plotting various types of network models. Accessible
 through the \code{plot()} S3 generic function.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
-plot(x)
-}
+fit1 <- fitNetwork(ggmDat)
+
+plot(fit1)
+plotNet(fit1) # This and the command above produce the same result
+
+fit2 <- fitNetwork(gvarDat, moderators = 'M', lags = 1)
+
+plot(fit2, 'pdc') # Partial Directed Correlations
+plot(fit2, 'pcc') # Partial Contemporaneous Correlations
 }
 \seealso{
 \code{\link{fitNetwork}, \link{predictNet}, \link{mlGVAR},

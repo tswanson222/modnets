@@ -39,12 +39,10 @@
 #'   \link[qgraph:clusteringTable]{qgraph::clusteringTable}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
+#' x <- fitNetwork(gvarDat, 'M', lags = TRUE)
 #'
-#' centTable(x)
 #' clustTable(x)
-#' }
+#' centTable(x, which.net = 'interactions')
 centTable <- function(Wmats, scale = TRUE, which.net = "temporal", labels = NULL,
                       relative = FALSE, weighted = TRUE, signed = TRUE){
   if(isTRUE(attr(Wmats, "mlGVAR"))){
@@ -249,11 +247,10 @@ clustTable <- function(Wmats, scale = TRUE, labels = NULL,
 #'   \link[qgraph:clustcoef_auto]{qgraph::clustcoef_auto}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
+#' x <- fitNetwork(ggmDat, 'M')
 #'
-#' centAuto(x)
-#' }
+#' clustAuto(x)
+#' centAuto(x, 'interactions')
 centAuto <- function(x, which.net = "temporal", weighted = TRUE, signed = TRUE){
   if(isTRUE(attr(x, "mlGVAR"))){
     x <- switch(which.net, between = x$betweenNet, x$fixedNets)}
@@ -440,13 +437,11 @@ clustAuto <- function(x, thresholdWS = 0, thresholdON = 0){
 #'   \link[qgraph:clusteringPlot]{qgraph::clusteringPlot}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
+#' x <- fitNetwork(ggmDat)
 #'
 #' centPlot(x)
 #' clustPlot(x)
 #' plotCentrality(x)
-#' }
 centPlot <- function(Wmats, scale = c("z-scores", "raw", "raw0", "relative"),
                      which.net = "temporal", include = "all", labels = NULL,
                      orderBy = NULL, decreasing = FALSE, plot = TRUE,

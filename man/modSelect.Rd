@@ -83,10 +83,12 @@ exactly to use the \code{\link{resample}} output to select a model, as
 sometimes there is more than one option for choosing a final model.
 }
 \examples{
-\dontrun{
-x <- resample(data)
-modSelect(x, data = data, fit = TRUE)
-}
+res1 <- resample(ggmDat, m = 'M', niter = 10)
+mods1 <- modSelect(res1)
+fit1 <- fitNetwork(ggmDat, morderators = 'M', type = mods1)
+
+res2 <- resample(ggmDat, m = 'M', sampMethod = 'stability')
+fit2 <- modSelect(res2, data = ggmDat, fit = TRUE, thresh = .7)
 }
 \seealso{
 \code{\link{resample}}

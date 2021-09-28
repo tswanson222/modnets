@@ -5,7 +5,7 @@
 \alias{mlgvarDat}
 \title{Simulated multi-level network data}
 \format{
-A \code{5000 x 7} data frame with five variables to serve as nodes in
+A \code{50000 x 7} data frame with five variables to serve as nodes in
 the networks, one variable \code{"M"} to serve as the time-lagged
 moderator, and an \code{ID} variable that labels responses from each of
 \code{100} simulated individuals. For each ID number, there are 500

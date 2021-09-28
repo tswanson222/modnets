@@ -126,11 +126,6 @@ In the process of adding further documentation. More details to come. The
 method is referred to as the "two-step multilevel VAR" (Epskamp et al.,
 2018).
 }
-\examples{
-\dontrun{
-x <- lmerVAR(data)
-}
-}
 \references{
 Epskamp, S., Waldorp, L. J., Mottus, R., & Borsboom, B. (2018).
 The gaussian graphical model in cross-sectional and time-series data.

@@ -68,7 +68,7 @@
 #' as nodes in the multi-level GVAR model, one moderator variable, and an ID
 #' variable that distinguishes between subjects.
 #'
-#' @format A \code{5000 x 7} data frame with five variables to serve as nodes in
+#' @format A \code{50000 x 7} data frame with five variables to serve as nodes in
 #'   the networks, one variable \code{"M"} to serve as the time-lagged
 #'   moderator, and an \code{ID} variable that labels responses from each of
 #'   \code{100} simulated individuals. For each ID number, there are 500

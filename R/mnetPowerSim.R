@@ -117,8 +117,10 @@
 #'   \link{mlGVARsim}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- mnetPowerSim()
+#' \donttest{
+#' x <- mnetPowerSim(niter = 10, N = c(100, 200))
+#' summary(x)
+#' plot(x)
 #' }
 mnetPowerSim <- function(niter = 10, N = 100, p = 5, m = FALSE, m1 = 0, m2 = .1, sparsity = .5,
                          lags = NULL, trueNet = NULL, threshold = TRUE, rule = 'OR', avg = TRUE,
@@ -773,9 +775,10 @@ sampleSize <- function(p, m = 0, lags = 0, print = TRUE){
 #' @seealso \code{\link{mnetPowerSim}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- mnetPowerSim()
+#' \donttest{
+#' x <- mnetPowerSim(niter = 10, N = c(100, 200))
 #' summary(x)
+#' plot(x)
 #' }
 summary.mnetPower <- function(object, ind = 'all', order = NULL, decreasing = FALSE, ...){
   if(is(object, 'list')){object <- object$Results}

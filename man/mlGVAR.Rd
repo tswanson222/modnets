@@ -143,10 +143,12 @@ random effects are approximated. See the work of Epskamp et al. (2018) for
 more details on how these types of effects are estimated.
 }
 \examples{
-\dontrun{
-x <- mlGVARsim()
-data <- x$data
-fit <- mlGVAR(data)
+\donttest{
+fit1 <- mlGVAR(mlgvarDat, 'M')
+
+fit2 <- mlGVAR(mlgvarDat, 'M', bm = TRUE) # Fit the same moderator in the between-subjects network
+
+fit3 <- mlGVAR(mlgvarDat, 'M', selectFUN = 'varSelect')
 }
 }
 \references{

@@ -47,10 +47,8 @@ outputs, although can only plot two networks in the same window.
 \code{\link{plotNet3}} can be used to plot 3 networks.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data, lags = TRUE)
+x <- fitNetwork(gvarDat, lags = TRUE)
 plotNet2(x)
-}
 }
 \seealso{
 \code{\link{fitNetwork}}

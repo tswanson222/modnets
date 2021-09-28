@@ -195,8 +195,10 @@ others. Doesn't calculate values for power, but can be used to serve a
 similar function as a traditional power analysis based on simulated datasets.
 }
 \examples{
-\dontrun{
-x <- mnetPowerSim()
+\donttest{
+x <- mnetPowerSim(niter = 10, N = c(100, 200))
+summary(x)
+plot(x)
 }
 }
 \seealso{

@@ -56,11 +56,6 @@ capacity to convert any
 \code{\link[systemfit:systemfit]{systemfit::systemfit}} output into a pair of
 network models compatible with the \code{modnets} package.
 }
-\examples{
-\dontrun{
-SURnet(fit, dat)
-}
-}
 \seealso{
 \code{\link{SURfit}, \link{fitNetwork},
   \link[systemfit:systemfit]{systemfit::systemfit}}

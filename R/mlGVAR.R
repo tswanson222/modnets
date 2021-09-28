@@ -95,10 +95,12 @@
 #'   \link{plotNet}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- mlGVARsim()
-#' data <- x$data
-#' fit <- mlGVAR(data)
+#' \donttest{
+#' fit1 <- mlGVAR(mlgvarDat, 'M')
+#'
+#' fit2 <- mlGVAR(mlgvarDat, 'M', bm = TRUE) # Fit the same moderator in the between-subjects network
+#'
+#' fit3 <- mlGVAR(mlgvarDat, 'M', selectFUN = 'varSelect')
 #' }
 mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar = 'ID',
                    exogenous = TRUE, center = TRUE, scale = TRUE, fixedType = 'g',
@@ -476,7 +478,7 @@ mlGVAR <- function(data, m = NULL, selectFUN = NULL, subjectNets = FALSE, idvar 
 #'
 #' @examples
 #' set.seed(1)
-#' x <- mlGVARsim()
+#' x <- mlGVARsim(nTime = 50, nPerson = 10, nNode = 3, m = TRUE)
 mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m1 = .7,
                       m0 = 1, lag = 1, thetaVar = NULL, mu_SD = NULL, init_beta_SD = NULL,
                       fixedMuSD = 1, shrink_fixed = 0.9, propPos = .5, m1SD = .1, m2SD = .1,

@@ -122,9 +122,11 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
-#' }
+#' fit1 <- fitNetwork(ggmDat)
+#'
+#' fit2 <- fitNetwork(ggmDat, 'M', type = 'varSelect', criterion = 'BIC')
+#'
+#' fit3 <- fitNetwork(gvarDat, 'M', lags = 1)
 fitNetwork <- function(data, moderators = NULL, type = "gaussian", lags = NULL,
                        seed = NULL, folds = 10, gamma = 0.5, which.lam = 'min',
                        rule = "OR", threshold = FALSE, scale = FALSE, std = TRUE,
@@ -1107,10 +1109,8 @@ modNet <- function(models, data = NULL, threshold = FALSE, rule = "AND", mval = 
 #' @seealso \code{\link{fitNetwork}, \link{plotCoefs}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
+#' x <- fitNetwork(ggmDat)
 #' getFitCIs(x)
-#' }
 getFitCIs <- function(fit, allNames = NULL, alpha = .05){
   if("SURnet" %in% names(fit)){
     if(!'SURfit' %in% names(fit)){stop('Requires SURfit')}

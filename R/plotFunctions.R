@@ -86,10 +86,15 @@
 #'   \link{intsPlot}, \link{resample}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
-#' plot(x)
-#' }
+#' fit1 <- fitNetwork(ggmDat)
+#'
+#' plot(fit1)
+#' plotNet(fit1) # This and the command above produce the same result
+#'
+#' fit2 <- fitNetwork(gvarDat, moderators = 'M', lags = 1)
+#'
+#' plot(fit2, 'pdc') # Partial Directed Correlations
+#' plot(fit2, 'pcc') # Partial Contemporaneous Correlations
 plotNet <- function(x, which.net = 'temporal', threshold = FALSE, layout = 'spring',
                     predict = FALSE, mnet = FALSE, names = TRUE, nodewise = FALSE,
                     scale = FALSE, lag = NULL, con = 'R2', cat = 'nCC', covNet = FALSE,
@@ -689,13 +694,15 @@ plotMods <- function(nets, nodewise = FALSE, elsize = 2, vsize = NULL,
 #' @seealso \code{\link{bootNet}, \link{resample}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- bootNet(data)
+#' boot1 <- bootNet(ggmDat, caseDrop = TRUE)
 #'
-#' plot(x)
+#' plot(boot1)
+#' plotBoot(boot1) # This functions the same as the command above
 #'
-#' plot(x, difference = TRUE)
-#' }
+#' boot2 <- bootNet(ggmDat)
+#'
+#' plot(boot2)
+#' plot(boot2, difference = TRUE)
 plotBoot <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor = .7,
                      order = 'mean', ci = .95, pairwise = TRUE, interactions = TRUE,
                      labels = NULL, title = NULL, cis = 'quantile', true = NULL,
@@ -1103,11 +1110,9 @@ plot.bootNet <- function(x, type = 'edges', net = 'temporal', plot = 'all', cor 
 #' @seealso \code{\link{resample}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- resample(data, sampMethod = "bootstrap")
-#' x <- resample(data, sampMethod = "split")
+#' x <- resample(ggmDat, sampMethod = "bootstrap")
 #' plot(x, what = 'pvals')
-#' }
+#' plot(x, 'pvals', outcome = 'V2', predictor = 'V1')
 plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
   stopifnot("adjCIs" %in% names(x))
   pvals <- lapply(x$samples$coefs, '[[', "P")
@@ -1160,10 +1165,9 @@ plotPvals <- function(x, outcome = 1, predictor = 1, title = TRUE, alpha = .05){
 #' @seealso \code{\link{resample}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- resample(data, sampMethod = "stability")
+#' x <- resample(ggmDat, sampMethod = "stability")
 #' plot(x, what = "stability")
-#' }
+#' plot(x, 'stability', outcome = 'V3')
 plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
                           thresh = .5, typeLegend = TRUE){
   if(x$call$criterion == "CV"){stop("Not possible when criterion == CV")}
@@ -1248,10 +1252,9 @@ plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
 #'   \link{plot.resample}, \link{plotNet}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data)
-#' plot(x, which.net = 'coef')
-#' }
+#' x <- fitNetwork(ggmDat)
+#' plot(x, which.net = 'coefs')
+#' plotCoefs(x) # This is the same as the above command
 plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
                       flip = TRUE, data = NULL, select = TRUE, size = 1,
                       labels = TRUE, title = NULL, vars = 'all'){
@@ -1421,10 +1424,9 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 #' @seealso \code{\link{fitNetwork}, \link{resample}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data, moderators = 'M')
-#' condPlot(x, to = 1, from = 2)
-#' }
+#' fit <- fitNetwork(ggmDat, 'M')
+#' condPlot(fit, to = 'V5', from = 'V4')
+#' condPlot(fit, to = 2, from = 3, avg = TRUE)
 condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
                      hist = FALSE, xlab = NULL, mods = NULL, nsims = 500,
                      xn = NULL, getCIs = FALSE, discrete = FALSE,
@@ -1578,10 +1580,8 @@ condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
 #' @seealso \code{\link{fitNetwork}, \link{plotNet}, \link{mlGVAR}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data, moderators = 'moderator')
-#' plot(x, which.net = 'ints')
-#' }
+#' fit <- fitNetwork(ggmDat, 'M')
+#' plot(fit, 'ints', y = 'all')
 intsPlot <- function(out, y = 'all', nsims = 500, alpha = .05){
   if(is(out, 'SURnet')){stop('Cannot use this function with temporal networks')}
   if(is(out, 'mlGVAR')){out <- out$betweenNet}
@@ -1675,8 +1675,9 @@ intsPlot <- function(out, y = 'all', nsims = 500, alpha = .05){
 #' @seealso \code{\link{mnetPowerSim}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- mnetPowerSim(niter = 100, N = c(100, 200))
+#' \donttest{
+#' x <- mnetPowerSim(niter = 10, N = c(100, 200))
+#' summary(x)
 #' plot(x)
 #' }
 plotPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline = .8,
@@ -1772,10 +1773,8 @@ plot.mnetPower <- function(x, by = 'type', yvar = 'default', yadd = NULL, hline 
 #' @seealso \code{\link{fitNetwork}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- fitNetwork(data, lags = TRUE)
+#' x <- fitNetwork(gvarDat, lags = TRUE)
 #' plotNet2(x)
-#' }
 plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
                      titles = c("PDC ", "PCC "), ...){
   whichTemp <- match.arg(whichTemp)
@@ -1852,10 +1851,8 @@ plotNet2 <- function(object, whichNets = NULL, whichTemp = c("temporal", "PDC"),
 #' @seealso \code{\link{mlGVAR}, \link{lmerVAR}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- mlGVAR(data)
+#' x <- mlGVAR(mlgvarDat, 'M')
 #' plotNet3(x)
-#' }
 plotNet3 <- function(object, ..., nets = c('temporal', 'contemporaneous', 'between'),
                      titles = TRUE, l = 3, label = NULL, xpos = 0, ypos = .5){
   args0 <- list(...)

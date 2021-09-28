@@ -104,13 +104,11 @@ way to combine centrality measures and clustering coefficients into a single
 plot.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
+x <- fitNetwork(ggmDat)
 
 centPlot(x)
 clustPlot(x)
 plotCentrality(x)
-}
 }
 \seealso{
 \code{\link{centTable}, \link{clustTable}, \link{centAuto},

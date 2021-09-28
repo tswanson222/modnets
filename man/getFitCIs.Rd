@@ -30,10 +30,8 @@ The \code{select} column in the output indicates whether the variable would
 be selected given the supplied alpha level.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
+x <- fitNetwork(ggmDat)
 getFitCIs(x)
-}
 }
 \seealso{
 \code{\link{fitNetwork}, \link{plotCoefs}}

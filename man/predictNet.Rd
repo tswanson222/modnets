@@ -43,15 +43,13 @@ SURs. Also can compare and find the change values (such as R-squared change)
 between two networks of the same size (i.e., with the same nodes).
 }
 \examples{
-\dontrun{
-out1 <- fitNetwork(data, covariates = 5)
-out2 <- fitNetwork(data, moderators = 5)
+fit1 <- fitNetwork(ggmDat, covariates = 'M')
+fit2 <- fitNetwork(ggmDat, moderators = 'M')
 
-predictNet(out1)
-predictNet(out1, all = TRUE)
+predictNet(fit1)
+predictNet(fit1, all = TRUE)
 
-predictNet(out1, out2)
-}
+predictNet(fit2, fit1) # Find the differences in prediction error across the two models
 }
 \seealso{
 \code{\link{fitNetwork}}

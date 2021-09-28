@@ -36,11 +36,11 @@ Performs individual nodewise model comparisons across multiple
 \code{\link{lmerVAR}} models.
 }
 \examples{
-\dontrun{
-x1 <- lmerVAR(data, temporal = "correlated")
-x2 <- lmerVAR(data, temporal = "orthogonal")
+\donttest{
+fit1 <- lmerVAR(mlgvarDat, temporal = "fixed", contemp = "orthogonal")
+fit2 <- lmerVAR(mlgvarDat, temporal = "orthogonal", contemp = "orthogonal")
 
-compareVAR(x1, x2)
+compareVAR(fit1, fit2)
 }
 }
 \seealso{

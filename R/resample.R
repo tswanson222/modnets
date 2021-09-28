@@ -190,9 +190,19 @@
 #'   \link[leaps:regsubsets]{leaps::regsubsets}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- resample(data)
-#' }
+#' fit1 <- resample(ggmDat, m = 'M', niter = 10)
+#'
+#' net(fit1)
+#' netInts(fit1)
+#'
+#' plot(fit1)
+#' plot(fit1, what = 'coefs')
+#' plot(fit1, what = 'bootstrap', multi = TRUE)
+#' plot(fit1, what = 'pvals', outcome = 2, predictor = 4)
+#'
+#' fit2 <- resample(gvarDat, m = 'M', niter = 10, lags = 1, sampMethod = 'stability')
+#'
+#' plot(fit2, what = 'stability', outcome = 3)
 resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", criterion = "AIC",
                      method = "glmnet", rule = "OR", gamma = .5, nfolds = 10,
                      nlam = 50, which.lam = "min", threshold = FALSE, bonf = FALSE,
@@ -878,10 +888,12 @@ resample <- function(data, m = NULL, niter = 10, sampMethod = "bootstrap", crite
 #' @seealso \code{\link{resample}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- resample(data)
-#' modSelect(x, data = data, fit = TRUE)
-#' }
+#' res1 <- resample(ggmDat, m = 'M', niter = 10)
+#' mods1 <- modSelect(res1)
+#' fit1 <- fitNetwork(ggmDat, morderators = 'M', type = mods1)
+#'
+#' res2 <- resample(ggmDat, m = 'M', sampMethod = 'stability')
+#' fit2 <- modSelect(res2, data = ggmDat, fit = TRUE, thresh = .7)
 modSelect <- function(obj, data = NULL, fit = FALSE, select = "select",
                       thresh = NULL, ascall = TRUE, type = "gaussian", ...){
   if(is.null(data)){ascall <- FALSE}
@@ -994,13 +1006,19 @@ modSelect <- function(obj, data = NULL, fit = FALSE, select = "select",
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' x <- resample(data)
+#' fit1 <- resample(ggmDat, m = 'M', niter = 10)
 #'
-#' plot(x, 'network')
-#' plot(x, 'bootstrap')
-#' plot(x, 'coefs')
-#' }
+#' net(fit1)
+#' netInts(fit1)
+#'
+#' plot(fit1)
+#' plot(fit1, what = 'coefs')
+#' plot(fit1, what = 'bootstrap', multi = TRUE)
+#' plot(fit1, what = 'pvals', outcome = 2, predictor = 4)
+#'
+#' fit2 <- resample(gvarDat, m = 'M', niter = 10, lags = 1, sampMethod = 'stability')
+#'
+#' plot(fit2, what = 'stability', outcome = 3)
 plot.resample <- function(x, what = 'network', ...){
   args <- tryCatch({list(...)}, error = function(e){list()})
   if(isTRUE(what) | is(what, 'numeric')){

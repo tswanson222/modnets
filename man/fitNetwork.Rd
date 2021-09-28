@@ -189,7 +189,9 @@ particularly via the \code{\link[systemfit:systemfit]{systemfit::systemfit}}
 function.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
-}
+fit1 <- fitNetwork(ggmDat)
+
+fit2 <- fitNetwork(ggmDat, 'M', type = 'varSelect', criterion = 'BIC')
+
+fit3 <- fitNetwork(gvarDat, 'M', lags = 1)
 }

@@ -35,17 +35,14 @@ significant at that threshold. This argument can be utilized whether or not a
 variable selection procedure has been employed.
 }
 \examples{
-\dontrun{
+fit1 <- fitNetwork(ggmDat)
+selected(fit1)
 
-fit1 <- fitNetwork(data)
-selected(fit1, threshold = TRUE)
+fit2 <- mlGVAR(mlgvarDat, m = 'M', verbose = FALSE)
+selected(fit2, threshold = TRUE, mod = 'temporal') # Can also set to 'between'
 
-fit2 <- mlGVAR(data, m = TRUE)
-selected(fit2, threshold = TRUE, mod = 'between')
-
-fit3 <- fitNetwork(data, type = 'varSelect')
+fit3 <- fitNetwork(gvarDat, moderators = 'M', type = 'varSelect', lags = 1)
 selected(fit3)
-}
 }
 \seealso{
 \code{\link{fitNetwork}, \link{mlGVAR}}

@@ -190,13 +190,15 @@ relevant plot will be returned as output instead.
 Creates various types of plot to visualize \code{bootNet} objects.
 }
 \examples{
-\dontrun{
-x <- bootNet(data)
+boot1 <- bootNet(ggmDat, caseDrop = TRUE)
 
-plot(x)
+plot(boot1)
+plotBoot(boot1) # This functions the same as the command above
 
-plot(x, difference = TRUE)
-}
+boot2 <- bootNet(ggmDat)
+
+plot(boot2)
+plot(boot2, difference = TRUE)
 }
 \seealso{
 \code{\link{bootNet}, \link{resample}}

@@ -89,8 +89,9 @@
 #' @seealso \code{\link{compareVAR}, \link{mlGVAR}, \link{mlGVARsim}}
 #'
 #' @examples
-#' \dontrun{
-#' x <- lmerVAR(data)
+#' \donttest{
+#' # The options were chosen so that the function would take less time to run
+#' x <- lmerVAR(mlgvarDat, 'M', temporal = "fixed", contemp = "orthogonal)
 #' }
 lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
                     idvar = "ID", intvars = NULL, center = TRUE, scale = TRUE,
@@ -448,11 +449,11 @@ lmerNets <- function(model, inds, m = NULL, threshold = FALSE,
 #' @seealso \code{\link{lmerVAR}}
 #'
 #' @examples
-#' \dontrun{
-#' x1 <- lmerVAR(data, temporal = "correlated")
-#' x2 <- lmerVAR(data, temporal = "orthogonal")
+#' \donttest{
+#' fit1 <- lmerVAR(mlgvarDat, temporal = "fixed", contemp = "orthogonal")
+#' fit2 <- lmerVAR(mlgvarDat, temporal = "orthogonal", contemp = "orthogonal")
 #'
-#' compareVAR(x1, x2)
+#' compareVAR(fit1, fit2)
 #' }
 compareVAR <- function(m1, m2, m3 = NULL, anova = NULL, type = "tempMods"){
   if(is.null(m3)){

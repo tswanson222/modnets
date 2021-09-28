@@ -101,17 +101,18 @@ Can also be used with output from the \code{\link{resample}} and
 \code{\link{bootNet}} functions.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
+x <- fitNetwork(ggmDat, 'M')
 
 net(x, threshold = .05)
+netInts(x, threshold = TRUE)
 
-y <- mlGVAR(data)
+y <- mlGVAR(mlgvarDat, 'M')
 
 net(y, n = 'beta')
 net(y, n = 'pcc')
 net(y, n = 'between')
-}
+
+netInts(y)
 }
 \seealso{
 \code{\link{fitNetwork}, \link{mlGVAR}, \link{lmerVAR},

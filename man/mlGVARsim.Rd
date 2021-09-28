@@ -168,7 +168,7 @@ simulations or other analyses. Output can be used to fit models with either
 }
 \examples{
 set.seed(1)
-x <- mlGVARsim()
+x <- mlGVARsim(nTime = 50, nPerson = 10, nNode = 3, m = TRUE)
 }
 \seealso{
 \code{\link{mlGVAR}, \link{lmerVAR}, \link{simNet}, \link{plotNet},

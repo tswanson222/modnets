@@ -35,15 +35,13 @@
 #' @seealso \code{\link{fitNetwork}}
 #'
 #' @examples
-#' \dontrun{
-#' out1 <- fitNetwork(data, covariates = 5)
-#' out2 <- fitNetwork(data, moderators = 5)
+#' fit1 <- fitNetwork(ggmDat, covariates = 'M')
+#' fit2 <- fitNetwork(ggmDat, moderators = 'M')
 #'
-#' predictNet(out1)
-#' predictNet(out1, all = TRUE)
+#' predictNet(fit1)
+#' predictNet(fit1, all = TRUE)
 #'
-#' predictNet(out1, out2)
-#' }
+#' predictNet(fit2, fit1) # Find the differences in prediction error across the two models
 predictNet <- function(object, data = NULL, all = FALSE, scale = FALSE){
   # Use predictDelta if there are two networks
   if(is(data, 'ggm') | is(data, 'SURnet')){

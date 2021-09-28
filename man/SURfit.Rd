@@ -92,11 +92,6 @@ If the variable selection results from \code{\link{resample}} are intended to
 be used as input for the \code{varMods} argument, then these results must be
 fed into the \code{\link{modSelect}} function.
 }
-\examples{
-\dontrun{
-SURfit(data)
-}
-}
 \seealso{
 \code{\link{SURnet}, \link{fitNetwork},
   \link[systemfit:systemfit]{systemfit::systemfit}}

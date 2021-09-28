@@ -69,8 +69,9 @@ Absolute Error)} \item{Precision} \item{Accuracy} \item{FDR (False Discovery
 Rate)} }
 }
 \examples{
-\dontrun{
-x <- mnetPowerSim(niter = 100, N = c(100, 200))
+\donttest{
+x <- mnetPowerSim(niter = 10, N = c(100, 200))
+summary(x)
 plot(x)
 }
 }

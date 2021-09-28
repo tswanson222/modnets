@@ -59,11 +59,10 @@ centrality and clustering values can be computed for the matrix of
 interactions within a temporal network.
 }
 \examples{
-\dontrun{
-x <- fitNetwork(data)
+x <- fitNetwork(ggmDat, 'M')
 
-centAuto(x)
-}
+clustAuto(x)
+centAuto(x, 'interactions')
 }
 \seealso{
 \code{\link{centTable}, \link{clustTable}, \link{centPlot},

@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "trevorswanson222@gmail.com")
 Maintainer: Trevor Swanson <trevorswanson222@gmail.com>
-Description: Methods for modeling moderator variables in cross-sectional, temporal, and multi-level networks. Includes model selection techniques and a variety of plotting functions.
+Description: Methods for modeling moderator variables in cross-sectional, temporal, and multi-level networks. Includes model selection techniques and a variety of plotting functions. Implements the methods described by Swanson (2020) <https://www.proquest.com/openview/d151ab6b93ad47e3f0d5e59d7b6fd3d3>.
 License: GPL (>= 3)
 URL: https://github.com/tswanson222/modnets
 BugReports: https://github.com/tswanson222/modnets/issues

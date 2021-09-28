@@ -59,11 +59,6 @@
 #'
 #' @seealso \code{\link{SURnet}, \link{fitNetwork},
 #'   \link[systemfit:systemfit]{systemfit::systemfit}}
-#'
-#' @examples
-#' \dontrun{
-#' SURfit(data)
-#' }
 SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL,
                    type = "g", center = TRUE, scale = FALSE, exogenous = TRUE,
                    covs = NULL, sur = TRUE, consec = NULL, ...){
@@ -121,11 +116,6 @@ SURfit <- function(data, varMods = NULL, mod = "min", maxiter = 100, m = NULL,
 #'
 #' @seealso \code{\link{SURfit}, \link{fitNetwork},
 #'   \link[systemfit:systemfit]{systemfit::systemfit}}
-#'
-#' @examples
-#' \dontrun{
-#' SURnet(fit, dat)
-#' }
 SURnet <- function(fit, dat, s = "sigma", m = NULL, threshold = FALSE,
                    mval = NULL, medges = 1, pcor = "none"){
   y <- dat$Y
