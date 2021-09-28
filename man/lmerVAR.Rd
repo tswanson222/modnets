@@ -18,7 +18,6 @@ lmerVAR(
   exogenous = TRUE,
   covariates = NULL,
   fix = NULL,
-  warnings = FALSE,
   verbose = TRUE,
   beepno = NULL,
   dayno = NULL,
@@ -99,10 +98,6 @@ separately from the dataset.}
 \item{fix}{Character vector to indicate which variables to only create fixed
 effects terms for.}
 
-\item{warnings}{If \code{FALSE}, warnings will not be returned in the console
-during the fitting process. Can be useful when the warnings are repetitive,
-unimportant, and annoying.}
-
 \item{verbose}{Logical. Determines whether to output progress bars and
 messages in the console during the fitting process.}
 
@@ -110,8 +105,8 @@ messages in the console during the fitting process.}
 (if any) encodes the survey number within a single day. Must be used in
 conjunction with \code{dayno} argument.}
 
-\item{dayno}{Character string or numeric value to indicate which variable
-(if any) encodes the survey number within a single day. Must be used in
+\item{dayno}{Character string or numeric value to indicate which variable (if
+any) encodes the survey number within a single day. Must be used in
 conjunction with \code{beepno} argument.}
 
 \item{deleteMissing}{Logical. Determines whether to automatically perform

@@ -69,16 +69,13 @@
 #'   separately from the dataset.
 #' @param fix Character vector to indicate which variables to only create fixed
 #'   effects terms for.
-#' @param warnings If \code{FALSE}, warnings will not be returned in the console
-#'   during the fitting process. Can be useful when the warnings are repetitive,
-#'   unimportant, and annoying.
 #' @param verbose Logical. Determines whether to output progress bars and
 #'   messages in the console during the fitting process.
 #' @param beepno Character string or numeric value to indicate which variable
 #'   (if any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{dayno} argument.
-#' @param dayno Character string or numeric value to indicate which variable
-#'   (if any) encodes the survey number within a single day. Must be used in
+#' @param dayno Character string or numeric value to indicate which variable (if
+#'   any) encodes the survey number within a single day. Must be used in
 #'   conjunction with \code{beepno} argument.
 #' @param deleteMissing Logical. Determines whether to automatically perform
 #'   listwise deletion if there are any missing values in the dataset.
@@ -98,11 +95,11 @@
 lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
                     idvar = "ID", intvars = NULL, center = TRUE, scale = TRUE,
                     centerWithin = TRUE, scaleWithin = FALSE, exogenous = TRUE,
-                    covariates = NULL, fix = NULL, warnings = FALSE, verbose = TRUE,
-                    beepno = NULL, dayno = NULL, deleteMissing = TRUE){
+                    covariates = NULL, fix = NULL, verbose = TRUE, beepno = NULL,
+                    dayno = NULL, deleteMissing = TRUE){
   t1 <- Sys.time()
   #suppressMessages(invisible(c(require(lme4), require(lmerTest))))
-  if(!warnings){oldw <- getOption("warn"); options(warn = -1)}
+  #if(!warnings){oldw <- getOption("warn"); options(warn = -1)}
   mnames <- m
   data <- data.frame(data)
   vars <- colnames(data)
@@ -245,7 +242,7 @@ lmerVAR <- function(data, m = NULL, temporal = "default", contemp = "default",
   class(out) <- c('list', 'lmerVAR')
   attr(out, "time") <- t2 <- Sys.time() - t1
   if(verbose){cat("\n"); print(Sys.time() - t1)}
-  if(!warnings){options(warn = oldw)}
+  #if(!warnings){options(warn = oldw)}
   return(out)
 }
 

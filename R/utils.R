@@ -345,8 +345,8 @@ mmat <- function(fit, m = NULL){
 
 ##### margCIs: retrieve CIs for the effect of Z on the coefficient relating X to Y
 margCIs <- function(mods, data = NULL, modname = NULL, alpha = .05, nsims = 500,
-                    compare = NULL, tTests = FALSE){
-  set.seed(666)
+                    compare = NULL, tTests = FALSE, seed = 666){
+  set.seed(seed)
   if(alpha == FALSE){alpha <- .05}
   if("adjMat" %in% names(mods)){mods <- mods$mods0}
   if(is.null(modname) & "dat" %in% names(mods)){modname <- colnames(mods$dat)[ncol(mods$dat)]}
