@@ -70,9 +70,11 @@ This is differentiated from the output of \code{\link{bootNet}} and
 from model parameters rather than estimated from bootstrapping.
 }
 \examples{
+\donttest{
 x <- fitNetwork(ggmDat)
 plot(x, which.net = 'coefs')
 plotCoefs(x) # This is the same as the above command
+}
 }
 \seealso{
 \code{\link{fitNetwork}, \link{resample}, \link{getFitCIs},

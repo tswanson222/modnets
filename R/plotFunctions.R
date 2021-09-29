@@ -1258,9 +1258,11 @@ plotStability <- function(x, outcome = 1, s = c('simult', 'split1', 'split2'),
 #'   \link{plot.resample}, \link{plotNet}}
 #'
 #' @examples
+#' \donttest{
 #' x <- fitNetwork(ggmDat)
 #' plot(x, which.net = 'coefs')
 #' plotCoefs(x) # This is the same as the above command
+#' }
 plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
                       flip = TRUE, data = NULL, select = TRUE, size = 1,
                       labels = TRUE, title = NULL, vars = 'all'){

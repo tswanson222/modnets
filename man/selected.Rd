@@ -35,16 +35,16 @@ significant at that threshold. This argument can be utilized whether or not a
 variable selection procedure has been employed.
 }
 \examples{
+\donttest{
 fit1 <- fitNetwork(ggmDat)
 selected(fit1)
 
-\donttest{
 fit2 <- mlGVAR(mlgvarDat, m = 'M', verbose = FALSE)
 selected(fit2, threshold = TRUE, mod = 'temporal') # Can also set to 'between'
-}
 
 fit3 <- fitNetwork(gvarDat, moderators = 'M', type = 'varSelect', lags = 1)
 selected(fit3)
+}
 }
 \seealso{
 \code{\link{fitNetwork}, \link{mlGVAR}}
