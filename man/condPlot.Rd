@@ -78,9 +78,11 @@ Creates a plot of the relationships between two variables at different levels
 of the moderator. Only works for relationships that include an interaction.
 }
 \examples{
+\donttest{
 fit <- fitNetwork(ggmDat, 'M')
 condPlot(fit, to = 'V5', from = 'V4')
 condPlot(fit, to = 2, from = 3, avg = TRUE)
+}
 }
 \seealso{
 \code{\link{fitNetwork}, \link{resample}}

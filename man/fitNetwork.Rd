@@ -191,7 +191,9 @@ function.
 \examples{
 fit1 <- fitNetwork(ggmDat)
 
+\donttest{
 fit2 <- fitNetwork(ggmDat, 'M', type = 'varSelect', criterion = 'BIC')
+}
 
 fit3 <- fitNetwork(gvarDat, 'M', lags = 1)
 }

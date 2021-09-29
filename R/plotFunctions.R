@@ -1430,9 +1430,11 @@ plotCoefs <- function(fit, true = FALSE, alpha = .05, plot = TRUE, col = "blue",
 #' @seealso \code{\link{fitNetwork}, \link{resample}}
 #'
 #' @examples
+#' \donttest{
 #' fit <- fitNetwork(ggmDat, 'M')
 #' condPlot(fit, to = 'V5', from = 'V4')
 #' condPlot(fit, to = 2, from = 3, avg = TRUE)
+#' }
 condPlot <- function(out, to, from, swap = FALSE, avg = FALSE, compare = NULL,
                      hist = FALSE, xlab = NULL, mods = NULL, nsims = 500,
                      xn = NULL, getCIs = FALSE, discrete = FALSE,

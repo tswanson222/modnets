@@ -103,6 +103,7 @@
 #'   \link[leaps:regsubsets]{leaps::regsubsets}}
 #'
 #' @examples
+#' \donttest{
 #' vars1 <- varSelect(ggmDat, criterion = 'BIC', method = 'subset')
 #' fit1 <- fitNetwork(ggmDat, type = vars1)
 #'
@@ -112,6 +113,7 @@
 #' # Add a moderator
 #' vars3 <- varSelect(ggmDat, m = 'M', criterion = 'EBIC', gamma = .5)
 #' fit3 <- fitNetwork(ggmDat, moderators = 'M', type = vars3)
+#' }
 varSelect <- function(data, m = NULL, criterion = "AIC", method = "glmnet",
                       lags = NULL, exogenous = TRUE, type = "g", center = TRUE,
                       scale = FALSE, gamma = .5, nfolds = 10, varSeed = NULL,
