@@ -93,7 +93,7 @@ library(modnets)
 ### ================================================ ###
 # Can simulate data with no moderators, or with one exogenous moderator
 set.seed(123)
-x <- simNet(N = 500, p = 5, m = TRUE, m1 = .5, m2 = .2, nCores = TRUE)
+x <- simNet(N = 500, p = 5, m = TRUE, m1 = .5, m2 = .2)
 
 str(x)
 

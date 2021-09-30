@@ -800,7 +800,7 @@ mlGVARsim <- function(nTime = 50, nPerson = 10, nNode = 3, m = NULL, m2 = .25, m
 
 ##### simCor: simulate correlation matrix
 simCor <- function(x, sparsity = .5, maxiter = 100, ...){
-  ow <- getOption("warn"); options(warn = 2)
+  #ow <- getOption("warn"); options(warn = 2)
   try <- 0
   while(try < maxiter){
     out <- tryCatch({
@@ -809,7 +809,7 @@ simCor <- function(x, sparsity = .5, maxiter = 100, ...){
     if(!isTRUE(out)){break}
     try <- try + 1
   }
-  options(warn = ow)
+  #options(warn = ow)
   if(try == maxiter){stop("Estimate failed to converge")}
   return(out)
 }

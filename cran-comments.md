@@ -5,6 +5,9 @@ This is a resubmission. The following changes have been made:
 * Removed all instances of `\dontrun`, and updated examples for all functions.
 * Added `\donttest` to all components of examples that take longer than 5s to run.
 * Edited Description line of DESCRIPTION to include a link to the published article that describes the methods in this package.
+* In the internal `simCor` function, the call to `options(warn = 2)` has been removed.
+* In the README, the `nCores` argument of the `simNet` function has been removed, such that only a single core is used for simulating data.
+
 
 ## Test environments
 * ubuntu 21.04, R 4.1.1
