@@ -4,7 +4,7 @@
 #'the \code{bfi} data in the \code{psychTools} package.
 #'
 #'@format A data frame with six variables representing composite scores
-#'  forparticipants across the Big 5 personality dimensions as well as gender.
+#'  for participants across the Big 5 personality dimensions as well as gender.
 #'  \code{A} is Agreeableness, \code{C} is conscientiousness, \code{E} is
 #'  extraversion, \code{N} is neuroticism, and \code{O} is openness to
 #'  experience. For a given participant, each value represents the mean of 5

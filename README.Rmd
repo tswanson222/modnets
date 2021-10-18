@@ -38,9 +38,13 @@ Additionally, model selection techniques based on penalized regression and itera
 
 ## Installation
 
-You can install the development version of modnets from [GitHub](https://github.com/tswanson222/modnets) with:
+You can install the released version of the package from [CRAN](https://CRAN.R-project.org), or the development version from [GitHub](https://github.com/tswanson222/modnets) with:
 
 ```{r, eval = FALSE}
+# Install the package from CRAN
+install.packages('modnets')
+
+# Or install the development version from GitHub
 # install.packages('devtools')
 devtools::install_github('tswanson222/modnets')
 ```
