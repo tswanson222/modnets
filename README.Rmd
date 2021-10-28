@@ -38,7 +38,7 @@ Additionally, model selection techniques based on penalized regression and itera
 
 ## Installation
 
-You can install the released version of the package from [CRAN](https://CRAN.R-project.org), or the development version from [GitHub](https://github.com/tswanson222/modnets) with:
+You can install the released version of the package from [CRAN](https://cran.r-project.org/web/packages/modnets/index.html), or the development version from [GitHub](https://github.com/tswanson222/modnets) with:
 
 ```{r, eval = FALSE}
 # Install the package from CRAN
